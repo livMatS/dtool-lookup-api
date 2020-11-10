@@ -34,16 +34,6 @@ jobs:
         pip install --upgrade setuptools wheel setuptools-scm[toml] importlib-metadata
         pip install flake8 pytest pytest-cov
 
-    - name: Provide dtool lookup server ${{ matrix.dtool-lookup-server-version }}
-      run: |
-        pip install PyYAML
-        pip install git+https://github.com/containers/podman-compose.git@devel
-        git clone --depth 1 --branch "dls-v${{ matrix.dtool-lookup-server-version }}" \
-            https://github.com/jotelha/dtool-lookup-server-container-composition.git \
-            .dtool-lookup-server-container-composition
-        cd .dtool-lookup-server-container-composition/keys && bash generate.sh && bash generate_jwt_key.sh && cd ../..
-        cd .dtool-lookup-server-container-composition && podman-compose build && podman image ls && cd ..
-
     - name: Install this package
       run: |
         if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
@@ -59,6 +49,23 @@ jobs:
 
     - name: Provide dtool lookup server ${{ matrix.dtool-lookup-server-version }} and test with pytest
       run: |
-        cd .dtool-lookup-server-container-composition && podman-compose up -d && podman-compose ps && cd ..
+        pip install PyYAML
+        pip install git+https://github.com/containers/podman-compose.git@devel
+        git clone --depth 1 --branch "dls-v${{ matrix.dtool-lookup-server-version }}" \
+            https://github.com/jotelha/dtool-lookup-server-container-composition.git \
+            .dtool-lookup-server-container-composition
+
+        cd .dtool-lookup-server-container-composition/keys
+        bash generate.sh
+        bash generate_jwt_key.sh
+        cd ../..
+
+        cd .dtool-lookup-server-container-composition
+        podman-compose build
+        podman image ls
+        podman-compose up -d
+        podman-compose ps
+        cd ..
+
         sleep 3
         pytest --log-level DEBUG
