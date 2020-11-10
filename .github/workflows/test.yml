@@ -42,7 +42,7 @@ jobs:
             https://github.com/jotelha/dtool-lookup-server-container-composition.git \
             .dtool-lookup-server-container-composition
         cd .dtool-lookup-server-container-composition/keys && bash generate.sh && bash generate_jwt_key.sh && cd ../..
-        cd .. && podman-compose build && podman image ls && cd ..
+        cd .dtool-lookup-server-container-composition && podman-compose build && podman image ls && cd ..
 
     - name: Install this package
       run: |
