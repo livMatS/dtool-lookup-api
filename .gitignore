@@ -1,0 +1,13 @@
+dtool_lookup_api/version.py
+
+*.pyc
+*.swp
+*.egg-info
+
+dist
+.coverage
+.eggs
+.tox
+.cache
+.pytest_cache
+env

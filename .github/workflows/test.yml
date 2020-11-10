@@ -1,0 +1,59 @@
+name: test
+
+on: [push]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: [3.6, 3.7, 3.8]
+        dtool-lookup-server-version: [0.15.0]
+
+    steps:
+    - name: Git checkout
+      uses: actions/checkout@v2
+
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python-version }}
+
+    - name: Install podman
+      run: |
+        source /etc/os-release
+        echo "deb https://download.opensuse.org/repositories/devel:/kubic:/libcontainers:/stable/xUbuntu_${VERSION_ID}/ /" | sudo tee /etc/apt/sources.list.d/devel:kubic:libcontainers:stable.list
+        curl -L https://download.opensuse.org/repositories/devel:/kubic:/libcontainers:/stable/xUbuntu_${VERSION_ID}/Release.key | sudo apt-key add -
+        sudo apt-get update
+        sudo apt-get -y install podman
+
+    - name: Install basic testing requirements
+      run: |
+        python -m pip install --upgrade pip
+        pip install --upgrade setuptools wheel setuptools-scm[toml] importlib-metadata
+        pip install flake8 pytest
+
+    - name: Install this package
+      run: |
+        if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+        pip install ".[testing]"
+        pip list
+
+    - name: Lint with flake8
+      run: |
+        # stop the build if there are Python syntax errors or undefined names
+        flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
+        # exit-zero treats all errors as warnings. The GitHub editor is 127 chars wide
+        flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
+
+    - name: Provide dtool lookup server ${{ matrix.dtool-lookup-server-version }}
+      run: |
+        pip install git+https://github.com/containers/podman-compose.git@devel
+        git clone https://github.com/jotelha/dtool-lookup-server-container-composition.git@dls-v${{ matrix.dtool-lookup-server-version }}
+        cd dtool-lookup-server-container-composition/keys && bash generate.sh && bash generate_jwt_key.sh
+        cd .. && podman-compose build && podman-compose up -d && cd ..
+
+    - name: Test with pytest
+      run: |
+        pytest --log-level DEBUG -rA
