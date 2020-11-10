@@ -3,7 +3,7 @@ import os
 from setuptools import setup
 from setuptools_scm import get_version
 
-URL = "https://github.com/IMTEK-Simulation/dtool-lookup-api"
+url = "https://github.com/IMTEK-Simulation/dtool-lookup-api"
 readme = open('README.rst').read()
 version = get_version(root='.', relative_to=__file__)
 
@@ -29,7 +29,7 @@ setup(
         "relative_to": __file__,
         "write_to": os.path.join("dtool_lookup_api", "version.py"),
         "local_scheme": local_scheme},
-    url=URL,
+    url=url,
     setup_requires=['setuptools_scm'],
     tests_require=['pytest', 'pytest-cov'],
     install_requires=[
