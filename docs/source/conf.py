@@ -45,10 +45,10 @@ source_suffix = '.rst'
 master_doc = 'index'
 
 # General information about the project.
-project = u"dtool_lookup_client"
-copyright = u"2018, Tjelvar Olsson"
-author = u"Tjelvar Olsson"
-repo_name = u"dtool_lookup_client"
+project = u"dtool_lookup_api"
+copyright = u"2020, IMTEK Simulation"
+author = u"Johannes Laurin Hoermann"
+repo_name = u"dtool_lookup_api"
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
@@ -161,6 +161,6 @@ man_pages = [
 #  dir menu entry, description, category)
 texinfo_documents = [
     (master_doc, repo_name, u'{} Documentation'.format(repo_name),
-     author, repo_name, u'Dtool plugin for interacting with dtool lookup server',
+     author, repo_name, u'Python API for interacting with dtool lookup server',
      'Miscellaneous'),
 ]

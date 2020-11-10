@@ -9,4 +9,5 @@ Content
 
    README
    CHANGELOG
+   CONTRIBUTORS
    LICENSE
