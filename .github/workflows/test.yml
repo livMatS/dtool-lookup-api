@@ -51,7 +51,7 @@ jobs:
       run: |
         pip install PyYAML
         pip install git+https://github.com/containers/podman-compose.git@devel
-        git clone https://github.com/jotelha/dtool-lookup-server-container-composition.git@dls-v${{ matrix.dtool-lookup-server-version }}
+        git clone --depth 1 --branch "dls-v${{ matrix.dtool-lookup-server-version }}" https://github.com/jotelha/dtool-lookup-server-container-composition.git
         cd dtool-lookup-server-container-composition/keys && bash generate.sh && bash generate_jwt_key.sh
         cd .. && podman-compose build && podman-compose up -d && cd ..
 
