@@ -15,6 +15,7 @@ DTOOL_LOOKUP_SERVER_VERIFY_SSL_KEY = "DTOOL_LOOKUP_SERVER_VERIFY_SSL"
 AFFIRMATIVE_EXPRESSIONS = ['true', '1', 'y', 'yes', 'on']
 NEGATIVE_EXPRESSIONS = ['false', '0', 'n', 'no', 'off']
 
+logger = logging.getLogger(__name__)
 
 class Config(object):
     """Connect to dtool lookup server session."""
@@ -22,19 +23,19 @@ class Config(object):
     # required
     lookup_url = dtoolcore.utils.get_config_value(DTOOL_LOOKUP_SERVER_URL_KEY)
     if lookup_url is None:
-        raise RuntimeError('Please provide {}'.format(DTOOL_LOOKUP_SERVER_URL_KEY))
+        logger.warning('Please provide {}'.format(DTOOL_LOOKUP_SERVER_URL_KEY))
 
     auth_url = dtoolcore.utils.get_config_value(DTOOL_LOOKUP_SERVER_TOKEN_KEY)
     if auth_url is None:
-        raise RuntimeError('Please provide {}'.format(DTOOL_LOOKUP_SERVER_TOKEN_KEY))
+        logger.warning('Please provide {}'.format(DTOOL_LOOKUP_SERVER_TOKEN_KEY))
 
     username = dtoolcore.utils.get_config_value(DTOOL_LOOKUP_SERVER_USERNAME_KEY)
     if username is None:
-        raise RuntimeError('Please provide {}'.format(DTOOL_LOOKUP_SERVER_USERNAME_KEY))
+        logger.warning('Please provide {}'.format(DTOOL_LOOKUP_SERVER_USERNAME_KEY))
 
     password = dtoolcore.utils.get_config_value(DTOOL_LOOKUP_SERVER_PASSWORD_KEY)
     if username is None:
-        raise RuntimeError('Please provide {}'.format(DTOOL_LOOKUP_SERVER_PASSWORD_KEY))
+        logger.warning('Please provide {}'.format(DTOOL_LOOKUP_SERVER_PASSWORD_KEY))
 
     # optional
     verify_ssl = dtoolcore.utils.get_config_value(DTOOL_LOOKUP_SERVER_VERIFY_SSL_KEY)
@@ -44,6 +45,5 @@ class Config(object):
         verify_ssl = True
 
 
-logger = logging.getLogger(__name__)
 for attr in ('lookup_url', 'auth_url', 'username', 'verify_ssl'):
     logger.debug("dtool config %s: %s" % (attr, getattr(Config, attr, None)))
