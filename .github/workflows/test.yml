@@ -49,6 +49,7 @@ jobs:
 
     - name: Provide dtool lookup server ${{ matrix.dtool-lookup-server-version }}
       run: |
+        pip install PyYAML
         pip install git+https://github.com/containers/podman-compose.git@devel
         git clone https://github.com/jotelha/dtool-lookup-server-container-composition.git@dls-v${{ matrix.dtool-lookup-server-version }}
         cd dtool-lookup-server-container-composition/keys && bash generate.sh && bash generate_jwt_key.sh
