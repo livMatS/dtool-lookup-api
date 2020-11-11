@@ -53,14 +53,14 @@ jobs:
         pip install git+https://github.com/containers/podman-compose.git@devel
         git clone --depth 1 --branch "dls-v${{ matrix.dtool-lookup-server-version }}" \
             https://github.com/jotelha/dtool-lookup-server-container-composition.git \
-            .dtool-lookup-server-container-composition
+            dtool-lookup-server-container-composition
+            cd dtool-lookup-server-container-composition/keys
 
-        cd .dtool-lookup-server-container-composition/keys
         bash generate.sh
         bash generate_jwt_key.sh
         cd ../..
 
-        cd .dtool-lookup-server-container-composition
+        cd dtool-lookup-server-container-composition
         podman-compose build
         podman image ls
         podman-compose up -d
@@ -68,4 +68,4 @@ jobs:
         cd ..
 
         sleep 3
-        pytest --log-level DEBUG
+        pytest --log-level DEBUG --deselect=dtool-lookup-server-container-composition
