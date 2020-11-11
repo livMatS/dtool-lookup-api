@@ -71,6 +71,10 @@ EXPECTED_DEFAULT_LOOKUP_RESPONSE_IMMUTABLE_MARKER[0].update(
 
 # manifest
 
+# interestingly, different machines returned different time stamps here
+# for the same dataset:
+# Comparing '1605054830.454785' == '1605027357.284966' -> False
+# might that time stamp depend on the actual file creation time on disk?
 DEFAULT_MANIFEST_URI = 'smb://test-share/1a1f9fad-8589-413e-9602-5bbd66bfe675'
 EXPECTED_DEFAULT_MANIFEST_RESPONSE = {
     "dtoolcore_version": "3.17.0",
@@ -88,6 +92,11 @@ EXPECTED_DEFAULT_MANIFEST_RESPONSE_IMMUTABLE_MARKER = _make_marker(EXPECTED_DEFA
 EXPECTED_DEFAULT_MANIFEST_RESPONSE_IMMUTABLE_MARKER.update(
     {
         "dtoolcore_version": False,
+    }
+)
+EXPECTED_DEFAULT_MANIFEST_RESPONSE_IMMUTABLE_MARKER["items"]["eb58eb70ebcddf630feeea28834f5256c207edfd"].update(
+    {
+        "utc_timestamp": False,
     }
 )
 
