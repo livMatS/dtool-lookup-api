@@ -22,16 +22,86 @@ The API needs to know the URL of the lookup server::
 
     export DTOOL_LOOKUP_SERVER_URL=http://localhost:5000
 
-You also need to specify the access token::
+You may also need specify an access token generated on the server::
 
     export DTOOL_LOOKUP_SERVER_TOKEN=$(flask user token testuser)
 
+
+Instead of specifying the access token directly, it is also possible to provide::
+
+    export DTOOL_LOOKUP_SERVER_TOKEN_GENERATOR_URL=http://localhost:5001
+    export DTOOL_LOOKUP_SERVER_USERNAME=my-username
+    export DTOOL_LOOKUP_SERVER_PASSWORD=my-password
+
+for the API to request a token. This, however, is intended only for testing
+purposes and strongly discouraged in a production environment, as your password
+would reside within environment variables or the dtool config file as clear text.
+
+Our recommended setup is a combination of::
+
+    export DTOOL_LOOKUP_SERVER_URL=http://localhost:5000
+    export DTOOL_LOOKUP_SERVER_TOKEN_GENERATOR_URL=http://localhost:5001
+
+in the config. If used interactively, the API will then ask for your
+credentials at the first interaction and cache the provided values for this
+session, i.e.::
+
+    In [1]: from dtool_lookup_api import query
+       ...: res = query(
+       ...:     {
+       ...:         'readme.owners.name': {'$regex': '^Testing User$'},
+       ...:     }
+       ...: )
+    Authentication URL http://localhost:5001/token username:my-username
+    Authentication URL http://localhost:5001/token password:
+
+    In [2]: res
+    Out[2]:
+    [{'base_uri': 'smb://test-share',
+      'created_at': 'Sun, 08 Nov 2020 18:38:40 GMT',
+      'creator_username': 'jotelha',
+      'dtoolcore_version': '3.17.0',
+      'frozen_at': 'Wed, 11 Nov 2020 17:20:30 GMT',
+      'name': 'simple_test_dataset',
+      'tags': [],
+      'type': 'dataset',
+      'uri': 'smb://test-share/1a1f9fad-8589-413e-9602-5bbd66bfe675',
+      'uuid': '1a1f9fad-8589-413e-9602-5bbd66bfe675'}]
+
+    In [3]: from dtool_lookup_api import all
+       ...: all()
+    Out[4]:
+    [{'base_uri': 'smb://test-share',
+      'created_at': 1604860720.736269,
+      'creator_username': 'jotelha',
+      'frozen_at': 1604921621.719575,
+      'name': 'simple_test_dataset',
+      'uri': 'smb://test-share/1a1f9fad-8589-413e-9602-5bbd66bfe675',
+      'uuid': '1a1f9fad-8589-413e-9602-5bbd66bfe675'}]
+
+Credentials caching and interactive prompting are turned off with::
+
+  In [1]: import dtool_lookup_api.core.config
+     ...: dtool_lookup_api.core.config.Config.interactive = False
+     ...: dtool_lookup_api.core.config.Config.cache = False
+
+  In [2]: from dtool_lookup_api import all
+     ...: all()
+  ...
+  RuntimeError: Authentication failed
 
 For testing purposes, it is possible to disable SSL certificates validation with::
 
     export DTOOL_LOOKUP_SERVER_VERIFY_SSL=false
 
-As usual, these settings may be specified within the default dtool configuration file as well.
+As usual, these settings may be specified within the default dtool configuration
+file as well, i.e. at ``~/.config/dtool/dtool.json``::
+
+    {
+        "DTOOL_LOOKUP_SERVER_TOKEN_GENERATOR_URL": "http://localhost:5001/token",
+        "DTOOL_LOOKUP_SERVER_URL": "https://localhost:5000"
+    }
+
 
 List all datasets
 -----------------

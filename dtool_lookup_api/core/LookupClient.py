@@ -30,66 +30,66 @@ import logging
 
 import aiohttp
 
-
-# TODO: implement writing token to config file as within dtool_lookup_client's
-# def token(dtool_lookup_server_token):
-#     """Display / set / update token for dtool lookup server."""
-#     if dtool_lookup_server_token is None:
-#         click.secho(dtoolcore.utils.get_config_value_from_file(
-#             DTOOL_LOOKUP_SERVER_TOKEN_KEY, default=""
-#         ))
-#     else:
-#         click.secho(dtoolcore.utils.write_config_value_to_file(
-#             DTOOL_LOOKUP_SERVER_TOKEN_KEY,
-#             dtool_lookup_server_token
-#         ))
+from .config import Config
 
 
-class LookupClient:
+async def authenticate(auth_url, username, password, verify_ssl=True):
+    """Authenticate against token generator and return received token."""
+    # async with aiohttp.ClientSession() as session:
+    async with aiohttp.ClientSession() as session, session.post(
+            auth_url,
+            json={
+                'username': username,
+                'password': password
+            }, verify_ssl=verify_ssl) as r:
+        if r.status == 200:
+            json = await r.json()
+            if 'token' not in json:
+                raise RuntimeError('Authentication failed')
+            else:
+                return json['token']
+        else:
+            raise RuntimeError(f'Error {r.status} retrieving data from '
+                               f'authentication server.')
+
+
+class TokenBasedLookupClient:
     """Core Python interface for communication with dtool lookup server."""
-    def __init__(self, lookup_url, auth_url, username, password, verify_ssl=True):
+    def __init__(self, lookup_url, token=None, verify_ssl=True):
+        logger = logging.getLogger(__name__)
+
         self.session = aiohttp.ClientSession()
         self.lookup_url = lookup_url
-        self.auth_url = auth_url
-        self.username = username
-        self.password = password
         self.verify_ssl = verify_ssl
+        self.token = token
+
+        logger.debug("%s initialized with lookup_url=%s, verify_ssl=%s",
+                     type(self).__name__, self.lookup_url, self.verify_ssl)
 
     async def __aenter__(self):
         logger = logging.getLogger(__name__)
         await self.connect()
-        logger.debug("Connection to %s established." % self.lookup_url)
+        logger.debug("Connection to %s established.", self.lookup_url)
         return self
 
     async def __aexit__(self, exc_type, exc_value, traceback):
         logger = logging.getLogger(__name__)
         await self.session.close()
-        logger.debug("Connection to %s closed." % self.lookup_url)
+        logger.debug("Connection to %s closed.", self.lookup_url)
 
     async def connect(self):
-        """Establisch connection."""
-        await self._authenticate(self.username, self.password)
-
-    async def _authenticate(self, username, password):
+        """Establish connection."""
         logger = logging.getLogger(__name__)
-        async with self.session.post(
-                self.auth_url,
-                json={
-                    'username': username,
-                    'password': password
-                }, verify_ssl=self.verify_ssl) as r:
-            if r.status == 200:
-                json = await r.json()
-                if 'token' not in json:
-                    raise RuntimeError('Authentication failed')
-                else:
-                    self.token = json['token']
-                    self.header = {'Authorization': f'Bearer {self.token}'}
 
-                logger.debug("Authentication succeeded.")
-            else:
-                raise RuntimeError(f'Error {r.status} retrieving data from '
-                                   f'authentication server.')
+        if self.token is None or self.token == "":
+            raise ValueError(
+                "Provide JWT token.")
+
+        logger.debug("Connect to %s, verify_ssl=%s", self.lookup_url, self.verify_ssl)
+
+    @property
+    def header(self):
+        return {'Authorization': f'Bearer {self.token}'}
 
     async def all(self):
         """List all registered datasets."""
@@ -188,3 +188,113 @@ class LookupClient:
                 verify_ssl=self.verify_ssl) as r:
             text = await r.text()
             return yaml.safe_load(text)
+
+
+class CredentialsBasedLookupClient(TokenBasedLookupClient):
+    """Request new token for every session based on user credentials."""
+    def __init__(self, lookup_url, auth_url, username, password,
+                 verify_ssl=True):
+        logger = logging.getLogger(__name__)
+        self.auth_url = auth_url
+        self.username = username
+        self.password = password
+
+        super().__init__(lookup_url=lookup_url, verify_ssl=verify_ssl)
+        logger.debug("%s initialized with lookup_url=%s, auth_url=%s, username=%s, verify_ssl=%s",
+                     type(self).__name__, self.lookup_url, self.auth_url, self.username, self.verify_ssl)
+
+    async def connect(self):
+        """Establish connection."""
+        logger = logging.getLogger(__name__)
+        logger.debug("Connect to lookup_url=%s, auth_url=%s, username=%s, verify_ssl=%s",
+                     self.lookup_url, self.auth_url, self.username, self.verify_ssl)
+
+        self.token = await authenticate(
+            auth_url=self.auth_url,
+            username=self.username,
+            password=self.password,
+            verify_ssl=self.verify_ssl)
+
+        await super().connect()
+
+class ConfigurationBasedLookupClient(CredentialsBasedLookupClient):
+    """Use configured token if available and valid or reuest new token with credentials if provided."""
+
+    # This class is intended on looking up any possibly configured token
+    # and reuse that before requesting a new one (if any credentials are provided
+    def __init__(self,
+                 lookup_url=None,
+                 auth_url=None,
+                 username=None,
+                 password=None,
+                 verify_ssl=None,
+                 cache_token=True):
+        logger = logging.getLogger(__name__)
+        # In order to avoid unwanted side effects, it is necessry to assign defaults as below
+
+        if lookup_url is None:
+            lookup_url = Config.lookup_url
+        if auth_url is None:
+            auth_url = Config.auth_url
+        if username is None:
+            username = Config.username
+        if password is None:
+            password = Config.password
+        if verify_ssl is None:
+            verify_ssl = Config.verify_ssl
+
+        logger.debug("Initializing % swith lookup_url=%s, auth_url=%s, username=%s, verify_ssl=%s, cache_token=%s",
+                     type(self).__name__, lookup_url, auth_url, username, verify_ssl, cache_token)
+
+        self.cache_token = cache_token
+
+        super().__init__(
+            lookup_url=lookup_url,
+            auth_url=auth_url,
+            username=username,
+            password=password,
+            verify_ssl=verify_ssl)
+
+        self.token = Config.token
+        logger.debug("%s initialized with lookup_url=%s, auth_url=%s, username=%s, verify_ssl=%s, cache_token=%s",
+                     type(self).__name__, self.lookup_url, self.auth_url,
+                     self.username, self.verify_ssl, self.cache_token)
+
+    async def connect(self):
+        """Establish connection."""
+        logger = logging.getLogger(__name__)
+        if self.token is None or self.token == "":
+            self.token = Config.token
+
+        if await self.has_valid_token():
+            logger.debug("Reusing provided token.")
+            await TokenBasedLookupClient.connect(self)
+        else:
+            logger.debug("Requesting new token.")
+            await CredentialsBasedLookupClient.connect(self)
+
+        if self.cache_token:
+            logger.debug("Caching token.")
+            Config.token = self.token
+
+    # TODO: Replace with something more elegant.
+    async def has_valid_token(self):
+        """Determine whether token still valid."""
+        logger = logging.getLogger(__name__)
+        if self.token is None or self.token == "":
+            logger.debug("Token empty.")
+            return False
+        else:
+            logger.debug("Testing token validity via /config/info route.")
+            async with self.session.get(
+                    f'{self.lookup_url}/config/info',
+                    headers=self.header,
+                    verify_ssl=self.verify_ssl) as r:
+                status_code = r.status
+                text = await r.text()
+            logger.debug("Server answered with %s: %s.", status_code, yaml.safe_load(text))
+            return status_code == 200
+
+
+class LookupClient(CredentialsBasedLookupClient):
+    """Deprecated, for compatibility reasons only."""
