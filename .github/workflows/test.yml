@@ -67,5 +67,8 @@ jobs:
         podman-compose ps
         cd ..
 
-        sleep 3
+        sleep 30
+        podman run -it --pod dtool-lookup-server-container-composition localhost/production_dtool_lookup_client dtool ls smb://test-share
+
+        sleep 10
         pytest --log-level DEBUG --deselect=dtool-lookup-server-container-composition
