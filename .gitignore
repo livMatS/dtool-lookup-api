@@ -1,4 +1,5 @@
 dtool_lookup_api/version.py
+build
 
 *.pyc
 *.swp
