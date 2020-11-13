@@ -61,7 +61,7 @@ in the config. If used interactively, the API will then ask for your
 credentials at the first interaction and cache the provided values for this
 session, i.e.
 
-.. code-block:: ipython
+.. code-block::
 
     In [1]: from dtool_lookup_api import query
        ...: res = query(
@@ -98,7 +98,7 @@ session, i.e.
 
 Credentials caching and interactive prompting are turned off with
 
-.. code-block:: ipython
+.. code-block::
 
   In [1]: import dtool_lookup_api.core.config
      ...: dtool_lookup_api.core.config.Config.interactive = False
@@ -131,7 +131,7 @@ List all datasets
 
 To list all registered datasets
 
-.. code-block:: ipython
+.. code-block::
 
     In [1]: from dtool_lookup_api import all
        ...: res = all()
@@ -153,7 +153,7 @@ Looking up datasets by UUID
 
 To lookup URIs from a dataset UUID within Python
 
-.. code-block:: ipython
+.. code-block::
 
     In [1]: from dtool_lookup_api import lookup
        ...: uuid = "1a1f9fad-8589-413e-9602-5bbd66bfe675"
@@ -175,7 +175,7 @@ Full text searching
 
 Full text search for the word "test"
 
-.. code-block:: ipython
+.. code-block::
 
     In [1]: from dtool_lookup_api import search
         ...: res = search("test")
@@ -199,7 +199,7 @@ Manifest
 
 Request the manifest of a particular dataset by URI
 
-.. code-block:: ipython
+.. code-block::
 
     In [1]: from dtool_lookup_api import manifest
        ...: uri = 'smb://test-share/1a1f9fad-8589-413e-9602-5bbd66bfe675'
@@ -220,7 +220,7 @@ Readme
 
 Request the readme cotent of a particular dataset by URI
 
-.. code-block:: ipython
+.. code-block::
 
     In [1]: from dtool_lookup_api import readme
         ..: res = readme('smb://test-share/1a1f9fad-8589-413e-9602-5bbd66bfe675')
@@ -247,7 +247,7 @@ Direct mongo language queries
 To list all datasets at a certain base URI with their name matching some regular
 expression pattern, send a direct mongo language query to the server with
 
-.. code-block:: ipython
+.. code-block::
 
     In [15]: from dtool_lookup_api import query
         ...: res = query(
@@ -273,7 +273,7 @@ expression pattern, send a direct mongo language query to the server with
 
 It is possible to search readme content via
 
-.. code-block:: ipython
+.. code-block::
 
     In [21]: from dtool_lookup_api import query
         ...: res = query(
