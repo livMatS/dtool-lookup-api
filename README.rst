@@ -25,20 +25,20 @@ This package depends on a `dtool-lookup-server
 Configuration
 -------------
 
-The API needs to know the URL of the lookup server::
+The API needs to know the URL of the lookup server
 
 .. code-block:: bash
 
     export DTOOL_LOOKUP_SERVER_URL=http://localhost:5000
 
-You may also need specify an access token generated on the server::
+You may also need specify an access token generated on the server
 
 .. code-block:: bash
 
     export DTOOL_LOOKUP_SERVER_TOKEN=$(flask user token testuser)
 
 
-Instead of specifying the access token directly, it is also possible to provide::
+Instead of specifying the access token directly, it is also possible to provide
 
 .. code-block:: bash
 
@@ -50,7 +50,7 @@ for the API to request a token. This, however, is intended only for testing
 purposes and strongly discouraged in a production environment, as your password
 would reside within environment variables or the dtool config file as clear text.
 
-Our recommended setup is a combination of::
+Our recommended setup is a combination of
 
 .. code-block:: bash
 
@@ -59,7 +59,7 @@ Our recommended setup is a combination of::
 
 in the config. If used interactively, the API will then ask for your
 credentials at the first interaction and cache the provided values for this
-session, i.e.::
+session, i.e.
 
 .. code-block:: ipython
 
@@ -96,7 +96,7 @@ session, i.e.::
       'uri': 'smb://test-share/1a1f9fad-8589-413e-9602-5bbd66bfe675',
       'uuid': '1a1f9fad-8589-413e-9602-5bbd66bfe675'}]
 
-Credentials caching and interactive prompting are turned off with::
+Credentials caching and interactive prompting are turned off with
 
 .. code-block:: ipython
 
@@ -109,14 +109,14 @@ Credentials caching and interactive prompting are turned off with::
   ...
   RuntimeError: Authentication failed
 
-For testing purposes, it is possible to disable SSL certificates validation with::
+For testing purposes, it is possible to disable SSL certificates validation with
 
 .. code-block:: bash
 
     export DTOOL_LOOKUP_SERVER_VERIFY_SSL=false
 
 As usual, these settings may be specified within the default dtool configuration
-file as well, i.e. at ``~/.config/dtool/dtool.json``::
+file as well, i.e. at ``~/.config/dtool/dtool.json``
 
 .. code-block:: bash
 
@@ -129,7 +129,7 @@ file as well, i.e. at ``~/.config/dtool/dtool.json``::
 List all datasets
 -----------------
 
-To list all registered datasets::
+To list all registered datasets
 
 .. code-block:: ipython
 
@@ -151,7 +151,7 @@ To list all registered datasets::
 Looking up datasets by UUID
 ---------------------------
 
-To lookup URIs from a dataset UUID within Python::
+To lookup URIs from a dataset UUID within Python
 
 .. code-block:: ipython
 
@@ -173,7 +173,7 @@ To lookup URIs from a dataset UUID within Python::
 Full text searching
 -------------------
 
-Full text search for the word "test"::
+Full text search for the word "test"
 
 .. code-block:: ipython
 
@@ -197,7 +197,7 @@ Full text search for the word "test"::
 Manifest
 --------
 
-Request the manifest of a particular dataset by URI::
+Request the manifest of a particular dataset by URI
 
 .. code-block:: ipython
 
@@ -218,7 +218,7 @@ Request the manifest of a particular dataset by URI::
 Readme
 ------
 
-Request the readme cotent of a particular dataset by URI::
+Request the readme cotent of a particular dataset by URI
 
 .. code-block:: ipython
 
@@ -245,7 +245,7 @@ Direct mongo language queries
 -----------------------------
 
 To list all datasets at a certain base URI with their name matching some regular
-expression pattern, send a direct mongo language query to the server with::
+expression pattern, send a direct mongo language query to the server with
 
 .. code-block:: ipython
 
@@ -271,7 +271,7 @@ expression pattern, send a direct mongo language query to the server with::
     'uuid': '1a1f9fad-8589-413e-9602-5bbd66bfe675'}]
 
 
-It is possible to search readme content via::
+It is possible to search readme content via
 
 .. code-block:: ipython
 
@@ -307,7 +307,7 @@ Usage on Jupyter notebook
 
 The current implementation via ``asgiref.async_to_sync`` (https://github.com/django/asgiref) 
 hinders the use of the synchronous interface within Jupyter notebooks. 
-Directly use the asynchronous api instead::
+Directly use the asynchronous api instead
 
 .. code-block:: python
 
