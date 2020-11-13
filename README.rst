@@ -1,7 +1,14 @@
 README
 ======
 
-Python API for interacting with dtool lookup server
+Python API for interacting with dtool lookup server.
+
+This package offers a class-based asynchronous lookup API within ``dtool_lookup_api.core.LookupClient``, 
+a simple class-less wrapper around it at ``dtool_lookup_api.asynchronous``,
+and a synchronous interface on top at ``dtool_lookup_api.synchronous``.
+
+Direct imports of utility functions from `dtool_lookup_api` in the examples below forward to the synchronous API variant.
+
 
 Installation
 ------------
@@ -18,16 +25,22 @@ This package depends on a `dtool-lookup-server
 Configuration
 -------------
 
-The API needs to know the URL of the lookup server::
+The API needs to know the URL of the lookup server
+
+.. code-block:: bash
 
     export DTOOL_LOOKUP_SERVER_URL=http://localhost:5000
 
-You may also need specify an access token generated on the server::
+You may also need specify an access token generated on the server
+
+.. code-block:: bash
 
     export DTOOL_LOOKUP_SERVER_TOKEN=$(flask user token testuser)
 
 
-Instead of specifying the access token directly, it is also possible to provide::
+Instead of specifying the access token directly, it is also possible to provide
+
+.. code-block:: bash
 
     export DTOOL_LOOKUP_SERVER_TOKEN_GENERATOR_URL=http://localhost:5001
     export DTOOL_LOOKUP_SERVER_USERNAME=my-username
@@ -37,14 +50,18 @@ for the API to request a token. This, however, is intended only for testing
 purposes and strongly discouraged in a production environment, as your password
 would reside within environment variables or the dtool config file as clear text.
 
-Our recommended setup is a combination of::
+Our recommended setup is a combination of
+
+.. code-block:: bash
 
     export DTOOL_LOOKUP_SERVER_URL=http://localhost:5000
     export DTOOL_LOOKUP_SERVER_TOKEN_GENERATOR_URL=http://localhost:5001
 
 in the config. If used interactively, the API will then ask for your
 credentials at the first interaction and cache the provided values for this
-session, i.e.::
+session, i.e.
+
+.. code-block:: ipython
 
     In [1]: from dtool_lookup_api import query
        ...: res = query(
@@ -79,7 +96,9 @@ session, i.e.::
       'uri': 'smb://test-share/1a1f9fad-8589-413e-9602-5bbd66bfe675',
       'uuid': '1a1f9fad-8589-413e-9602-5bbd66bfe675'}]
 
-Credentials caching and interactive prompting are turned off with::
+Credentials caching and interactive prompting are turned off with
+
+.. code-block:: ipython
 
   In [1]: import dtool_lookup_api.core.config
      ...: dtool_lookup_api.core.config.Config.interactive = False
@@ -90,12 +109,16 @@ Credentials caching and interactive prompting are turned off with::
   ...
   RuntimeError: Authentication failed
 
-For testing purposes, it is possible to disable SSL certificates validation with::
+For testing purposes, it is possible to disable SSL certificates validation with
+
+.. code-block:: bash
 
     export DTOOL_LOOKUP_SERVER_VERIFY_SSL=false
 
 As usual, these settings may be specified within the default dtool configuration
-file as well, i.e. at ``~/.config/dtool/dtool.json``::
+file as well, i.e. at ``~/.config/dtool/dtool.json``
+
+.. code-block:: bash
 
     {
         "DTOOL_LOOKUP_SERVER_TOKEN_GENERATOR_URL": "http://localhost:5001/token",
@@ -106,7 +129,9 @@ file as well, i.e. at ``~/.config/dtool/dtool.json``::
 List all datasets
 -----------------
 
-To list all registered datasets::
+To list all registered datasets
+
+.. code-block:: ipython
 
     In [1]: from dtool_lookup_api import all
        ...: res = all()
@@ -126,7 +151,9 @@ To list all registered datasets::
 Looking up datasets by UUID
 ---------------------------
 
-To lookup URIs from a dataset UUID within Python::
+To lookup URIs from a dataset UUID within Python
+
+.. code-block:: ipython
 
     In [1]: from dtool_lookup_api import lookup
        ...: uuid = "1a1f9fad-8589-413e-9602-5bbd66bfe675"
@@ -146,7 +173,9 @@ To lookup URIs from a dataset UUID within Python::
 Full text searching
 -------------------
 
-Full text search for the word "test"::
+Full text search for the word "test"
+
+.. code-block:: ipython
 
     In [1]: from dtool_lookup_api import search
         ...: res = search("test")
@@ -168,7 +197,9 @@ Full text search for the word "test"::
 Manifest
 --------
 
-Request the manifest of a particular dataset by URI::
+Request the manifest of a particular dataset by URI
+
+.. code-block:: ipython
 
     In [1]: from dtool_lookup_api import manifest
        ...: uri = 'smb://test-share/1a1f9fad-8589-413e-9602-5bbd66bfe675'
@@ -187,7 +218,9 @@ Request the manifest of a particular dataset by URI::
 Readme
 ------
 
-Request the readme cotent of a particular dataset by URI::
+Request the readme cotent of a particular dataset by URI
+
+.. code-block:: ipython
 
     In [1]: from dtool_lookup_api import readme
         ..: res = readme('smb://test-share/1a1f9fad-8589-413e-9602-5bbd66bfe675')
@@ -212,7 +245,9 @@ Direct mongo language queries
 -----------------------------
 
 To list all datasets at a certain base URI with their name matching some regular
-expression pattern, send a direct mongo language query to the server with::
+expression pattern, send a direct mongo language query to the server with
+
+.. code-block:: ipython
 
     In [15]: from dtool_lookup_api import query
         ...: res = query(
@@ -236,7 +271,9 @@ expression pattern, send a direct mongo language query to the server with::
     'uuid': '1a1f9fad-8589-413e-9602-5bbd66bfe675'}]
 
 
-It is possible to search readme content via::
+It is possible to search readme content via
+
+.. code-block:: ipython
 
     In [21]: from dtool_lookup_api import query
         ...: res = query(
@@ -258,9 +295,24 @@ It is possible to search readme content via::
       'uri': 'smb://test-share/1a1f9fad-8589-413e-9602-5bbd66bfe675',
       'uuid': '1a1f9fad-8589-413e-9602-5bbd66bfe675'}]
 
-
 This requires the server-side `dtool-lookup-server-direct-mongo-plugin
 <https://github.com/IMTEK-Simulation/dtool-lookup-server-direct-mongo-plugin>`_.
 
 TODO: Response from server-side direct mongo plugin still yields dates as strings.
 Fix within https://github.com/IMTEK-Simulation/dtool-lookup-server-direct-mongo-plugin.
+
+
+Usage on Jupyter notebook
+--------------------------
+
+The current implementation via ``asgiref.async_to_sync`` (https://github.com/django/asgiref) 
+hinders the use of the synchronous interface within Jupyter notebooks. 
+Directly use the asynchronous api instead
+
+.. code-block:: python
+
+    import dtool_lookup_api.asynchronous as dl
+    res = await dl.query({
+        'base_uri': 'smb://test-share',
+        'name': {'$regex': 'test'},
+    })
