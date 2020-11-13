@@ -259,6 +259,24 @@ It is possible to search readme content via::
       'uuid': '1a1f9fad-8589-413e-9602-5bbd66bfe675'}]
 
 
+Usage on Jupyter notebook
+--------------------------
+
+Using dtool_lookup_api in jupyter notebook produces errors like: 
+
+```
+RuntimeError: You cannot use AsyncToSync in the same thread as an async event loop - just await the async function directly.
+```
+
+Directly using the asynchronous api solves the problem:
+```python
+import dtool_lookup_api.asynchronous as dl
+res = await dl.query({
+   'base_uri': 'smb://test-share',
+   'name': {'$regex': 'test'},
+})
+
+```
 This requires the server-side `dtool-lookup-server-direct-mongo-plugin
 <https://github.com/IMTEK-Simulation/dtool-lookup-server-direct-mongo-plugin>`_.
 
