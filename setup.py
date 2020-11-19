@@ -36,6 +36,7 @@ setup(
         "asgiref",
         "aiohttp",
         "dtoolcore>=3.9.0",
+        "PyYAML",
     ],
     download_url="{}/tarball/{}".format(url, version),
     license="MIT"
