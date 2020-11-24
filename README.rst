@@ -1,14 +1,7 @@
 README
 ======
 
-.. image:: https://img.shields.io/pypi/v/dtool-lookup-api   
-    :alt: PyPI
-    
-.. image:: https://img.shields.io/github/v/tag/IMTEK-Simulation/dtool-lookup-api   
-    :alt: GitHub tag (latest by date)
-
-.. image:: https://img.shields.io/github/workflow/status/IMTEK-Simulation/dtool-lookup-api/test?label=tests   
-    :alt: GitHub Workflow Status
+|PyPI| |github tag| |github tests|
 
 Python API for interacting with dtool lookup server.
 
@@ -325,3 +318,15 @@ Directly use the asynchronous api instead
         'base_uri': 'smb://test-share',
         'name': {'$regex': 'test'},
     })
+
+.. |PyPI| image:: https://img.shields.io/pypi/v/dtool-lookup-api 
+    :alt: PyPI
+    :target: https://pypi.org/project/dtool-lookup-api/
+
+.. |github tag| image:: https://img.shields.io/github/v/tag/IMTEK-Simulation/dtool-lookup-api 
+    :alt: GitHub tag (latest by date)
+    :target: https://github.com/IMTEK-Simulation/dtool-lookup-api/tags
+
+.. |github tests| image:: https://img.shields.io/github/workflow/status/IMTEK-Simulation/dtool-lookup-api/test?label=tests 
+    :alt: GitHub Workflow Status
+    :target: https://github.com/IMTEK-Simulation/dtool-lookup-api/actions?query=workflow%3Atest
