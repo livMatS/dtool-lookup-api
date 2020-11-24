@@ -1,6 +1,15 @@
 README
 ======
 
+.. image:: https://img.shields.io/pypi/v/dtool-lookup-api   
+    :alt: PyPI
+    
+.. image:: https://img.shields.io/github/v/tag/IMTEK-Simulation/dtool-lookup-api   
+    :alt: GitHub tag (latest by date)
+
+.. image:: https://img.shields.io/github/workflow/status/IMTEK-Simulation/dtool-lookup-api/test?label=tests   
+    :alt: GitHub Workflow Status
+
 Python API for interacting with dtool lookup server.
 
 This package offers a class-based asynchronous lookup API within ``dtool_lookup_api.core.LookupClient``, 
