@@ -6,6 +6,7 @@ import pytest
 from utils import _log_nested_dict, _compare
 from metadata import (
     EXPECTED_DEFAULT_ALL_RESPONSE, EXPECTED_DEFAULT_ALL_RESPONSE_IMMUTABLE_MARKER,
+    DEFAULT_AGGREGATION, EXPECTED_DEFAULT_AGGREGATION_RESPONSE, EXPECTED_DEFAULT_AGGREGATION_RESPONSE_IMMUTABLE_MARKER,
     EXPECTED_CONFIG_RESPONSE, EXPECTED_CONFIG_RESPONSE_IMMUTABLE_MARKER,
     DEFAULT_LOOKUP_UUID, EXPECTED_DEFAULT_LOOKUP_RESPONSE, EXPECTED_DEFAULT_LOOKUP_RESPONSE_IMMUTABLE_MARKER,
     DEFAULT_MANIFEST_URI, EXPECTED_DEFAULT_MANIFEST_RESPONSE, EXPECTED_DEFAULT_MANIFEST_RESPONSE_IMMUTABLE_MARKER,
@@ -34,6 +35,29 @@ def test_all():
         EXPECTED_DEFAULT_ALL_RESPONSE_IMMUTABLE_MARKER,
     )
 
+    assert compares
+
+
+@pytest.mark.usefixtures("dtool_lookup_server", "dtool_config")
+def test_defaut_aggregation():
+    """Will send a direct mongo query request to the server."""
+    from dtool_lookup_api.synchronous import aggregate
+
+    logger = logging.getLogger(__name__)
+
+    response = aggregate(DEFAULT_AGGREGATION)
+    assert response is not None
+
+    logger.debug("Response:")
+    _log_nested_dict(logger.debug, response)
+
+    assert len(response) == 1
+
+    compares = _compare(
+        response,
+        EXPECTED_DEFAULT_AGGREGATION_RESPONSE,
+        EXPECTED_DEFAULT_AGGREGATION_RESPONSE_IMMUTABLE_MARKER
+    )
     assert compares
 
 
