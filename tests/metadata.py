@@ -5,6 +5,9 @@ from utils import _make_marker
 # TODO: right now, the expected metadata content depends on what's to be found within
 # https://github.com/jotelha/dtool-lookup-server-container-composition/tree/master/tests/dtool/simple_test_dataset
 # That should become independent of the testing framework, ideally by providing our own datasets.
+
+# all
+
 ALL_METADTA = [
     {
         "base_uri": "smb://test-share",
@@ -48,6 +51,23 @@ EXPECTED_DEFAULT_ALL_RESPONSE_IMMUTABLE_MARKER[0].update(
     }
 )
 
+# aggregate
+
+DEFAULT_AGGREGATION = [
+    {
+        '$match': {
+            'base_uri': 'smb://test-share',
+            'name': {'$regex': 'test'},
+        }
+    }, {
+        '$count': "matches"
+    }
+]
+
+EXPECTED_DEFAULT_AGGREGATION_RESPONSE = [{'matches': 1}]
+EXPECTED_DEFAULT_AGGREGATION_RESPONSE_IMMUTABLE_MARKER = _make_marker(EXPECTED_DEFAULT_AGGREGATION_RESPONSE)
+
+# lookup
 
 DEFAULT_LOOKUP_UUID = "1a1f9fad-8589-413e-9602-5bbd66bfe675"
 EXPECTED_DEFAULT_LOOKUP_RESPONSE = [
@@ -109,6 +129,8 @@ DEFAULT_QUERY = {
 EXPECTED_DEFAULT_QUERY_RESPONSE = ALL_METADTA
 EXPECTED_DEFAULT_QUERY_RESPONSE_IMMUTABLE_MARKER = ALL_METADTA_IMMUTABLE_MARKER
 
+# readme
+
 DEFAULT_README_URI = 'smb://test-share/1a1f9fad-8589-413e-9602-5bbd66bfe675'
 EXPECTED_DEFAULT_README_RESPONSE = {
     "creation_date": "2020-11-08",
@@ -134,10 +156,13 @@ EXPECTED_DEFAULT_README_RESPONSE = {
 
 EXPECTED_DEFAULT_README_RESPONSE_IMMUTABLE_MARKER = _make_marker(EXPECTED_DEFAULT_README_RESPONSE)
 
+# search
+
 DEFAULT_SEARCH_TEXT = "test"
 EXPECTED_DEFAULT_SEARCH_RESPONSE = ALL_METADTA
 EXPECTED_DEFAULT_SEARCH_RESPONSE_IMMUTABLE_MARKER = ALL_METADTA_IMMUTABLE_MARKER
 
+# config
 
 EXPECTED_CONFIG_RESPONSE = {
     "dtool_lookup_server_dependency_graph_plugin": {
@@ -167,8 +192,10 @@ EXPECTED_CONFIG_RESPONSE = {
     "sqlalchemy_track_modifications": False,
     "version": "0.15.0"
 }
+
 EXPECTED_CONFIG_RESPONSE_IMMUTABLE_MARKER = _make_marker(EXPECTED_CONFIG_RESPONSE)
 EXPECTED_CONFIG_RESPONSE_IMMUTABLE_MARKER["jwt_public_key"] = False
 EXPECTED_CONFIG_RESPONSE_IMMUTABLE_MARKER["version"] = False
 EXPECTED_CONFIG_RESPONSE_IMMUTABLE_MARKER["dtool_lookup_server_dependency_graph_plugin"]["version"] = False
 EXPECTED_CONFIG_RESPONSE_IMMUTABLE_MARKER["dtool_lookup_server_direct_mongo_plugin"]["version"] = False
+EXPECTED_CONFIG_RESPONSE_IMMUTABLE_MARKER["dtool_lookup_server_direct_mongo_plugin"]["allow_direct_aggregation"] = False

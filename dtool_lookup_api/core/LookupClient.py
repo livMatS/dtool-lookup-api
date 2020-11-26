@@ -98,6 +98,18 @@ class TokenBasedLookupClient:
                 headers=self.header, verify_ssl=self.verify_ssl) as r:
             return await r.json()
 
+    async def aggregate(self, aggregation):
+        """Direct mongo aggregation, requires server-side direct mongo plugin."""
+        if isinstance(aggregation, str):
+            query = json.loads(aggregation)
+        async with self.session.post(
+                f'{self.lookup_url}/mongo/aggregate',
+                headers=self.header,
+                json={
+                    'aggregation': aggregation
+                }, verify_ssl=self.verify_ssl) as r:
+            return await r.json()
+
     async def search(self, keyword):
         """Free text search"""
         async with self.session.post(
@@ -114,11 +126,11 @@ class TokenBasedLookupClient:
 
     # query and by_query are interchangeable
     async def query(self, query):
-        """Direct mongo query."""
+        """Direct mongo query, requires server-side direct mongo plugin."""
         return await self.by_query(query)
 
     async def by_query(self, query):
-        """Direct mongo query"""
+        """Direct mongo query, , requires server-side direct mongo plugin"""
         if isinstance(query, str):
             query = json.loads(query)
         async with self.session.post(

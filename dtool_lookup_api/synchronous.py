@@ -15,6 +15,12 @@ async def all():
 
 
 @async_to_sync
+async def aggregate(aggregation):
+    """Wraps around asynchronous.aggregate."""
+    return await asynchronous.aggregate(aggregation)
+
+
+@async_to_sync
 async def config():
     """Wraps around asynchronous.config."""
     return await asynchronous.config()

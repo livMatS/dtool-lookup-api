@@ -9,6 +9,10 @@ async def all():
     async with ConfigurationBasedLookupClient() as lookup_client:
         return await lookup_client.all()
 
+async def aggregate(aggregation):
+    """Wraps around LookupClient method 'aggregate'."""
+    async with ConfigurationBasedLookupClient() as lookup_client:
+        return await lookup_client.aggregate(aggregation)
 
 async def config():
     """Wraps around LookupClient method 'config'."""
