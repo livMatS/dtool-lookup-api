@@ -1,6 +1,10 @@
+# custom
 dtool_lookup_api/version.py
 build
+.idea
 
+
+# default
 *.pyc
 *.swp
 *.egg-info
