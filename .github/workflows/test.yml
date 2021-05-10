@@ -27,47 +27,11 @@ jobs:
       with:
         python-version: ${{ matrix.python-version }}
 
-    # - name: Install podman
-    #  run: |
-    #    source /etc/os-release
-    #    echo "deb https://download.opensuse.org/repositories/devel:/kubic:/libcontainers:/stable/xUbuntu_${VERSION_ID}/ /" | sudo tee /etc/apt/sources.list.d/devel:kubic:libcontainers:stable.list
-    #    curl -L https://download.opensuse.org/repositories/devel:/kubic:/libcontainers:/stable/xUbuntu_${VERSION_ID}/Release.key | sudo apt-key add -
-    #    sudo apt-get update
-    #    sudo apt-get -y install podman
-    #    echo "podman info"
-    #    podman info
-
-    # https://docs.github.com/en/free-pro-team@latest/actions/reference/workflow-commands-for-github-actions#using-workflow-commands-to-access-toolkit-functions
-    # - name: Install podman extras
-    #  id: install-podman-extras
-    #  run: |
-    #    pip install PyYAML
-    #    pip install git+https://github.com/containers/podman-compose.git@devel
-    #    pip install shyaml  # for parsing yaml on command line
-    #
-    #    podman info | shyaml get-value store.graphRoot | xargs -I{} echo '::set-output name=podman_graph_root::{}'
-
-    # https://github.com/actions/cache
-    # - name: Cache container images
-    #   id: cache-container-images
-    #   uses: actions/cache@v2
-    #   with:
-    #     path: ${{ steps.install-podman-extras.outputs.podman_graph_root }}/vfs-images
-    #     key: podman-graph-root-vfs-images-${{ runner.os }}-dls-${{ matrix.dtool-lookup-server-container-composition-version }}-py-${{ matrix.python-version }}-fw-${{ matrix.fireworks-version }}
-    #     restore-keys: |
-    #       podman-graph-root-vfs-images-${{ runner.os }}-dls-${{ matrix.dtool-lookup-server-container-composition-version }}-py-${{ matrix.python-version }}-fw-${{ matrix.ireworks-version }}
-    #       podman-graph-root-vfs-images-${{ runner.os }}-dls-${{ matrix.dtool-lookup-server-container-composition-version }}-py-${{ matrix.python-version }}-
-    #       podman-graph-root-vfs-images-${{ runner.os }}-dls-${{ matrix.dtool-lookup-server-container-composition-version }}-
-
     - name: Pull container images and prepare composition
-    #   if: steps.cache-container-images.outputs.cache-hit != 'true'
       run: |
         cd dtool-lookup-server-container-composition
 
-        # podman-compose pull  # won't pull images that have a build command in the compose file
         docker-compose pull 
-        # echo "podman image ls"
-        # podman image ls
         echo "docker image ls"
         docker image ls
 
@@ -100,47 +64,32 @@ jobs:
       run: |
         
         cd dtool-lookup-server-container-composition
-        # podman-compose -p dtool-lookup-server-container-composition up -d --no-build  # will pull missing images with build command in compose file
         docker-compose -p dtool-lookup-server-container-composition up -d --no-build  # will pull missing images with build command in compose file
 
         sleep 10
        
-        # echo "podman pod ls"
-        # podman pod ls
-        
-        # echo "podman container ls --all"
-        # podman container ls --all
         echo "docker container ls --all"
         docker container ls --all
 
-        # echo "podman volume ls"
-        # podman volume ls
         echo "docker volume ls"
         docker volume ls
         
-        # echo "podman image ls"
-        # podman image ls
         echo "docker images"
         docker-compose images
 
         echo "dtool lookup server log"
-        # podman logs dtool-lookup-server-container-composition_dtool_lookup_server_1
         docker-compose logs dtool_lookup_server
         
         echo "dtool lookup client log"
-        # podman logs dtool-lookup-server-container-composition_dtool_lookup_client_1
         docker-compose logs dtool_lookup_client
 
         echo "dtool ls smb://test-share"
-        # podman run -it --pod dtool-lookup-server-container-composition jotelha/dtool-lookup-client dtool ls smb://test-share
         docker-compose run dtool_lookup_client dtool ls smb://test-share
         
         echo "explicitly re-evoke dataset indexing"
-        # podman exec -it dtool-lookup-server-container-composition_dtool_lookup_server_1 /refresh_index
         docker-compose exec -T dtool_lookup_server /refresh_index
 
         echo "dtool query '{}'"
-        # podman run -it --pod dtool-lookup-server-container-composition jotelha/dtool-lookup-client dtool query '{}'
         docker-compose run dtool_lookup_client dtool query '{}'
 
         cd ..
