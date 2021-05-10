@@ -137,7 +137,7 @@ jobs:
         
         echo "explicitly re-evoke dataset indexing"
         # podman exec -it dtool-lookup-server-container-composition_dtool_lookup_server_1 /refresh_index
-        docker-compose exec dtool_lookup_server /refresh_index
+        docker-compose exec -T dtool_lookup_server /refresh_index
 
         echo "dtool query '{}'"
         # podman run -it --pod dtool-lookup-server-container-composition jotelha/dtool-lookup-client dtool query '{}'
