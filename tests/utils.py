@@ -34,7 +34,7 @@ def _log_nested_dict(log_func, dct):
 
 
 def _make_marker(d):
-    """Mark everzthing for comparison."""
+    """Mark everything for comparison."""
     if isinstance(d, list):
         return [_make_marker(e) for e in d]
     elif isinstance(d, dict):
