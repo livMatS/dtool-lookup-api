@@ -319,6 +319,29 @@ Directly use the asynchronous api instead
         'name': {'$regex': 'test'},
     })
 
+The drawback of the above approach is that the same code doesn't work in python and in jupyter (`await` outsite of a function is a syntax error in non-interactive python context).
+The code below can be executed in both contexts:
+
+.. code-block:: python
+
+    import dtool_lookup_api.asynchronous as dl
+    if asyncio.get_event_loop().is_running():
+        # then we are in jupyter notebook
+        # this allows nested event loops, i.e. calls to asyncio.run inside the notebook as well
+        # This way, the same code works in notebook and python
+        import nest_asyncio
+        nest_asyncio.apply()
+
+    def query(query_dict):
+        return asyncio.run(dl.query(query_dict))
+    
+    query({
+        'base_uri': 'smb://test-share',
+        'name': {'$regex': 'test'},
+    })
+
+See https://github.com/jupyter/notebook/issues/3397#issuecomment-419386811, https://ipython.readthedocs.io/en/stable/interactive/autoawait.html
+
 .. |PyPI| image:: https://img.shields.io/pypi/v/dtool-lookup-api 
     :alt: PyPI
     :target: https://pypi.org/project/dtool-lookup-api/
