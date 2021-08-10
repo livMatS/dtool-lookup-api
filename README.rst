@@ -347,7 +347,7 @@ Testing
 -------
 
 Tests require the presence of a working dtool lookup server ecosystem.
-The testing workflow found within :code:`.github/workflows/test.yml` uses the
+The testing workflow within :code:`.github/workflows/test.yml` uses the
 `dtool-lookup-server-container-composition
 <https://github.com/jotelha/dtool-lookup-server-container-composition>`_
 to provide a mock ecosystem. It is possible to run the workflow locally
