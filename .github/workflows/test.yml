@@ -29,6 +29,12 @@ jobs:
 
     - name: Pull container images and prepare composition
       run: |
+        # the following line allows testing locally with act (https://github.com/nektos/act),
+        # i.e. by running
+        #   
+        sudo chown runner:docker /var/run/docker.sock
+        # see https://github.com/nektos/act/issues/724#issuecomment-855390956
+        
         cd dtool-lookup-server-container-composition
 
         docker-compose pull 
@@ -95,3 +101,11 @@ jobs:
         cd ..
         sleep 10
         pytest --deselect=dtool-lookup-server-container-composition
+
+        cd dtool-lookup-server-container-composition
+        echo "docker-compose down --volumes"
+        docker-compose down --volumes --timeout 30
+        cd ..
+
+        
+
