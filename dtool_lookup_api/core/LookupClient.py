@@ -201,6 +201,54 @@ class TokenBasedLookupClient:
             text = await r.text()
             return yaml.safe_load(text)
 
+    async def list_users(self):
+        """Request a list of users. (Needs admin priviledges.)"""
+        async with self.session.get(
+                f'{self.lookup_url}/admin/user/list',
+                headers=self.header,
+                verify_ssl=self.verify_ssl) as r:
+            text = await r.text()
+            return yaml.safe_load(text)
+
+    async def register_user(self, username, is_admin=False):
+        """Register a user. (Needs admin priviledges.)"""
+        async with self.session.post(
+                f'{self.lookup_url}/admin/user/register',
+                headers=self.header,
+                json={
+                    'username': username,
+                    'is_admin': is_admin
+                },
+                verify_ssl=self.verify_ssl) as r:
+            text = await r.text()
+            return yaml.safe_load(text)
+
+    async def permission_info(self, base_uri):
+        """Request permissions on base URI. (Needs admin priviledges.)"""
+        async with self.session.post(
+                f'{self.lookup_url}/admin/permission/info',
+                json={
+                    'base_uri': base_uri
+                },
+                headers=self.header,
+                verify_ssl=self.verify_ssl) as r:
+            text = await r.text()
+            return yaml.safe_load(text)
+
+    async def update_permissions(self, base_uri, users_with_search_permissions, users_with_register_permissions=[]):
+        """Request permissions on base URI. (Needs admin priviledges.)"""
+        async with self.session.post(
+                f'{self.lookup_url}/admin/permission/update_on_base_uri',
+                json={
+                    'base_uri': base_uri,
+                    'users_with_search_permissions': users_with_search_permissions,
+                    'users_with_register_permissions': users_with_register_permissions
+                },
+                headers=self.header,
+                verify_ssl=self.verify_ssl) as r:
+            text = await r.text()
+            return yaml.safe_load(text)
+
 
 class CredentialsBasedLookupClient(TokenBasedLookupClient):
     """Request new token for every session based on user credentials."""
