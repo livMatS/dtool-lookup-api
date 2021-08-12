@@ -98,11 +98,11 @@ class TokenBasedLookupClient:
                 headers=self.header, verify_ssl=self.verify_ssl) as r:
             return await r.json()
 
-    async def _post(self, route, **kwargs):
+    async def _post(self, route, json):
         async with self.session.post(
                 f'{self.lookup_url}{route}',
                 headers=self.header,
-                json=kwargs,
+                json=json,
                 verify_ssl=self.verify_ssl) as r:
             return await r.json()
 
@@ -118,11 +118,11 @@ class TokenBasedLookupClient:
         """Direct mongo aggregation, requires server-side direct mongo plugin."""
         if isinstance(aggregation, str):
             query = json.loads(aggregation)
-        return await self._post('/mongo/aggregate', aggregation=aggregation)
+        return await self._post('/mongo/aggregate', dict(aggregation=aggregation))
 
     async def search(self, keyword):
         """Free text search"""
-        return await self._post('/dataset/search', free_text=keyword)
+        return await self._post('/dataset/search', dict(free_text=keyword))
 
     # The direct-mongo plugin offers the same functionality as /dataset/search
     # plus an extra keyword "query" to contain plain mongo on the /mongo/query
@@ -137,7 +137,7 @@ class TokenBasedLookupClient:
         """Direct mongo query, , requires server-side direct mongo plugin"""
         if isinstance(query, str):
             query = json.loads(query)
-        return await self._post('/mongo/query', query=query)
+        return await self._post('/mongo/query', dict(query=query))
 
     # lookup and by_uuid are interchangeable
     async def lookup(self, uuid):
@@ -153,15 +153,15 @@ class TokenBasedLookupClient:
         if dependency_keys is None:
             return await self._get('/graph/lookup/{uuid}')
         else:  # TODO: validity check on dependency key list
-            return await self._post('/graph/lookup/{uuid}', **dependency_keys)
+            return await self._post('/graph/lookup/{uuid}', dependency_keys)
 
     async def readme(self, uri):
         """Request the README.yml of a dataset by URI."""
-        return await self._post('/dataset/readme', uri=uri)
+        return await self._post('/dataset/readme', dict(uri=uri))
 
     async def manifest(self, uri):
         """Request the manifest of a dataset by URI."""
-        return await self._post('/dataset/manifest', uri=uri)
+        return await self._post('/dataset/manifest', dict(uri=uri))
 
     async def config(self):
         """Request the server configuration."""
@@ -173,18 +173,18 @@ class TokenBasedLookupClient:
 
     async def register_user(self, username, is_admin=False):
         """Register a user. (Needs admin priviledges.)"""
-        return await self._post('/admin/user/register', username=username, is_admin=is_admin)
+        return await self._post('/admin/user/register', dict(username=username, is_admin=is_admin))
 
     async def permission_info(self, base_uri):
         """Request permissions on base URI. (Needs admin priviledges.)"""
-        return await self._post('/admin/permission/info', base_uri=base_uri)
+        return await self._post('/admin/permission/info', dict(base_uri=base_uri))
 
     async def update_permissions(self, base_uri, users_with_search_permissions, users_with_register_permissions=[]):
         """Request permissions on base URI. (Needs admin priviledges.)"""
-        return await self._post('/admin/permission/update_on_base_uri',
+        return await self._post('/admin/permission/update_on_base_uri', dict(
             base_uri=base_uri,
             users_with_search_permissions=users_with_search_permissions,
-            users_with_register_permissions=users_with_register_permissions)
+            users_with_register_permissions=users_with_register_permissions))
 
 
 class CredentialsBasedLookupClient(TokenBasedLookupClient):
