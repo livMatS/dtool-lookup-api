@@ -146,14 +146,14 @@ class TokenBasedLookupClient:
 
     async def by_uuid(self, uuid):
         """Search for a specific uuid."""
-        return await self._get('/dataset/lookup/{uuid}')
+        return await self._get(f'/dataset/lookup/{uuid}')
 
     async def graph(self, uuid, dependency_keys=None):
         """Request dependency graph for specific uuid"""
         if dependency_keys is None:
-            return await self._get('/graph/lookup/{uuid}')
+            return await self._get(f'/graph/lookup/{uuid}')
         else:  # TODO: validity check on dependency key list
-            return await self._post('/graph/lookup/{uuid}', dependency_keys)
+            return await self._post(f'/graph/lookup/{uuid}', dependency_keys)
 
     async def readme(self, uri):
         """Request the README.yml of a dataset by URI."""
