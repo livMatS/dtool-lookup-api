@@ -165,11 +165,11 @@ class TokenBasedLookupClient:
 
     async def config(self):
         """Request the server configuration."""
-        self._get('/config/info')
+        return await self._get('/config/info')
 
     async def list_users(self):
         """Request a list of users. (Needs admin priviledges.)"""
-        self._get('/admin/user/list')
+        return await self._get('/admin/user/list')
 
     async def register_user(self, username, is_admin=False):
         """Register a user. (Needs admin priviledges.)"""
