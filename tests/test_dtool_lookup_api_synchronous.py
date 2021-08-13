@@ -13,6 +13,10 @@ from metadata import (
     DEFAULT_QUERY, EXPECTED_DEFAULT_QUERY_RESPONSE, EXPECTED_DEFAULT_QUERY_RESPONSE_IMMUTABLE_MARKER,
     DEFAULT_README_URI, EXPECTED_DEFAULT_README_RESPONSE, EXPECTED_DEFAULT_README_RESPONSE_IMMUTABLE_MARKER,
     DEFAULT_SEARCH_TEXT, EXPECTED_DEFAULT_SEARCH_RESPONSE, EXPECTED_DEFAULT_SEARCH_RESPONSE_IMMUTABLE_MARKER,
+    EXPECTED_DEFAULT_LIST_USERS_RESPONSE, EXPECTED_DEFAULT_LIST_USERS_RESPONSE_IMMUTABLE_MARKER,
+    EXPECTED_DEFAULT_REGISTER_USER_RESPONSE, EXPECTED_DEFAULT_REGISTER_USER_RESPONSE_IMMUTABLE_MARKER,
+    EXPECTED_DEFAULT_PERMISSION_INFO_RESPONSE, EXPECTED_DEFAULT_PERMISSION_INFO_RESPONSE_IMMUTABLE_MARKER,
+    EXPECTED_DEFAULT_UPDATE_PERMISSIONS_RESPONSE, EXPECTED_DEFAULT_UPDATE_PERMISSIONS_RESPONSE_IMMUTABLE_MARKER,
 )
 
 
@@ -188,5 +192,119 @@ def test_default_search():
         response,
         EXPECTED_DEFAULT_SEARCH_RESPONSE,
         EXPECTED_DEFAULT_SEARCH_RESPONSE_IMMUTABLE_MARKER
+    )
+    assert compares
+
+
+@pytest.mark.usefixtures("dtool_lookup_server", "dtool_config")
+def test_default_list_users():
+    """Will send a list users request to the server."""
+    from dtool_lookup_api.synchronous import list_users
+
+    logger = logging.getLogger(__name__)
+
+    response = list_users()
+    assert response is not None
+
+    logger.debug("Response:")
+    _log_nested_dict(logger.debug, response)
+
+    assert len(response) == 1
+
+    compares = _compare(
+        response,
+        EXPECTED_DEFAULT_LIST_USERS_RESPONSE,
+        EXPECTED_DEFAULT_LIST_USERS_RESPONSE_IMMUTABLE_MARKER
+    )
+    assert compares
+
+
+@pytest.mark.usefixtures("dtool_lookup_server", "dtool_config")
+def test_default_register_user():
+    """Will send a register user request to the server."""
+    from dtool_lookup_api.synchronous import register_user
+
+    logger = logging.getLogger(__name__)
+
+    response = register_user()
+    assert response is not None
+
+    logger.debug("Response:")
+    _log_nested_dict(logger.debug, response)
+
+    assert len(response) == 1
+
+    compares = _compare(
+        response,
+        EXPECTED_DEFAULT_REGISTER_USER_RESPONSE,
+        EXPECTED_DEFAULT_REGISTER_USER_RESPONSE_IMMUTABLE_MARKER
+    )
+    assert compares
+
+
+@pytest.mark.usefixtures("dtool_lookup_server", "dtool_config")
+def test_default_permission_info():
+    """Will send a permission info request to the server."""
+    from dtool_lookup_api.synchronous import permission_info
+
+    logger = logging.getLogger(__name__)
+
+    response = permission_info()
+    assert response is not None
+
+    logger.debug("Response:")
+    _log_nested_dict(logger.debug, response)
+
+    assert len(response) == 1
+
+    compares = _compare(
+        response,
+        EXPECTED_DEFAULT_PERMISSION_INFO_RESPONSE,
+        EXPECTED_DEFAULT_PERMISSION_INFO_RESPONSE_IMMUTABLE_MARKER
+    )
+    assert compares
+
+@pytest.mark.usefixtures("dtool_lookup_server", "dtool_config")
+def test_default_permission_info():
+    """Will send a permission info request to the server."""
+    from dtool_lookup_api.synchronous import permission_info
+
+    logger = logging.getLogger(__name__)
+
+    response = permission_info()
+    assert response is not None
+
+    logger.debug("Response:")
+    _log_nested_dict(logger.debug, response)
+
+    assert len(response) == 1
+
+    compares = _compare(
+        response,
+        EXPECTED_DEFAULT_PERMISSION_INFO_RESPONSE,
+        EXPECTED_DEFAULT_PERMISSION_INFO_RESPONSE_IMMUTABLE_MARKER
+    )
+    assert compares
+
+
+@pytest.mark.usefixtures("dtool_lookup_server", "dtool_config")
+def test_default_update_permissions():
+    """Will send a permission info request to the server."""
+    from dtool_lookup_api.synchronous import update_permissions
+
+    logger = logging.getLogger(__name__)
+
+    response = update_permissions()
+    assert response is not None
+
+    logger.debug("Response:")
+    _log_nested_dict(logger.debug, response)
+
+    assert len(response) == 1
+
+    compares = _compare(
+        response,
+        EXPECTED_DEFAULT_UPDATE_PERMISSIONS_RESPONSE,
+        EXPECTED_DEFAULT_UPDATE_PERMISSIONS_RESPONSE_IMMUTABLE_MARKER
     )
     assert compares
