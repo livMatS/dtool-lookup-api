@@ -4,6 +4,8 @@ import logging
 import pytest
 
 from utils import _log_nested_dict, _compare
+
+# TODO: in need for more elegant way to outsource default queries and expected responses
 from metadata import (
     EXPECTED_DEFAULT_ALL_RESPONSE, EXPECTED_DEFAULT_ALL_RESPONSE_IMMUTABLE_MARKER,
     DEFAULT_AGGREGATION, EXPECTED_DEFAULT_AGGREGATION_RESPONSE, EXPECTED_DEFAULT_AGGREGATION_RESPONSE_IMMUTABLE_MARKER,
@@ -13,6 +15,10 @@ from metadata import (
     DEFAULT_QUERY, EXPECTED_DEFAULT_QUERY_RESPONSE, EXPECTED_DEFAULT_QUERY_RESPONSE_IMMUTABLE_MARKER,
     DEFAULT_README_URI, EXPECTED_DEFAULT_README_RESPONSE, EXPECTED_DEFAULT_README_RESPONSE_IMMUTABLE_MARKER,
     DEFAULT_SEARCH_TEXT, EXPECTED_DEFAULT_SEARCH_RESPONSE, EXPECTED_DEFAULT_SEARCH_RESPONSE_IMMUTABLE_MARKER,
+    EXPECTED_DEFAULT_LIST_USERS_RESPONSE, EXPECTED_DEFAULT_LIST_USERS_RESPONSE_IMMUTABLE_MARKER,
+    # EXPECTED_DEFAULT_REGISTER_USER_RESPONSE, EXPECTED_DEFAULT_REGISTER_USER_RESPONSE_IMMUTABLE_MARKER,
+    DEFAULT_PERMISSION_INFO_BASE_URI, EXPECTED_DEFAULT_PERMISSION_INFO_RESPONSE, EXPECTED_DEFAULT_PERMISSION_INFO_RESPONSE_IMMUTABLE_MARKER,
+    # EXPECTED_DEFAULT_UPDATE_PERMISSIONS_RESPONSE, EXPECTED_DEFAULT_UPDATE_PERMISSIONS_RESPONSE_IMMUTABLE_MARKER,
 )
 
 
@@ -190,3 +196,107 @@ def test_default_search():
         EXPECTED_DEFAULT_SEARCH_RESPONSE_IMMUTABLE_MARKER
     )
     assert compares
+
+# mark to run early in order to not have any other users registered in database by other tests
+@pytest.mark.first
+@pytest.mark.usefixtures("dtool_lookup_server", "dtool_config")
+def test_default_list_users():
+    """Will send a list users request to the server."""
+    from dtool_lookup_api.synchronous import list_users
+
+    logger = logging.getLogger(__name__)
+
+    response = list_users()
+    assert response is not None
+
+    logger.debug("Response:")
+    _log_nested_dict(logger.debug, response)
+
+    assert len(response) == 1
+
+    compares = _compare(
+        response,
+        EXPECTED_DEFAULT_LIST_USERS_RESPONSE,
+        EXPECTED_DEFAULT_LIST_USERS_RESPONSE_IMMUTABLE_MARKER
+    )
+    assert compares
+
+
+# TODO: clean up, i.e. delete users after use
+@pytest.mark.usefixtures("dtool_lookup_server", "dtool_config")
+def test_default_register_user():
+    """Will send a register user request to the server."""
+    from dtool_lookup_api.synchronous import register_user
+
+    logger = logging.getLogger(__name__)
+
+    # mimic https://github.com/jic-dtool/dtool-lookup-server/blob/12baba73eebc668b4998ae2c2ea43946dc3bf856/tests/test_admin_user_routes.py#L14
+    users = [
+        {"username": "evil-witch", "is_admin": True},
+        {"username": "dopey"}
+    ]
+
+    # TODO: check for nonexistence of not yet registered users on server
+
+    for user in users:
+        response = register_user(**user)
+        assert response == True
+        logger.debug("Response:")
+        _log_nested_dict(logger.debug, response)
+
+    # Ensure idempotent.
+    for user in users:
+        response = register_user(**user)
+        assert response == True
+        logger.debug("Response:")
+        _log_nested_dict(logger.debug, response)
+
+    # TODO: check for existence of registered users on server
+
+# mark to run early in order to not have any other users registered in database by other tests
+@pytest.mark.first
+@pytest.mark.usefixtures("dtool_lookup_server", "dtool_config")
+def test_default_permission_info():
+    """Will send a permission info request to the server."""
+    from dtool_lookup_api.synchronous import permission_info
+
+    logger = logging.getLogger(__name__)
+
+    response = permission_info(DEFAULT_PERMISSION_INFO_BASE_URI)
+    assert response is not None
+
+    logger.debug("Response:")
+    _log_nested_dict(logger.debug, response)
+
+    assert len(response) == 3
+
+    compares = _compare(
+        response,
+        EXPECTED_DEFAULT_PERMISSION_INFO_RESPONSE,
+        EXPECTED_DEFAULT_PERMISSION_INFO_RESPONSE_IMMUTABLE_MARKER
+    )
+    assert compares
+
+
+# TODO: test for update_permissions
+# @pytest.mark.usefixtures("dtool_lookup_server", "dtool_config")
+# def test_default_update_permissions():
+#     """Will send a permission info request to the server."""
+#     from dtool_lookup_api.synchronous import update_permissions
+#
+#     logger = logging.getLogger(__name__)
+#
+#     response = update_permissions()
+#     assert response is not None
+#
+#     logger.debug("Response:")
+#     _log_nested_dict(logger.debug, response)
+#
+#     assert len(response) == 1
+#
+#     compares = _compare(
+#         response,
+#         EXPECTED_DEFAULT_UPDATE_PERMISSIONS_RESPONSE,
+#         EXPECTED_DEFAULT_UPDATE_PERMISSIONS_RESPONSE_IMMUTABLE_MARKER
+#     )
+#     assert compares

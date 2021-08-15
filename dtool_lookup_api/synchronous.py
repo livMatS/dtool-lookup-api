@@ -54,3 +54,27 @@ async def readme(uri):
 async def search(keyword=None):
     """Wraps around asynchronous.search."""
     return await asynchronous.search(keyword)
+
+
+@async_to_sync
+async def list_users():
+    """Wraps around asynchronous.search."""
+    return await asynchronous.list_users()
+
+
+@async_to_sync
+async def register_user(username, is_admin=False):
+    """Wraps around asynchronous.search."""
+    return await asynchronous.register_user(username, is_admin)
+
+
+@async_to_sync
+async def permission_info(base_uri):
+    """Wraps around asynchronous.search."""
+    return await asynchronous.permission_info(base_uri)
+
+
+@async_to_sync
+async def update_permissions(base_uri, users_with_search_permissions, users_with_register_permissions=[]):
+    """Wraps around asynchronous.search."""
+    return await asynchronous.register_user(base_uri, users_with_search_permissions, users_with_register_permissions)

@@ -48,3 +48,27 @@ async def search(keyword=None):
     """Wraps around LookupClient method 'search'."""
     async with ConfigurationBasedLookupClient() as lookup_client:
         return await lookup_client.search(keyword)
+
+
+async def list_users():
+    """Wraps around LookupClient method 'list_users'."""
+    async with ConfigurationBasedLookupClient() as lookup_client:
+        return await lookup_client.list_users()
+
+
+async def register_user(username, is_admin=False):
+    """Wraps around LookupClient method 'list_users'."""
+    async with ConfigurationBasedLookupClient() as lookup_client:
+        return await lookup_client.register_user(username, is_admin)
+
+
+async def permission_info(base_uri):
+    """Wraps around LookupClient method 'list_users'."""
+    async with ConfigurationBasedLookupClient() as lookup_client:
+        return await lookup_client.permission_info(base_uri)
+
+
+async def update_permissions(base_uri, users_with_search_permissions, users_with_register_permissions=[]):
+    """Wraps around LookupClient method 'list_users'."""
+    async with ConfigurationBasedLookupClient() as lookup_client:
+        return await lookup_client.update_permissions(base_uri, users_with_search_permissions, users_with_register_permissions)

@@ -91,34 +91,42 @@ class TokenBasedLookupClient:
     def header(self):
         return {'Authorization': f'Bearer {self.token}'}
 
-    async def all(self):
-        """List all registered datasets."""
+    async def _get(self, route):
+        """Return information from a specific route."""
         async with self.session.get(
-                f'{self.lookup_url}/dataset/list',
+                f'{self.lookup_url}{route}',
                 headers=self.header, verify_ssl=self.verify_ssl) as r:
             return await r.json()
+
+    async def _post(self, route, json, method='json'):
+        async with self.session.post(
+                f'{self.lookup_url}{route}',
+                headers=self.header,
+                json=json,
+                verify_ssl=self.verify_ssl) as r:
+            try:  # workaround for other non-json, non-method properties, better solutions welcme
+                return await getattr(r, method)()
+            except TypeError:
+                return getattr(r, method)
+
+
+    async def summary(self):
+        """Overall summary of datasets accessible to a user."""
+        return await self._get('/dataset/summary')
+
+    async def all(self):
+        """List all registered datasets."""
+        return await self._get('/dataset/list')
 
     async def aggregate(self, aggregation):
         """Direct mongo aggregation, requires server-side direct mongo plugin."""
         if isinstance(aggregation, str):
             query = json.loads(aggregation)
-        async with self.session.post(
-                f'{self.lookup_url}/mongo/aggregate',
-                headers=self.header,
-                json={
-                    'aggregation': aggregation
-                }, verify_ssl=self.verify_ssl) as r:
-            return await r.json()
+        return await self._post('/mongo/aggregate', dict(aggregation=aggregation))
 
     async def search(self, keyword):
         """Free text search"""
-        async with self.session.post(
-                f'{self.lookup_url}/dataset/search',
-                headers=self.header,
-                json={
-                    'free_text': keyword
-                }, verify_ssl=self.verify_ssl) as r:
-            return await r.json()
+        return await self._post('/dataset/search', dict(free_text=keyword))
 
     # The direct-mongo plugin offers the same functionality as /dataset/search
     # plus an extra keyword "query" to contain plain mongo on the /mongo/query
@@ -133,73 +141,55 @@ class TokenBasedLookupClient:
         """Direct mongo query, , requires server-side direct mongo plugin"""
         if isinstance(query, str):
             query = json.loads(query)
-        async with self.session.post(
-                f'{self.lookup_url}/mongo/query',
-                headers=self.header,
-                json={
-                    'query': query
-                }, verify_ssl=self.verify_ssl) as r:
-            return await r.json()
+        return await self._post('/mongo/query', dict(query=query))
 
     # lookup and by_uuid are interchangeable
     async def lookup(self, uuid):
-        """Search for a specific uuid"""
+        """Search for a specific uuid."""
         return await self.by_uuid(uuid)
 
     async def by_uuid(self, uuid):
-        """Search for a specific uuid"""
-        async with self.session.get(
-                f'{self.lookup_url}/dataset/lookup/{uuid}',
-                headers=self.header,
-                verify_ssl=self.verify_ssl) as r:
-            return await r.json()
+        """Search for a specific uuid."""
+        return await self._get(f'/dataset/lookup/{uuid}')
 
     async def graph(self, uuid, dependency_keys=None):
         """Request dependency graph for specific uuid"""
         if dependency_keys is None:
-            async with self.session.get(
-                    f'{self.lookup_url}/graph/lookup/{uuid}',
-                    headers=self.header,
-                    verify_ssl=self.verify_ssl) as r:
-                return await r.json()
+            return await self._get(f'/graph/lookup/{uuid}')
         else:  # TODO: validity check on dependency key list
-            async with self.session.post(
-                    f'{self.lookup_url}/graph/lookup/{uuid}',
-                    headers=self.header,
-                    json=dependency_keys,
-                    verify_ssl=self.verify_ssl) as r:
-                return await r.json()
+            return await self._post(f'/graph/lookup/{uuid}', dependency_keys)
 
     async def readme(self, uri):
         """Request the README.yml of a dataset by URI."""
-        async with self.session.post(
-                f'{self.lookup_url}/dataset/readme',
-                headers=self.header,
-                json={
-                    'uri': uri
-                }, verify_ssl=self.verify_ssl) as r:
-            text = await r.text()
-            return yaml.safe_load(text)
+        return await self._post('/dataset/readme', dict(uri=uri))
 
     async def manifest(self, uri):
         """Request the manifest of a dataset by URI."""
-        async with self.session.post(
-                f'{self.lookup_url}/dataset/manifest',
-                headers=self.header,
-                json={
-                    'uri': uri
-                }, verify_ssl=self.verify_ssl) as r:
-            text = await r.text()
-            return yaml.safe_load(text)
+        return await self._post('/dataset/manifest', dict(uri=uri))
 
     async def config(self):
         """Request the server configuration."""
-        async with self.session.get(
-                f'{self.lookup_url}/config/info',
-                headers=self.header,
-                verify_ssl=self.verify_ssl) as r:
-            text = await r.text()
-            return yaml.safe_load(text)
+        return await self._get('/config/info')
+
+    async def list_users(self):
+        """Request a list of users. (Needs admin priviledges.)"""
+        return await self._get('/admin/user/list')
+
+    async def register_user(self, username, is_admin=False):
+        """Register a user. (Needs admin priviledges.)"""
+        return await self._post('/admin/user/register', [dict(username=username, is_admin=is_admin)],
+                                method='status') == 201
+
+    async def permission_info(self, base_uri):
+        """Request permissions on base URI. (Needs admin priviledges.)"""
+        return await self._post('/admin/permission/info', dict(base_uri=base_uri))
+
+    async def update_permissions(self, base_uri, users_with_search_permissions, users_with_register_permissions=[]):
+        """Request permissions on base URI. (Needs admin priviledges.)"""
+        return await self._post('/admin/permission/update_on_base_uri', dict(
+            base_uri=base_uri,
+            users_with_search_permissions=users_with_search_permissions,
+            users_with_register_permissions=users_with_register_permissions))
 
 
 class CredentialsBasedLookupClient(TokenBasedLookupClient):
