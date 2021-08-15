@@ -197,7 +197,8 @@ def test_default_search():
     )
     assert compares
 
-
+# mark to run early in order to not have any other users registered in database by other tests
+@pytest.mark.first
 @pytest.mark.usefixtures("dtool_lookup_server", "dtool_config")
 def test_default_list_users():
     """Will send a list users request to the server."""
@@ -221,6 +222,7 @@ def test_default_list_users():
     assert compares
 
 
+# TODO: clean up, i.e. delete users after use
 @pytest.mark.usefixtures("dtool_lookup_server", "dtool_config")
 def test_default_register_user():
     """Will send a register user request to the server."""
@@ -251,7 +253,8 @@ def test_default_register_user():
 
     # TODO: check for existence of registered users on server
 
-
+# mark to run early in order to not have any other users registered in database by other tests
+@pytest.mark.first
 @pytest.mark.usefixtures("dtool_lookup_server", "dtool_config")
 def test_default_permission_info():
     """Will send a permission info request to the server."""

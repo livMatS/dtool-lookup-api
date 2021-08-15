@@ -31,7 +31,7 @@ setup(
         "local_scheme": local_scheme},
     url=url,
     setup_requires=['setuptools_scm'],
-    tests_require=['pytest', 'pytest-cov'],
+    tests_require=['pytest', 'pytest-cov', 'pytest-ordering'],
     install_requires=[
         "asgiref",
         "aiohttp",

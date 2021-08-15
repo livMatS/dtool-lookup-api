@@ -216,7 +216,7 @@ EXPECTED_DEFAULT_LIST_USERS_RESPONSE_IMMUTABLE_MARKER = _make_marker(EXPECTED_DE
 DEFAULT_PERMISSION_INFO_BASE_URI = 'smb://test-share'
 EXPECTED_DEFAULT_PERMISSION_INFO_RESPONSE = {
     'base_uri': 'smb://test-share',
-    'users_with_register_permissions': ['testuser'],
+    'users_with_register_permissions': [],
     'users_with_search_permissions': ['testuser']
 }
 EXPECTED_DEFAULT_PERMISSION_INFO_RESPONSE_IMMUTABLE_MARKER = _make_marker(EXPECTED_DEFAULT_PERMISSION_INFO_RESPONSE)
