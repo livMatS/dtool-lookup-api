@@ -98,13 +98,17 @@ class TokenBasedLookupClient:
                 headers=self.header, verify_ssl=self.verify_ssl) as r:
             return await r.json()
 
-    async def _post(self, route, json):
+    async def _post(self, route, json, method='json'):
         async with self.session.post(
                 f'{self.lookup_url}{route}',
                 headers=self.header,
                 json=json,
                 verify_ssl=self.verify_ssl) as r:
-            return await r.json()
+            try:  # workaround for other non-json, non-method properties, better solutions welcme
+                return await getattr(r, method)()
+            except TypeError:
+                return getattr(r, method)
+
 
     async def summary(self):
         """Overall summary of datasets accessible to a user."""
@@ -173,7 +177,8 @@ class TokenBasedLookupClient:
 
     async def register_user(self, username, is_admin=False):
         """Register a user. (Needs admin priviledges.)"""
-        return await self._post('/admin/user/register', dict(username=username, is_admin=is_admin))
+        return await self._post('/admin/user/register', [dict(username=username, is_admin=is_admin)],
+                                method='status') == 201
 
     async def permission_info(self, base_uri):
         """Request permissions on base URI. (Needs admin priviledges.)"""
