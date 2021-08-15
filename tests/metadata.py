@@ -200,8 +200,18 @@ EXPECTED_CONFIG_RESPONSE_IMMUTABLE_MARKER["dtool_lookup_server_dependency_graph_
 EXPECTED_CONFIG_RESPONSE_IMMUTABLE_MARKER["dtool_lookup_server_direct_mongo_plugin"]["version"] = False
 EXPECTED_CONFIG_RESPONSE_IMMUTABLE_MARKER["dtool_lookup_server_direct_mongo_plugin"]["allow_direct_aggregation"] = False
 
-EXPECTED_DEFAULT_LIST_USERS_RESPONSE = ALL_METADTA
-EXPECTED_DEFAULT_LIST_USERS_RESPONSE_IMMUTABLE_MARKER = ALL_METADTA_IMMUTABLE_MARKER
+# admin routes
+
+# list users
+
+EXPECTED_DEFAULT_LIST_USERS_RESPONSE = [{
+    'is_admin': True,
+    'register_permissions_on_base_uris': [],
+    'search_permissions_on_base_uris': ['smb://test-share'],
+    'username': 'testuser'
+}]
+EXPECTED_DEFAULT_LIST_USERS_RESPONSE_IMMUTABLE_MARKER = _make_marker(EXPECTED_DEFAULT_LIST_USERS_RESPONSE)
+
 
 EXPECTED_DEFAULT_REGISTER_USER_RESPONSE = ALL_METADTA
 EXPECTED_DEFAULT_REGISTER_USER_RESPONSE_IMMUTABLE_MARKER = ALL_METADTA_IMMUTABLE_MARKER
