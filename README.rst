@@ -5,7 +5,7 @@ README
 
 Python API for interacting with dtool lookup server.
 
-This package offers a class-based asynchronous lookup API within ``dtool_lookup_api.core.LookupClient``, 
+This package offers a class-based asynchronous lookup API within ``dtool_lookup_api.core.LookupClient``,
 a simple class-less wrapper around it at ``dtool_lookup_api.asynchronous``,
 and a synchronous interface on top at ``dtool_lookup_api.synchronous``.
 
@@ -307,8 +307,8 @@ Fix within https://github.com/IMTEK-Simulation/dtool-lookup-server-direct-mongo-
 Usage on Jupyter notebook
 --------------------------
 
-The current implementation via ``asgiref.async_to_sync`` (https://github.com/django/asgiref) 
-hinders the use of the synchronous interface within Jupyter notebooks. 
+The current implementation via ``asgiref.async_to_sync`` (https://github.com/django/asgiref)
+hinders the use of the synchronous interface within Jupyter notebooks.
 Directly use the asynchronous api instead
 
 .. code-block:: python
@@ -334,7 +334,7 @@ The code below can be executed in both contexts:
 
     def query(query_dict):
         return asyncio.run(dl.query(query_dict))
-    
+
     query({
         'base_uri': 'smb://test-share',
         'name': {'$regex': 'test'},
@@ -342,14 +342,49 @@ The code below can be executed in both contexts:
 
 See https://github.com/jupyter/notebook/issues/3397#issuecomment-419386811, https://ipython.readthedocs.io/en/stable/interactive/autoawait.html
 
-.. |PyPI| image:: https://img.shields.io/pypi/v/dtool-lookup-api 
+
+Testing
+-------
+
+Tests require the presence of a working dtool lookup server ecosystem.
+The testing workflow within :code:`.github/workflows/test.yml` uses the
+`dtool-lookup-server-container-composition
+<https://github.com/jotelha/dtool-lookup-server-container-composition>`_
+to provide a mock ecosystem. It is possible to run the workflow locally
+with the help of `docker <https://www.docker.com/>`_ and
+`act <https://github.com/nektos/act>`_.
+
+After `installing and configuring act <https://github.com/nektos/act#installation>`_, run
+
+.. code-block:: bash
+
+  act -P ubuntu-latest=catthehacker/ubuntu:full-latest -s GITHUB_TOKEN=$GITHUB_TOKEN -W .github/workflows/test.yml --bind
+
+from within this repository. :code:`$GITHUB_TOKEN` must hold a valid
+`access token <https://github.com/settings/tokens>`_.
+The user must be member of the :code:`docker` group.
+The :code:`--bind` option avoids quirky permission errors by running
+the test in the current directory. This will however result in the
+local creation of two subdirectories :code:`dtool-lookup-server-container-composition`
+and :code:`workflow` during testing, which may be removed with
+
+.. code-block:: bash
+
+  rm -rf dtool-lookup-server-container-composition
+  sudo rm -rf workflow
+
+eventually. All tests have been confirmed to work with the
+:code:`catthehacker/ubuntu:full-20.04` `runner <https://github.com/nektos/act#runners>`_.
+
+
+.. |PyPI| image:: https://img.shields.io/pypi/v/dtool-lookup-api
     :alt: PyPI
     :target: https://pypi.org/project/dtool-lookup-api/
 
-.. |github tag| image:: https://img.shields.io/github/v/tag/IMTEK-Simulation/dtool-lookup-api 
+.. |github tag| image:: https://img.shields.io/github/v/tag/IMTEK-Simulation/dtool-lookup-api
     :alt: GitHub tag (latest by date)
     :target: https://github.com/IMTEK-Simulation/dtool-lookup-api/tags
 
-.. |github tests| image:: https://img.shields.io/github/workflow/status/IMTEK-Simulation/dtool-lookup-api/test?label=tests 
+.. |github tests| image:: https://img.shields.io/github/workflow/status/IMTEK-Simulation/dtool-lookup-api/test?label=tests
     :alt: GitHub Workflow Status
     :target: https://github.com/IMTEK-Simulation/dtool-lookup-api/actions?query=workflow%3Atest

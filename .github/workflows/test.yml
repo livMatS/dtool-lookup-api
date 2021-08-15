@@ -8,8 +8,8 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python-version: [3.6, 3.7, 3.8]
-        dtool-lookup-server-container-composition-version: [0.1.4]
+        python-version: [3.6, 3.7, 3.8, 3.9]
+        dtool-lookup-server-container-composition-version: [0.1.5]
 
     steps:
     - name: Git checkout this
@@ -29,6 +29,13 @@ jobs:
 
     - name: Pull container images and prepare composition
       run: |
+        # the following line allows testing locally with act (https://github.com/nektos/act),
+        # i.e. by running
+        #   act -W .github/workflows/test.yml --bind
+        # from within this repository's root directory (see README for more information).
+        sudo chown runner:docker /var/run/docker.sock
+        # see https://github.com/nektos/act/issues/724#issuecomment-855390956
+
         cd dtool-lookup-server-container-composition
 
         docker-compose pull 
@@ -95,3 +102,11 @@ jobs:
         cd ..
         sleep 10
         pytest --deselect=dtool-lookup-server-container-composition
+
+        cd dtool-lookup-server-container-composition
+        echo "docker-compose down --volumes"
+        docker-compose down --volumes --timeout 30
+        cd ..
+
+        
+
