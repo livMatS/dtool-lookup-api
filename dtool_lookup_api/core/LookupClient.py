@@ -41,7 +41,7 @@ async def authenticate(auth_url, username, password, verify_ssl=True):
             json={
                 'username': username,
                 'password': password
-            }, verify_ssl=verify_ssl) as r:
+            }, ssl=verify_ssl) as r:
         if r.status == 200:
             json = await r.json()
             if 'token' not in json:
@@ -63,7 +63,7 @@ class TokenBasedLookupClient:
         self.verify_ssl = verify_ssl
         self.token = token
 
-        logger.debug("%s initialized with lookup_url=%s, verify_ssl=%s",
+        logger.debug("%s initialized with lookup_url=%s, ssl=%s",
                      type(self).__name__, self.lookup_url, self.verify_ssl)
 
     async def __aenter__(self):
@@ -85,7 +85,7 @@ class TokenBasedLookupClient:
             raise ValueError(
                 "Provide JWT token.")
 
-        logger.debug("Connect to %s, verify_ssl=%s", self.lookup_url, self.verify_ssl)
+        logger.debug("Connect to %s, ssl=%s", self.lookup_url, self.verify_ssl)
 
     @property
     def header(self):
@@ -95,7 +95,7 @@ class TokenBasedLookupClient:
         """Return information from a specific route."""
         async with self.session.get(
                 f'{self.lookup_url}{route}',
-                headers=self.header, verify_ssl=self.verify_ssl) as r:
+                headers=self.header, ssl=self.verify_ssl) as r:
             return await r.json()
 
     async def _post(self, route, json, method='json'):
@@ -103,7 +103,7 @@ class TokenBasedLookupClient:
                 f'{self.lookup_url}{route}',
                 headers=self.header,
                 json=json,
-                verify_ssl=self.verify_ssl) as r:
+                ssl=self.verify_ssl) as r:
             try:  # workaround for other non-json, non-method properties, better solutions welcme
                 return await getattr(r, method)()
             except TypeError:
@@ -202,13 +202,13 @@ class CredentialsBasedLookupClient(TokenBasedLookupClient):
         self.password = password
 
         super().__init__(lookup_url=lookup_url, verify_ssl=verify_ssl)
-        logger.debug("%s initialized with lookup_url=%s, auth_url=%s, username=%s, verify_ssl=%s",
+        logger.debug("%s initialized with lookup_url=%s, auth_url=%s, username=%s, ssl=%s",
                      type(self).__name__, self.lookup_url, self.auth_url, self.username, self.verify_ssl)
 
     async def connect(self):
         """Establish connection."""
         logger = logging.getLogger(__name__)
-        logger.debug("Connect to lookup_url=%s, auth_url=%s, username=%s, verify_ssl=%s",
+        logger.debug("Connect to lookup_url=%s, auth_url=%s, username=%s, ssl=%s",
                      self.lookup_url, self.auth_url, self.username, self.verify_ssl)
 
         self.token = await authenticate(
@@ -245,7 +245,7 @@ class ConfigurationBasedLookupClient(CredentialsBasedLookupClient):
         if verify_ssl is None:
             verify_ssl = Config.verify_ssl
 
-        logger.debug("Initializing % swith lookup_url=%s, auth_url=%s, username=%s, verify_ssl=%s, cache_token=%s",
+        logger.debug("Initializing % swith lookup_url=%s, auth_url=%s, username=%s, ssl=%s, cache_token=%s",
                      type(self).__name__, lookup_url, auth_url, username, verify_ssl, cache_token)
 
         self.cache_token = cache_token
@@ -258,7 +258,7 @@ class ConfigurationBasedLookupClient(CredentialsBasedLookupClient):
             verify_ssl=verify_ssl)
 
         self.token = Config.token
-        logger.debug("%s initialized with lookup_url=%s, auth_url=%s, username=%s, verify_ssl=%s, cache_token=%s",
+        logger.debug("%s initialized with lookup_url=%s, auth_url=%s, username=%s, ssl=%s, cache_token=%s",
                      type(self).__name__, self.lookup_url, self.auth_url,
                      self.username, self.verify_ssl, self.cache_token)
 
@@ -291,7 +291,7 @@ class ConfigurationBasedLookupClient(CredentialsBasedLookupClient):
             async with self.session.get(
                     f'{self.lookup_url}/config/info',
                     headers=self.header,
-                    verify_ssl=self.verify_ssl) as r:
+                    ssl=self.verify_ssl) as r:
                 status_code = r.status
                 text = await r.text()
             logger.debug("Server answered with %s: %s.", status_code, yaml.safe_load(text))
