@@ -27,8 +27,9 @@ class DtoolLookupAPIConfig():
         """If interactive set True, allow prompting for username and password.
            If cache set True, store entered username and password entered during
            runtime."""
-        for attr in ('lookup_url', 'auth_url', 'username', 'verify_ssl'):
-            logger.debug("dtool config %s: %s", attr, getattr(self, attr, None))
+        if logger.level >= logging.DEBUG:  # only query properties if output desired
+            for attr in ('lookup_url', 'auth_url', 'username', 'verify_ssl'):
+                logger.debug("dtool config %s: %s", attr, getattr(self, attr, None))
 
         self.interactive = interactive
         self.cache = cache
