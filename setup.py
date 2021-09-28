@@ -1,43 +1,47 @@
 import os
 
 from setuptools import setup
-from setuptools_scm import get_version
 
-url = "https://github.com/IMTEK-Simulation/dtool-lookup-api"
+url = 'https://github.com/IMTEK-Simulation/dtool-lookup-api'
 readme = open('README.rst').read()
-version = get_version(root='.', relative_to=__file__)
+try:
+    from setuptools_scm import get_version
+    version = get_version(root='.', relative_to=__file__)
+except ModuleNotFoundError:
+    version = 'N/A'
 
 
 def local_scheme(version):
-    """Skip the local version (eg. +xyz of 0.6.1.dev4+gdf99fe2)
-    to be able to upload to Test PyPI"""
-    return ""
+    '''Skip the local version (eg. +xyz of 0.6.1.dev4+gdf99fe2)
+    to be able to upload to Test PyPI'''
+    return ''
 
 
 setup(
-    name="dtool-lookup-api",
-    packages=["dtool_lookup_api"],
-    description="""This package offers both synchronous and asynchronous
+    name='dtool-lookup-api',
+    packages=['dtool_lookup_api'],
+    description='''This package offers both synchronous and asynchronous
                    implementations of a standardized Python API to communicate
-                   with the dtool lookup server.""",
+                   with the dtool lookup server.''',
     long_description=readme,
     include_package_data=True,
-    author="Johannes Laurin Hoermann",
-    author_email="johannes.hoermann@imtek.uni-freiburg.de",
+    author='Johannes Laurin Hoermann',
+    author_email='johannes.hoermann@imtek.uni-freiburg.de',
     use_scm_version={
-        "root": '.',
-        "relative_to": __file__,
-        "write_to": os.path.join("dtool_lookup_api", "version.py"),
-        "local_scheme": local_scheme},
+        'root': '.',
+        'relative_to': __file__,
+        'write_to': os.path.join('dtool_lookup_api', 'version.py'),
+        'local_scheme': local_scheme},
     url=url,
     setup_requires=['setuptools_scm'],
     tests_require=['pytest', 'pytest-cov', 'pytest-ordering'],
     install_requires=[
-        "asgiref",
-        "aiohttp",
-        "dtoolcore>=3.9.0",
-        "PyYAML",
+        'setuptools_scm',
+        'asgiref',
+        'aiohttp',
+        'dtoolcore>=3.9.0',
+        'PyYAML',
     ],
-    download_url="{}/tarball/{}".format(url, version),
-    license="MIT"
+    download_url='{}/tarball/{}'.format(url, version),
+    license='MIT'
 )
