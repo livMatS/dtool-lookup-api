@@ -51,6 +51,10 @@ class DtoolLookupAPIConfig():
             logger.warning('Please provide %s', DTOOL_LOOKUP_SERVER_URL_KEY)
         return lookup_url
 
+    @lookup_url.setter
+    def lookup_url(self, value):
+        dtoolcore.utils.write_config_value_to_file(DTOOL_LOOKUP_SERVER_URL_KEY, value)
+
     # optional
     @property
     def token(self):
@@ -65,6 +69,10 @@ class DtoolLookupAPIConfig():
     def auth_url(self):
         return dtoolcore.utils.get_config_value(DTOOL_LOOKUP_SERVER_TOKEN_GENERATOR_URL_KEY, default="")
 
+    @auth_url.setter
+    def auth_url(self, value):
+        dtoolcore.utils.write_config_value_to_file(DTOOL_LOOKUP_SERVER_TOKEN_GENERATOR_URL_KEY, value)
+
     @property
     def username(self):
         if self._username_cache is None:
@@ -76,6 +84,10 @@ class DtoolLookupAPIConfig():
         else:
             username = self._username_cache
         return username
+
+    @username.setter
+    def username(self, value):
+        dtoolcore.utils.write_config_value_to_file(DTOOL_LOOKUP_SERVER_USERNAME_KEY, value)
 
     @property
     def password(self):
@@ -89,6 +101,10 @@ class DtoolLookupAPIConfig():
             password = self._password_cache
         return password
 
+    @password.setter
+    def password(self, value):
+        dtoolcore.utils.write_config_value_to_file(DTOOL_LOOKUP_SERVER_PASSWORD_KEY, value)
+
     @property
     def verify_ssl(self):
         verify_ssl = dtoolcore.utils.get_config_value(DTOOL_LOOKUP_SERVER_VERIFY_SSL_KEY)
@@ -97,6 +113,11 @@ class DtoolLookupAPIConfig():
         elif not isinstance(verify_ssl, bool):
             verify_ssl = True
         return verify_ssl
+
+    @verify_ssl.setter
+    def verify_ssl(self, value):
+        dtoolcore.utils.write_config_value_to_file(DTOOL_LOOKUP_SERVER_VERIFY_SSL_KEY,
+                                                   AFFIRMATIVE_EXPRESSIONS[0] if value else NEGATIVE_EXPRESSIONS[0])
 
 
 Config = DtoolLookupAPIConfig()
