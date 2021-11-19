@@ -17,9 +17,8 @@ def local_scheme(version):
 setup(
     name="dtool-lookup-api",
     packages=["dtool_lookup_api"],
-    description="""This package offers both synchronous and asynchronous
-                   implementations of a standardized Python API to communicate
-                   with the dtool lookup server.""",
+    description="This package offers both synchronous and asynchronous implementations of a standardized Python API "
+                "to communicate with the dtool lookup server.",
     long_description=readme,
     include_package_data=True,
     author="Johannes Laurin Hoermann",
