@@ -175,6 +175,14 @@ class TokenBasedLookupClient:
         """Request a list of users. (Needs admin priviledges.)"""
         return await self._get('/admin/user/list')
 
+    async def register_base_uri(self, base_uri):
+        """Register a base URI. (Needs admin priviledges.)"""
+        return await self._post('/admin/base_uri/register', dict(base_uri=base_uri))
+
+    async def list_base_uris(self):
+        """List all registered base URIs. (Needs admin priviledges.)"""
+        return await self._get('/admin/base_uri/list')
+
     async def register_user(self, username, is_admin=False):
         """Register a user. (Needs admin priviledges.)"""
         return await self._post('/admin/user/register', [dict(username=username, is_admin=is_admin)],
@@ -218,6 +226,7 @@ class CredentialsBasedLookupClient(TokenBasedLookupClient):
             verify_ssl=self.verify_ssl)
 
         await super().connect()
+
 
 class ConfigurationBasedLookupClient(CredentialsBasedLookupClient):
     """Use configured token if available and valid or reuest new token with credentials if provided."""
