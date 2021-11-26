@@ -37,14 +37,11 @@ jobs:
         # see https://github.com/nektos/act/issues/724#issuecomment-855390956
 
         cd dtool-lookup-server-container-composition
-
-        docker-compose pull 
+        docker-compose -f docker-compose.yml -f docker-compose.default-envs.yml -f docker-compose.default-ports.yml -f docker-compose.testing.yml pull 
         echo "docker image ls"
         docker image ls
-
-        echo "generate certs and keys"
+        echo "generate jwt key"
         cd keys
-        bash generate.sh
         bash generate_jwt_key.sh
 
     - name: Install basic testing requirements
@@ -69,11 +66,10 @@ jobs:
 
     - name: Provide dtool lookup server ${{ matrix.dtool-lookup-server-version }} and test with pytest
       run: |
-        
         cd dtool-lookup-server-container-composition
-        docker-compose -p dtool-lookup-server-container-composition up -d --no-build  # will pull missing images with build command in compose file
+        docker-compose -f docker-compose.yml -f docker-compose.default-envs.yml -f docker-compose.default-ports.yml -f docker-compose.testing.yml up -d 
 
-        sleep 10
+        sleep 10 # TODO: wait for all services to be ready and healthy
        
         echo "docker container ls --all"
         docker container ls --all
@@ -82,22 +78,36 @@ jobs:
         docker volume ls
         
         echo "docker images"
-        docker-compose images
+        docker-compose -f docker-compose.yml -f docker-compose.default-envs.yml -f docker-compose.default-ports.yml -f docker-compose.testing.yml images
 
         echo "dtool lookup server log"
-        docker-compose logs dtool_lookup_server
+        docker-compose -f docker-compose.yml -f docker-compose.default-envs.yml -f docker-compose.default-ports.yml -f docker-compose.testing.yml logs dtool_lookup_server
         
         echo "dtool lookup client log"
-        docker-compose logs dtool_lookup_client
+        docker-compose -f docker-compose.yml -f docker-compose.default-envs.yml -f docker-compose.default-ports.yml -f docker-compose.testing.yml logs dtool_lookup_client
+
+        # create dtool directory on samba share
+        echo "smbclient -U guest -c "mkdir dtool" -N -W WORKGROUP //sambaserver/sambashare"
+        docker-compose -f docker-compose.yml -f docker-compose.default-envs.yml -f docker-compose.default-ports.yml -f docker-compose.testing.yml run --entrypoint smbclient dtool_lookup_client -U guest -c "mkdir dtool" -N -W WORKGROUP //sambaserver/sambashare
+
+        # place test datasets on storage infrastructure
+        echo "dtool cp tests/dtool/simple_test_dataset smb://test-share"
+        docker-compose -f docker-compose.yml -f docker-compose.default-envs.yml -f docker-compose.default-ports.yml -f docker-compose.testing.yml run -v $(pwd)/tests:/tests dtool_lookup_client cp /tests/dtool/simple_test_dataset smb://test-share
+
+        echo "dtool cp tests/dtool/simple_test_dataset s3://test-bucket"
+        docker-compose -f docker-compose.yml -f docker-compose.default-envs.yml -f docker-compose.default-ports.yml -f docker-compose.testing.yml run -v $(pwd)/tests:/tests dtool_lookup_client cp /tests/dtool/simple_test_dataset s3://test-bucket
 
         echo "dtool ls smb://test-share"
-        docker-compose run dtool_lookup_client dtool ls smb://test-share
+        docker-compose -f docker-compose.yml -f docker-compose.default-envs.yml -f docker-compose.default-ports.yml -f docker-compose.testing.yml run dtool_lookup_client ls smb://test-share
+
+        echo "dtool ls s3://test-bucket"
+        docker-compose -f docker-compose.yml -f docker-compose.default-envs.yml -f docker-compose.default-ports.yml -f docker-compose.testing.yml run dtool_lookup_client ls s3://test-bucket
         
         echo "explicitly re-evoke dataset indexing"
-        docker-compose exec -T dtool_lookup_server /refresh_index
+        docker-compose -f docker-compose.yml -f docker-compose.default-envs.yml -f docker-compose.default-ports.yml -f docker-compose.testing.yml exec -T dtool_lookup_server /refresh_index
 
         echo "dtool query '{}'"
-        docker-compose run dtool_lookup_client dtool query '{}'
+        docker-compose -f docker-compose.yml -f docker-compose.default-envs.yml -f docker-compose.default-ports.yml -f docker-compose.testing.yml run dtool_lookup_client query '{}'
 
         cd ..
         sleep 10
@@ -105,8 +115,4 @@ jobs:
 
         cd dtool-lookup-server-container-composition
         echo "docker-compose down --volumes"
-        docker-compose down --volumes --timeout 30
-        cd ..
-
-        
-
+        docker-compose -f docker-compose.yml -f docker-compose.default-envs.yml -f docker-compose.default-ports.yml -f docker-compose.testing.yml down --volumes --timeout 30
