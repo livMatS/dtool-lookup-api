@@ -224,6 +224,19 @@ EXPECTED_CONFIG_RESPONSE_IMMUTABLE_MARKER["dtool_lookup_server_dependency_graph_
 EXPECTED_CONFIG_RESPONSE_IMMUTABLE_MARKER["dtool_lookup_server_direct_mongo_plugin"]["version"] = False
 EXPECTED_CONFIG_RESPONSE_IMMUTABLE_MARKER["dtool_lookup_server_direct_mongo_plugin"]["allow_direct_aggregation"] = False
 
+
+# user info
+
+DEFAULT_USER_INFO_USER_NAME = 'testuser'
+EXPECTED_DEFAULT_USER_INFO_RESPONSE = {
+    'is_admin': True,
+    'register_permissions_on_base_uris': [],
+    'search_permissions_on_base_uris': ['smb://test-share', 's3://test-bucket'],
+    'username': 'testuser'
+}
+EXPECTED_DEFAULT_USER_INFO_RESPONSE_IMMUTABLE_MARKER = _make_marker(EXPECTED_DEFAULT_USER_INFO_RESPONSE)
+
+
 # admin routes
 
 # list users

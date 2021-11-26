@@ -109,7 +109,6 @@ class TokenBasedLookupClient:
             except TypeError:
                 return getattr(r, method)
 
-
     async def summary(self):
         """Overall summary of datasets accessible to a user."""
         return await self._get('/dataset/summary')
@@ -171,29 +170,33 @@ class TokenBasedLookupClient:
         """Request the server configuration."""
         return await self._get('/config/info')
 
+    async def user_info(self, user):
+        """Request user info."""
+        return await self._get(f'/user/info/{user}')
+
     async def list_users(self):
-        """Request a list of users. (Needs admin priviledges.)"""
+        """Request a list of users. (Needs admin privilges.)"""
         return await self._get('/admin/user/list')
 
     async def register_base_uri(self, base_uri):
-        """Register a base URI. (Needs admin priviledges.)"""
+        """Register a base URI. (Needs admin privileges.)"""
         return await self._post('/admin/base_uri/register', dict(base_uri=base_uri))
 
     async def list_base_uris(self):
-        """List all registered base URIs. (Needs admin priviledges.)"""
+        """List all registered base URIs. (Needs admin privileges.)"""
         return await self._get('/admin/base_uri/list')
 
     async def register_user(self, username, is_admin=False):
-        """Register a user. (Needs admin priviledges.)"""
+        """Register a user. (Needs admin privileges.)"""
         return await self._post('/admin/user/register', [dict(username=username, is_admin=is_admin)],
                                 method='status') == 201
 
     async def permission_info(self, base_uri):
-        """Request permissions on base URI. (Needs admin priviledges.)"""
+        """Request permissions on base URI. (Needs admin privileges.)"""
         return await self._post('/admin/permission/info', dict(base_uri=base_uri))
 
     async def update_permissions(self, base_uri, users_with_search_permissions, users_with_register_permissions=[]):
-        """Request permissions on base URI. (Needs admin priviledges.)"""
+        """Request permissions on base URI. (Needs admin privileges.)"""
         return await self._post('/admin/permission/update_on_base_uri', dict(
             base_uri=base_uri,
             users_with_search_permissions=users_with_search_permissions,
@@ -254,7 +257,7 @@ class ConfigurationBasedLookupClient(CredentialsBasedLookupClient):
         if verify_ssl is None:
             verify_ssl = Config.verify_ssl
 
-        logger.debug("Initializing % swith lookup_url=%s, auth_url=%s, username=%s, ssl=%s, cache_token=%s",
+        logger.debug("Initializing % with lookup_url=%s, auth_url=%s, username=%s, ssl=%s, cache_token=%s",
                      type(self).__name__, lookup_url, auth_url, username, verify_ssl, cache_token)
 
         self.cache_token = cache_token
