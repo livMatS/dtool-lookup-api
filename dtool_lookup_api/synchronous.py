@@ -57,6 +57,12 @@ async def search(keyword=None):
 
 
 @async_to_sync
+async def user_info(user):
+    """Wraps around asynchronous.list_users."""
+    return await asynchronous.user_info(user)
+
+
+@async_to_sync
 async def list_users():
     """Wraps around asynchronous.search."""
     return await asynchronous.list_users()

@@ -50,6 +50,12 @@ async def search(keyword=None):
         return await lookup_client.search(keyword)
 
 
+async def user_info(user):
+    """Wraps around LookupClient method 'user_info'."""
+    async with ConfigurationBasedLookupClient() as lookup_client:
+        return await lookup_client.user_info(user)
+
+
 async def list_users():
     """Wraps around LookupClient method 'list_users'."""
     async with ConfigurationBasedLookupClient() as lookup_client:
