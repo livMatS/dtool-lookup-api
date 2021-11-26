@@ -9,7 +9,7 @@ jobs:
       fail-fast: false
       matrix:
         python-version: [3.6, 3.7, 3.8, 3.9]
-        dtool-lookup-server-container-composition-version: [0.1.6]
+        dtool-lookup-server-container-composition-version: [0.4.1]
 
     steps:
     - name: Git checkout this
