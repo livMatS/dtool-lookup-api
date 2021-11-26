@@ -18,9 +18,12 @@
 #
 set -euxo pipefail
 cd dtool-lookup-server-container-composition
-docker-compose down --volumes --timeout 30
 
-DOCKER_COMPOSE_OPTS=${DOCKER_COMPOSE_OPTS:-"-f docker-compose.yml -f docker-compose.default-envs.yml -f docker-compose.default-ports.yml -f docker-compose.testing.yml"}
+DOCKER_COMPOSE_OPTS=${DOCKER_COMPOSE_OPTS:-"-p dtool-lookup-server-container-composition \
+                                            -f docker-compose.yml \
+                                            -f docker-compose.default-envs.yml \
+                                            -f docker-compose.default-ports.yml \
+                                            -f docker-compose.testing.yml"}
 
 docker-compose ${DOCKER_COMPOSE_OPTS} down --volumes --timeout 30
 
@@ -47,7 +50,7 @@ flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
 flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
 
 cd dtool-lookup-server-container-composition
-docker-compose ${DOCKER_COMPOSE_OPTS} -p dtool-lookup-server-container-composition up -d
+docker-compose ${DOCKER_COMPOSE_OPTS} up -d
 
 sleep 10 # TODO: mechanism to wait for containers to be ready
 
@@ -95,5 +98,5 @@ pytest --deselect=dtool-lookup-server-container-composition
 
 # cd dtool-lookup-server-container-composition
 # echo "docker-compose down --volumes"
-# docker-compose down --volumes --timeout 30
+# docker-compose ${DOCKER_COMPOSE_OPTS} down --volumes --timeout 30
 # cd ..
