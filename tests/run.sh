@@ -31,7 +31,7 @@ docker image ls
 echo "generate jwt key"
 cd keys && bash generate_jwt_key.sh && cd ..
 
-cd ../..
+cd ..
 python -m pip install --upgrade pip
 pip install --upgrade setuptools wheel setuptools-scm[toml] importlib-metadata
 pip install flake8 pytest pytest-cov pytest-ordering
@@ -93,7 +93,7 @@ cd ..
 sleep 10
 pytest --deselect=dtool-lookup-server-container-composition
 
-cd dtool-lookup-server-container-composition
-echo "docker-compose down --volumes"
-docker-compose down --volumes --timeout 30
-cd ..
+# cd dtool-lookup-server-container-composition
+# echo "docker-compose down --volumes"
+# docker-compose down --volumes --timeout 30
+# cd ..
