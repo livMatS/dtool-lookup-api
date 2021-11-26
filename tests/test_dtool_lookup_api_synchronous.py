@@ -188,7 +188,7 @@ def test_default_search():
     logger.debug("Response:")
     _log_nested_dict(logger.debug, response)
 
-    assert len(response) == 1
+    assert len(response) == 2
 
     compares = _compare(
         response,

@@ -8,7 +8,7 @@ from environ import TemporaryOSEnviron
 
 DTOOL_LOOKUP_SERVER_ADDRESS_AND_CREDENTIALS = {
     "DTOOL_LOOKUP_SERVER_URL": "https://localhost:5000",
-    "DTOOL_LOOKUP_SERVER_TOKEN_GENERATOR_URL": "http://localhost:5001/token",
+    "DTOOL_LOOKUP_SERVER_TOKEN_GENERATOR_URL": "https://localhost:5001/token",
     "DTOOL_LOOKUP_SERVER_USERNAME": "testuser",
     "DTOOL_LOOKUP_SERVER_PASSWORD": "test_password",
     "DTOOL_LOOKUP_SERVER_VERIFY_SSL": False,

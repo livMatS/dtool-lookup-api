@@ -30,13 +30,15 @@ setup(
         "local_scheme": local_scheme},
     url=url,
     setup_requires=['setuptools_scm'],
-    tests_require=['pytest', 'pytest-cov', 'pytest-ordering'],
     install_requires=[
         "asgiref",
         "aiohttp",
         "dtoolcore>=3.9.0",
         "PyYAML",
     ],
+    extras_require={
+        'testing': ['pytest', 'pytest-cov', 'pytest-ordering'],
+    },
     download_url="{}/tarball/{}".format(url, version),
     license="MIT"
 )
