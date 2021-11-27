@@ -257,7 +257,7 @@ class ConfigurationBasedLookupClient(CredentialsBasedLookupClient):
         if verify_ssl is None:
             verify_ssl = Config.verify_ssl
 
-        logger.debug("Initializing % with lookup_url=%s, auth_url=%s, username=%s, ssl=%s, cache_token=%s",
+        logger.debug("Initializing %s with lookup_url=%s, auth_url=%s, username=%s, ssl=%s, cache_token=%s",
                      type(self).__name__, lookup_url, auth_url, username, verify_ssl, cache_token)
 
         self.cache_token = cache_token
