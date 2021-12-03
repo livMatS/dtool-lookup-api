@@ -250,10 +250,6 @@ class ConfigurationBasedLookupClient(CredentialsBasedLookupClient):
             lookup_url = Config.lookup_url
         if auth_url is None:
             auth_url = Config.auth_url
-        if username is None:
-            username = Config.username
-        if password is None:
-            password = Config.password
         if verify_ssl is None:
             verify_ssl = Config.verify_ssl
 
@@ -284,6 +280,11 @@ class ConfigurationBasedLookupClient(CredentialsBasedLookupClient):
             logger.debug("Reusing provided token.")
             await TokenBasedLookupClient.connect(self)
         else:
+            # only look for username and password if really necessry
+            if self.username is None:
+                self.username = Config.username
+            if self.password is None:
+                self.password = Config.password
             logger.debug("Requesting new token.")
             await CredentialsBasedLookupClient.connect(self)
 
