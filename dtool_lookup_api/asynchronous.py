@@ -34,7 +34,7 @@ class _WrapClient:
         self._func = func
         self.__doc__ = self._func.__doc__
 
-    async def __call__(*args, **kwargs):
+    async def __call__(self, *args, **kwargs):
         async with ConfigurationBasedLookupClient() as lookup_client:
             return await self._func(lookup_client, *args, **kwargs)
 
