@@ -28,6 +28,7 @@ import inspect
 
 from .core.LookupClient import ConfigurationBasedLookupClient
 
+
 class _WrapClient:
     def __init__(self, name, func):
         self._name = name
