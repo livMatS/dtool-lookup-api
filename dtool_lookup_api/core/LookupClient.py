@@ -21,6 +21,7 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 #
+
 """dtool_lookup_api.core.LookupClient module."""
 
 
@@ -31,6 +32,10 @@ import logging
 import aiohttp
 
 from .config import Config
+
+
+class LookupServerError(Exception):
+    pass
 
 
 async def authenticate(auth_url, username, password, verify_ssl=True):
@@ -91,12 +96,18 @@ class TokenBasedLookupClient:
     def header(self):
         return {'Authorization': f'Bearer {self.token}'}
 
+    def _check_json(self, json):
+        if 'msg' in json:
+            raise LookupServerError(json['msg'])
+
     async def _get(self, route):
         """Return information from a specific route."""
         async with self.session.get(
                 f'{self.lookup_url}{route}',
                 headers=self.header, ssl=self.verify_ssl) as r:
-            return await r.json()
+            json = await r.json()
+            self._check_json(json)
+            return json
 
     async def _post(self, route, json, method='json'):
         async with self.session.post(
@@ -105,9 +116,11 @@ class TokenBasedLookupClient:
                 json=json,
                 ssl=self.verify_ssl) as r:
             try:  # workaround for other non-json, non-method properties, better solutions welcme
-                return await getattr(r, method)()
+                json = await getattr(r, method)()
             except TypeError:
-                return getattr(r, method)
+                json = getattr(r, method)
+            self._check_json(json)
+            return json
 
 
     async def summary(self):
