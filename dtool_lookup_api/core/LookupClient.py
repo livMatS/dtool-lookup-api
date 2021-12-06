@@ -97,7 +97,7 @@ class TokenBasedLookupClient:
         return {'Authorization': f'Bearer {self.token}'}
 
     def _check_json(self, json):
-        if 'msg' in json:
+        if isinstance(json, dict) and 'msg' in json:
             raise LookupServerError(json['msg'])
 
     async def _get(self, route):
