@@ -1,14 +1,14 @@
 CHANGELOG
 =========
 
-This project uses `semantic versioning <http://semver.org/>`_.
-This change log uses principles from `keep a changelog <http://keepachangelog.com/>`_.
+0.3.0 (6Dec21)
+--------------
 
-[Unreleased]
-------------
+- Automatically create `synchronous` and `asynchronous` modules.
+- Detect server errors (in particular if a token expires) and raise exceptions.
 
-Added
-^^^^^
+0.2.0 (30Aug21)
+---------------
 
 - ``dtool_lookup_api.lookup``
 - ``dtool_lookup_api.search``
@@ -16,23 +16,3 @@ Added
 - ``dtool_lookup_api.config``
 - ... as well as their asynchronous pendants within ``dtool_lookup_api.asynchronous`` ...
 - and the underlying core mechanisms within ``dtool_lookup_api.core.LookupClient```.
-
-
-Changed
-^^^^^^^
-
-
-Deprecated
-^^^^^^^^^^
-
-
-Removed
-^^^^^^^
-
-
-Fixed
-^^^^^
-
-
-Security
-^^^^^^^^
