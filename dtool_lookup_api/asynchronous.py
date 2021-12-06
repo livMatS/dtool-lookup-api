@@ -22,7 +22,7 @@
 # SOFTWARE.
 #
 
-"""dtool_lookup_client.async module."""
+"""Module that has asynchronous API access functions in its global scope."""
 
 import inspect
 
