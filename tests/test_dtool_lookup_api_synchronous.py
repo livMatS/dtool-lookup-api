@@ -19,6 +19,7 @@ from metadata import (
     # EXPECTED_DEFAULT_REGISTER_USER_RESPONSE, EXPECTED_DEFAULT_REGISTER_USER_RESPONSE_IMMUTABLE_MARKER,
     DEFAULT_PERMISSION_INFO_BASE_URI, EXPECTED_DEFAULT_PERMISSION_INFO_RESPONSE, EXPECTED_DEFAULT_PERMISSION_INFO_RESPONSE_IMMUTABLE_MARKER,
     # EXPECTED_DEFAULT_UPDATE_PERMISSIONS_RESPONSE, EXPECTED_DEFAULT_UPDATE_PERMISSIONS_RESPONSE_IMMUTABLE_MARKER,
+    DEFAULT_USER_INFO_USER_NAME, EXPECTED_DEFAULT_USER_INFO_RESPONSE, EXPECTED_DEFAULT_USER_INFO_RESPONSE_IMMUTABLE_MARKER,
 )
 
 
@@ -188,7 +189,7 @@ def test_default_search():
     logger.debug("Response:")
     _log_nested_dict(logger.debug, response)
 
-    assert len(response) == 1
+    assert len(response) == 2
 
     compares = _compare(
         response,
@@ -196,6 +197,32 @@ def test_default_search():
         EXPECTED_DEFAULT_SEARCH_RESPONSE_IMMUTABLE_MARKER
     )
     assert compares
+
+
+# mark to run early in order to not have any other users registered in database by other tests
+@pytest.mark.first
+@pytest.mark.usefixtures("dtool_lookup_server", "dtool_config")
+def test_user_info():
+    """Will send a user info request to the server."""
+    from dtool_lookup_api.synchronous import user_info
+
+    logger = logging.getLogger(__name__)
+
+    response = user_info(DEFAULT_USER_INFO_USER_NAME)
+    assert response is not None
+
+    logger.debug("Response:")
+    _log_nested_dict(logger.debug, response)
+
+    compares = _compare(
+        response,
+        EXPECTED_DEFAULT_USER_INFO_RESPONSE,
+        EXPECTED_DEFAULT_USER_INFO_RESPONSE_IMMUTABLE_MARKER
+    )
+    assert compares
+
+
+# admin routes
 
 # mark to run early in order to not have any other users registered in database by other tests
 @pytest.mark.first
@@ -252,6 +279,7 @@ def test_default_register_user():
         _log_nested_dict(logger.debug, response)
 
     # TODO: check for existence of registered users on server
+
 
 # mark to run early in order to not have any other users registered in database by other tests
 @pytest.mark.first

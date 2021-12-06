@@ -55,7 +55,8 @@ class DtoolLookupAPIConfig():
             for attr in ('lookup_url', 'auth_url', 'username', 'verify_ssl'):
                 logger.debug("dtool config %s: %s", attr, getattr(self, attr, None))
 
-        self.interactive = interactive
+        # don't behave interactive at constructor
+        self.interactive = False
         self.cache = cache
 
         self._username_cache = None
@@ -67,6 +68,8 @@ class DtoolLookupAPIConfig():
                 'Please provide either %s or a pair of credentials %s and %s together with %s.',
                 DTOOL_LOOKUP_SERVER_TOKEN_KEY, DTOOL_LOOKUP_SERVER_USERNAME_KEY,
                 DTOOL_LOOKUP_SERVER_PASSWORD_KEY, DTOOL_LOOKUP_SERVER_TOKEN_GENERATOR_URL_KEY)
+
+        self.interactive = interactive
 
     @property
     def lookup_url(self):
