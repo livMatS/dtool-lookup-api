@@ -28,13 +28,19 @@ import inspect
 
 from .core.LookupClient import ConfigurationBasedLookupClient
 
+class _WrapClient:
+    def __init__(self, name, func):
+        self._name = name
+        self._func = func
+        self.__doc__ = self._func.__doc__
+
+    async def __call__(*args, **kwargs):
+        async with ConfigurationBasedLookupClient() as lookup_client:
+            return await self._func(lookup_client, *args, **kwargs)
+
+
 # Import all methods from ConfigurationBasedLookupClient into the global namespace
 for name, func in inspect.getmembers(ConfigurationBasedLookupClient, predicate=inspect.isfunction):
-    async def _wrap_client(*args, **kwargs):
-        async with ConfigurationBasedLookupClient() as lookup_client:
-            return await getattr(lookup_client, name)(*args, **kwargs)
-        __doc__ = func.__doc__
-
     # Import everything that does not start with an underscore
     if not name.startswith('_'):
-        globals()[name] = _wrap_client
+        globals()[name] = _WrapClient(name, func)
