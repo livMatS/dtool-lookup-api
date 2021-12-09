@@ -18,5 +18,6 @@ def wrap_asyncio(fun):
 
 
 query = wrap_asyncio(dl.query)
+readme = wrap_asyncio(dl.readme)
 
 # TODO: automate this: https://stackoverflow.com/questions/39184338/how-can-i-decorate-all-functions-imported-from-a-file
