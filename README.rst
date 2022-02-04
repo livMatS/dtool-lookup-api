@@ -31,7 +31,7 @@ The API needs to know the URL of the lookup server
 
 .. code-block:: bash
 
-    export DTOOL_LOOKUP_SERVER_URL=http://localhost:5000
+    export DTOOL_LOOKUP_SERVER_URL=https://localhost:5000
 
 You may also need specify an access token generated on the server
 
@@ -44,7 +44,7 @@ Instead of specifying the access token directly, it is also possible to provide
 
 .. code-block:: bash
 
-    export DTOOL_LOOKUP_SERVER_TOKEN_GENERATOR_URL=http://localhost:5001
+    export DTOOL_LOOKUP_SERVER_TOKEN_GENERATOR_URL=https://localhost:5001
     export DTOOL_LOOKUP_SERVER_USERNAME=my-username
     export DTOOL_LOOKUP_SERVER_PASSWORD=my-password
 
@@ -56,8 +56,8 @@ Our recommended setup is a combination of
 
 .. code-block:: bash
 
-    export DTOOL_LOOKUP_SERVER_URL=http://localhost:5000
-    export DTOOL_LOOKUP_SERVER_TOKEN_GENERATOR_URL=http://localhost:5001
+    export DTOOL_LOOKUP_SERVER_URL=https://localhost:5000
+    export DTOOL_LOOKUP_SERVER_TOKEN_GENERATOR_URL=https://localhost:5001
 
 in the config. If used interactively, the API will then ask for your
 credentials at the first interaction and cache the provided values for this
@@ -71,8 +71,8 @@ session, i.e.
        ...:         'readme.owners.name': {'$regex': '^Testing User$'},
        ...:     }
        ...: )
-    Authentication URL http://localhost:5001/token username:my-username
-    Authentication URL http://localhost:5001/token password:
+    Authentication URL https://localhost:5001/token username:my-username
+    Authentication URL https://localhost:5001/token password:
 
     In [2]: res
     Out[2]:
@@ -123,7 +123,7 @@ file as well, i.e. at ``~/.config/dtool/dtool.json``
 .. code-block:: bash
 
     {
-        "DTOOL_LOOKUP_SERVER_TOKEN_GENERATOR_URL": "http://localhost:5001/token",
+        "DTOOL_LOOKUP_SERVER_TOKEN_GENERATOR_URL": "https://localhost:5001/token",
         "DTOOL_LOOKUP_SERVER_URL": "https://localhost:5000"
     }
 
