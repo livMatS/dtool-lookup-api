@@ -8,7 +8,7 @@ from utils import _make_marker
 
 # all
 
-ALL_METADTA = [
+ALL_METADTA = sorted([
     {
         'base_uri': 's3://test-bucket',
         'created_at': 1604860720.736,
@@ -33,7 +33,7 @@ ALL_METADTA = [
         'uri': 'smb://test-share/1a1f9fad-8589-413e-9602-5bbd66bfe675',
         'uuid': '1a1f9fad-8589-413e-9602-5bbd66bfe675'
     }
-]
+], key=lambda r: r['uri'])
 
 ALL_METADTA_IMMUTABLE_MARKER = _make_marker(ALL_METADTA)
 for dataset in ALL_METADTA_IMMUTABLE_MARKER:
@@ -94,8 +94,16 @@ EXPECTED_DEFAULT_AGGREGATION_RESPONSE_IMMUTABLE_MARKER = _make_marker(EXPECTED_D
 # lookup
 
 DEFAULT_LOOKUP_UUID = "1a1f9fad-8589-413e-9602-5bbd66bfe675"
-EXPECTED_DEFAULT_LOOKUP_RESPONSE = [
+EXPECTED_DEFAULT_LOOKUP_RESPONSE = sorted([
     {
+        'base_uri': 's3://test-bucket',
+        'created_at': 1604860720.736269,
+        'creator_username': 'jotelha',
+        'frozen_at': 1604864525.691079,
+        'name': 'simple_test_dataset',
+        'uri': 's3://test-bucket/1a1f9fad-8589-413e-9602-5bbd66bfe675',
+        'uuid': '1a1f9fad-8589-413e-9602-5bbd66bfe675'
+    }, {
         "base_uri": "smb://test-share",
         "created_at": 1604860720.736269,
         "creator_username": "jotelha",
@@ -104,14 +112,15 @@ EXPECTED_DEFAULT_LOOKUP_RESPONSE = [
         "uri": "smb://test-share/1a1f9fad-8589-413e-9602-5bbd66bfe675",
         "uuid": "1a1f9fad-8589-413e-9602-5bbd66bfe675"
     }
-]
+], key=lambda r: r["uri"])
 EXPECTED_DEFAULT_LOOKUP_RESPONSE_IMMUTABLE_MARKER = _make_marker(EXPECTED_DEFAULT_LOOKUP_RESPONSE)
-EXPECTED_DEFAULT_LOOKUP_RESPONSE_IMMUTABLE_MARKER[0].update(
-    {
-        "created_at": False,
-        "frozen_at": False,
-    }
-)
+for dataset in EXPECTED_DEFAULT_LOOKUP_RESPONSE_IMMUTABLE_MARKER:
+    dataset.update(
+        {
+            "created_at": False,
+            "frozen_at": False,
+        }
+    )
 
 # manifest
 

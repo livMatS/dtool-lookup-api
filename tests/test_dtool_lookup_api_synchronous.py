@@ -192,7 +192,7 @@ def test_default_search():
     assert len(response) == 2
 
     compares = _compare(
-        response,
+        sorted(response, key=lambda r: r['uri']),
         EXPECTED_DEFAULT_SEARCH_RESPONSE,
         EXPECTED_DEFAULT_SEARCH_RESPONSE_IMMUTABLE_MARKER
     )
