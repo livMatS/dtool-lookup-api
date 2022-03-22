@@ -11,6 +11,16 @@ jobs:
         python-version: [3.7, 3.8, 3.9, 3.10]
         dtool-lookup-server-container-composition-version: [0.6.4]
 
+    env:
+      DOCKER_COMPOSE_OPTS: >-
+        -p dtool-lookup-server-default-ports
+        -f docker-compose.yml 
+        -f docker-compose.versions.yml
+        -f docker-compose.default-envs.yml 
+        -f docker-compose.default-ports.yml 
+        -f docker-compose.testing.yml
+        -f docker-compose.testing.versions.yml
+      
     steps:
     - name: Git checkout this
       uses: actions/checkout@v3
