@@ -62,8 +62,7 @@ jobs:
     - name: Provide dtool lookup server ${{ matrix.dtool-lookup-server-version }} and test with pytest
       working-directory: dtool-lookup-server-container-composition
       run: |
-        cd dtool-lookup-server-container-composition
-        docker-compose -f docker-compose.yml -f docker-compose.default-envs.yml -f docker-compose.default-ports.yml -f docker-compose.testing.yml up -d 
+        docker-compose ${DOCKER_COMPOSE_OPTS} up -d 
 
         sleep 10 # TODO: wait for all services to be ready and healthy
        
