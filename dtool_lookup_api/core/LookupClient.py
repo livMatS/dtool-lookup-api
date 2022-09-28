@@ -21,6 +21,7 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 #
+
 """dtool_lookup_api.core.LookupClient module."""
 
 
@@ -33,6 +34,10 @@ import aiohttp
 from .config import Config
 
 
+class LookupServerError(Exception):
+    pass
+
+
 async def authenticate(auth_url, username, password, verify_ssl=True):
     """Authenticate against token generator and return received token."""
     # async with aiohttp.ClientSession() as session:
@@ -41,7 +46,7 @@ async def authenticate(auth_url, username, password, verify_ssl=True):
             json={
                 'username': username,
                 'password': password
-            }, verify_ssl=verify_ssl) as r:
+            }, ssl=verify_ssl) as r:
         if r.status == 200:
             json = await r.json()
             if 'token' not in json:
@@ -63,7 +68,7 @@ class TokenBasedLookupClient:
         self.verify_ssl = verify_ssl
         self.token = token
 
-        logger.debug("%s initialized with lookup_url=%s, verify_ssl=%s",
+        logger.debug("%s initialized with lookup_url=%s, ssl=%s",
                      type(self).__name__, self.lookup_url, self.verify_ssl)
 
     async def __aenter__(self):
@@ -85,40 +90,55 @@ class TokenBasedLookupClient:
             raise ValueError(
                 "Provide JWT token.")
 
-        logger.debug("Connect to %s, verify_ssl=%s", self.lookup_url, self.verify_ssl)
+        logger.debug("Connect to %s, ssl=%s", self.lookup_url, self.verify_ssl)
 
     @property
     def header(self):
         return {'Authorization': f'Bearer {self.token}'}
 
+    def _check_json(self, json):
+        if isinstance(json, dict) and 'msg' in json:
+            raise LookupServerError(json['msg'])
+
+    async def _get(self, route):
+        """Return information from a specific route."""
+        async with self.session.get(
+                f'{self.lookup_url}{route}',
+                headers=self.header, ssl=self.verify_ssl) as r:
+            json = await r.json()
+            self._check_json(json)
+            return json
+
+    async def _post(self, route, json, method='json'):
+        async with self.session.post(
+                f'{self.lookup_url}{route}',
+                headers=self.header,
+                json=json,
+                ssl=self.verify_ssl) as r:
+            try:  # workaround for other non-json, non-method properties, better solutions welcme
+                json = await getattr(r, method)()
+            except TypeError:
+                json = getattr(r, method)
+            self._check_json(json)
+            return json
+
+    async def summary(self):
+        """Overall summary of datasets accessible to a user."""
+        return await self._get('/dataset/summary')
+
     async def all(self):
         """List all registered datasets."""
-        async with self.session.get(
-                f'{self.lookup_url}/dataset/list',
-                headers=self.header, verify_ssl=self.verify_ssl) as r:
-            return await r.json()
+        return await self._get('/dataset/list')
 
     async def aggregate(self, aggregation):
         """Direct mongo aggregation, requires server-side direct mongo plugin."""
         if isinstance(aggregation, str):
             query = json.loads(aggregation)
-        async with self.session.post(
-                f'{self.lookup_url}/mongo/aggregate',
-                headers=self.header,
-                json={
-                    'aggregation': aggregation
-                }, verify_ssl=self.verify_ssl) as r:
-            return await r.json()
+        return await self._post('/mongo/aggregate', dict(aggregation=aggregation))
 
     async def search(self, keyword):
         """Free text search"""
-        async with self.session.post(
-                f'{self.lookup_url}/dataset/search',
-                headers=self.header,
-                json={
-                    'free_text': keyword
-                }, verify_ssl=self.verify_ssl) as r:
-            return await r.json()
+        return await self._post('/dataset/search', dict(free_text=keyword))
 
     # The direct-mongo plugin offers the same functionality as /dataset/search
     # plus an extra keyword "query" to contain plain mongo on the /mongo/query
@@ -133,73 +153,67 @@ class TokenBasedLookupClient:
         """Direct mongo query, , requires server-side direct mongo plugin"""
         if isinstance(query, str):
             query = json.loads(query)
-        async with self.session.post(
-                f'{self.lookup_url}/mongo/query',
-                headers=self.header,
-                json={
-                    'query': query
-                }, verify_ssl=self.verify_ssl) as r:
-            return await r.json()
+        return await self._post('/mongo/query', dict(query=query))
 
     # lookup and by_uuid are interchangeable
     async def lookup(self, uuid):
-        """Search for a specific uuid"""
+        """Search for a specific uuid."""
         return await self.by_uuid(uuid)
 
     async def by_uuid(self, uuid):
-        """Search for a specific uuid"""
-        async with self.session.get(
-                f'{self.lookup_url}/dataset/lookup/{uuid}',
-                headers=self.header,
-                verify_ssl=self.verify_ssl) as r:
-            return await r.json()
+        """Search for a specific uuid."""
+        return await self._get(f'/dataset/lookup/{uuid}')
 
     async def graph(self, uuid, dependency_keys=None):
         """Request dependency graph for specific uuid"""
         if dependency_keys is None:
-            async with self.session.get(
-                    f'{self.lookup_url}/graph/lookup/{uuid}',
-                    headers=self.header,
-                    verify_ssl=self.verify_ssl) as r:
-                return await r.json()
+            return await self._get(f'/graph/lookup/{uuid}')
         else:  # TODO: validity check on dependency key list
-            async with self.session.post(
-                    f'{self.lookup_url}/graph/lookup/{uuid}',
-                    headers=self.header,
-                    json=dependency_keys,
-                    verify_ssl=self.verify_ssl) as r:
-                return await r.json()
+            return await self._post(f'/graph/lookup/{uuid}', dependency_keys)
 
     async def readme(self, uri):
         """Request the README.yml of a dataset by URI."""
-        async with self.session.post(
-                f'{self.lookup_url}/dataset/readme',
-                headers=self.header,
-                json={
-                    'uri': uri
-                }, verify_ssl=self.verify_ssl) as r:
-            text = await r.text()
-            return yaml.safe_load(text)
+        return await self._post('/dataset/readme', dict(uri=uri))
 
     async def manifest(self, uri):
         """Request the manifest of a dataset by URI."""
-        async with self.session.post(
-                f'{self.lookup_url}/dataset/manifest',
-                headers=self.header,
-                json={
-                    'uri': uri
-                }, verify_ssl=self.verify_ssl) as r:
-            text = await r.text()
-            return yaml.safe_load(text)
+        return await self._post('/dataset/manifest', dict(uri=uri))
 
     async def config(self):
         """Request the server configuration."""
-        async with self.session.get(
-                f'{self.lookup_url}/config/info',
-                headers=self.header,
-                verify_ssl=self.verify_ssl) as r:
-            text = await r.text()
-            return yaml.safe_load(text)
+        return await self._get('/config/info')
+
+    async def user_info(self, user):
+        """Request user info."""
+        return await self._get(f'/user/info/{user}')
+
+    async def list_users(self):
+        """Request a list of users. (Needs admin privilges.)"""
+        return await self._get('/admin/user/list')
+
+    async def register_base_uri(self, base_uri):
+        """Register a base URI. (Needs admin privileges.)"""
+        return await self._post('/admin/base_uri/register', dict(base_uri=base_uri))
+
+    async def list_base_uris(self):
+        """List all registered base URIs. (Needs admin privileges.)"""
+        return await self._get('/admin/base_uri/list')
+
+    async def register_user(self, username, is_admin=False):
+        """Register a user. (Needs admin privileges.)"""
+        return await self._post('/admin/user/register', [dict(username=username, is_admin=is_admin)],
+                                method='status') == 201
+
+    async def permission_info(self, base_uri):
+        """Request permissions on base URI. (Needs admin privileges.)"""
+        return await self._post('/admin/permission/info', dict(base_uri=base_uri))
+
+    async def update_permissions(self, base_uri, users_with_search_permissions, users_with_register_permissions=[]):
+        """Request permissions on base URI. (Needs admin privileges.)"""
+        return await self._post('/admin/permission/update_on_base_uri', dict(
+            base_uri=base_uri,
+            users_with_search_permissions=users_with_search_permissions,
+            users_with_register_permissions=users_with_register_permissions))
 
 
 class CredentialsBasedLookupClient(TokenBasedLookupClient):
@@ -212,13 +226,13 @@ class CredentialsBasedLookupClient(TokenBasedLookupClient):
         self.password = password
 
         super().__init__(lookup_url=lookup_url, verify_ssl=verify_ssl)
-        logger.debug("%s initialized with lookup_url=%s, auth_url=%s, username=%s, verify_ssl=%s",
+        logger.debug("%s initialized with lookup_url=%s, auth_url=%s, username=%s, ssl=%s",
                      type(self).__name__, self.lookup_url, self.auth_url, self.username, self.verify_ssl)
 
     async def connect(self):
         """Establish connection."""
         logger = logging.getLogger(__name__)
-        logger.debug("Connect to lookup_url=%s, auth_url=%s, username=%s, verify_ssl=%s",
+        logger.debug("Connect to lookup_url=%s, auth_url=%s, username=%s, ssl=%s",
                      self.lookup_url, self.auth_url, self.username, self.verify_ssl)
 
         self.token = await authenticate(
@@ -228,6 +242,7 @@ class CredentialsBasedLookupClient(TokenBasedLookupClient):
             verify_ssl=self.verify_ssl)
 
         await super().connect()
+
 
 class ConfigurationBasedLookupClient(CredentialsBasedLookupClient):
     """Use configured token if available and valid or reuest new token with credentials if provided."""
@@ -248,14 +263,10 @@ class ConfigurationBasedLookupClient(CredentialsBasedLookupClient):
             lookup_url = Config.lookup_url
         if auth_url is None:
             auth_url = Config.auth_url
-        if username is None:
-            username = Config.username
-        if password is None:
-            password = Config.password
         if verify_ssl is None:
             verify_ssl = Config.verify_ssl
 
-        logger.debug("Initializing % swith lookup_url=%s, auth_url=%s, username=%s, verify_ssl=%s, cache_token=%s",
+        logger.debug("Initializing %s with lookup_url=%s, auth_url=%s, username=%s, ssl=%s, cache_token=%s",
                      type(self).__name__, lookup_url, auth_url, username, verify_ssl, cache_token)
 
         self.cache_token = cache_token
@@ -268,7 +279,7 @@ class ConfigurationBasedLookupClient(CredentialsBasedLookupClient):
             verify_ssl=verify_ssl)
 
         self.token = Config.token
-        logger.debug("%s initialized with lookup_url=%s, auth_url=%s, username=%s, verify_ssl=%s, cache_token=%s",
+        logger.debug("%s initialized with lookup_url=%s, auth_url=%s, username=%s, ssl=%s, cache_token=%s",
                      type(self).__name__, self.lookup_url, self.auth_url,
                      self.username, self.verify_ssl, self.cache_token)
 
@@ -282,6 +293,11 @@ class ConfigurationBasedLookupClient(CredentialsBasedLookupClient):
             logger.debug("Reusing provided token.")
             await TokenBasedLookupClient.connect(self)
         else:
+            # only look for username and password if really necessry
+            if self.username is None:
+                self.username = Config.username
+            if self.password is None:
+                self.password = Config.password
             logger.debug("Requesting new token.")
             await CredentialsBasedLookupClient.connect(self)
 
@@ -301,7 +317,7 @@ class ConfigurationBasedLookupClient(CredentialsBasedLookupClient):
             async with self.session.get(
                     f'{self.lookup_url}/config/info',
                     headers=self.header,
-                    verify_ssl=self.verify_ssl) as r:
+                    ssl=self.verify_ssl) as r:
                 status_code = r.status
                 text = await r.text()
             logger.debug("Server answered with %s: %s.", status_code, yaml.safe_load(text))

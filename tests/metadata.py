@@ -8,29 +8,42 @@ from utils import _make_marker
 
 # all
 
-ALL_METADTA = [
+ALL_METADTA = sorted([
     {
-        "base_uri": "smb://test-share",
-        "created_at": "Sun, 08 Nov 2020 18:38:40 GMT",
-        "creator_username": "jotelha",
-        "dtoolcore_version": "3.17.0",
-        "frozen_at": "Mon, 09 Nov 2020 11:33:41 GMT",
-        "name": "simple_test_dataset",
-        "tags": [],
-        "type": "dataset",
-        "uri": "smb://test-share/1a1f9fad-8589-413e-9602-5bbd66bfe675",
-        "uuid": "1a1f9fad-8589-413e-9602-5bbd66bfe675"
+        'base_uri': 's3://test-bucket',
+        'created_at': 1604860720.736,
+        'creator_username': 'jotelha',
+        'dtoolcore_version': '3.17.0',
+        'frozen_at': 1637950453.869,
+        'name': 'simple_test_dataset',
+        'tags': [],
+        'type': 'dataset',
+        'uri': 's3://test-bucket/1a1f9fad-8589-413e-9602-5bbd66bfe675',
+        'uuid': '1a1f9fad-8589-413e-9602-5bbd66bfe675'
+    },
+    {
+        'base_uri': 'smb://test-share',
+        'created_at': 1604860720.736,
+        'creator_username': 'jotelha',
+        'dtoolcore_version': '3.17.0',
+        'frozen_at': 1637950390.648,
+        'name': 'simple_test_dataset',
+        'tags': [],
+        'type': 'dataset',
+        'uri': 'smb://test-share/1a1f9fad-8589-413e-9602-5bbd66bfe675',
+        'uuid': '1a1f9fad-8589-413e-9602-5bbd66bfe675'
     }
-]
+], key=lambda r: r['uri'])
 
 ALL_METADTA_IMMUTABLE_MARKER = _make_marker(ALL_METADTA)
-ALL_METADTA_IMMUTABLE_MARKER[0].update(
-    {
-        "created_at": False,
-        "dtoolcore_version": False,
-        "frozen_at": False,
-    }
-)
+for dataset in ALL_METADTA_IMMUTABLE_MARKER:
+    dataset.update(
+        {
+            "created_at": False,
+            "dtoolcore_version": False,
+            "frozen_at": False,
+        }
+    )
 
 EXPECTED_DEFAULT_ALL_RESPONSE = [
     {
@@ -41,15 +54,26 @@ EXPECTED_DEFAULT_ALL_RESPONSE = [
         'name': 'simple_test_dataset',
         'uri': 'smb://test-share/1a1f9fad-8589-413e-9602-5bbd66bfe675',
         'uuid': '1a1f9fad-8589-413e-9602-5bbd66bfe675'
+    },
+    {
+        'base_uri': 's3://test-bucket',
+        'created_at': 1604860720.736269,
+        'creator_username': 'jotelha',
+        'frozen_at': 1637950453.869,
+        'name': 'simple_test_dataset',
+        'uri': 's3://test-bucket/1a1f9fad-8589-413e-9602-5bbd66bfe675',
+        'uuid': '1a1f9fad-8589-413e-9602-5bbd66bfe675'
     }
 ]
+
 EXPECTED_DEFAULT_ALL_RESPONSE_IMMUTABLE_MARKER = _make_marker(EXPECTED_DEFAULT_ALL_RESPONSE)
-EXPECTED_DEFAULT_ALL_RESPONSE_IMMUTABLE_MARKER[0].update(
-    {
-        "created_at": False,
-        "frozen_at": False,
-    }
-)
+for dataset in EXPECTED_DEFAULT_ALL_RESPONSE_IMMUTABLE_MARKER:
+    dataset.update(
+        {
+            "created_at": False,
+            "frozen_at": False,
+        }
+    )
 
 # aggregate
 
@@ -70,8 +94,16 @@ EXPECTED_DEFAULT_AGGREGATION_RESPONSE_IMMUTABLE_MARKER = _make_marker(EXPECTED_D
 # lookup
 
 DEFAULT_LOOKUP_UUID = "1a1f9fad-8589-413e-9602-5bbd66bfe675"
-EXPECTED_DEFAULT_LOOKUP_RESPONSE = [
+EXPECTED_DEFAULT_LOOKUP_RESPONSE = sorted([
     {
+        'base_uri': 's3://test-bucket',
+        'created_at': 1604860720.736269,
+        'creator_username': 'jotelha',
+        'frozen_at': 1604864525.691079,
+        'name': 'simple_test_dataset',
+        'uri': 's3://test-bucket/1a1f9fad-8589-413e-9602-5bbd66bfe675',
+        'uuid': '1a1f9fad-8589-413e-9602-5bbd66bfe675'
+    }, {
         "base_uri": "smb://test-share",
         "created_at": 1604860720.736269,
         "creator_username": "jotelha",
@@ -80,14 +112,15 @@ EXPECTED_DEFAULT_LOOKUP_RESPONSE = [
         "uri": "smb://test-share/1a1f9fad-8589-413e-9602-5bbd66bfe675",
         "uuid": "1a1f9fad-8589-413e-9602-5bbd66bfe675"
     }
-]
+], key=lambda r: r["uri"])
 EXPECTED_DEFAULT_LOOKUP_RESPONSE_IMMUTABLE_MARKER = _make_marker(EXPECTED_DEFAULT_LOOKUP_RESPONSE)
-EXPECTED_DEFAULT_LOOKUP_RESPONSE_IMMUTABLE_MARKER[0].update(
-    {
-        "created_at": False,
-        "frozen_at": False,
-    }
-)
+for dataset in EXPECTED_DEFAULT_LOOKUP_RESPONSE_IMMUTABLE_MARKER:
+    dataset.update(
+        {
+            "created_at": False,
+            "frozen_at": False,
+        }
+    )
 
 # manifest
 
@@ -126,8 +159,8 @@ DEFAULT_QUERY = {
     'base_uri': 'smb://test-share',
     'name': {'$regex': 'test'},
 }
-EXPECTED_DEFAULT_QUERY_RESPONSE = ALL_METADTA
-EXPECTED_DEFAULT_QUERY_RESPONSE_IMMUTABLE_MARKER = ALL_METADTA_IMMUTABLE_MARKER
+EXPECTED_DEFAULT_QUERY_RESPONSE = [ALL_METADTA[1]]
+EXPECTED_DEFAULT_QUERY_RESPONSE_IMMUTABLE_MARKER = [ALL_METADTA_IMMUTABLE_MARKER[1]]
 
 # readme
 
@@ -199,3 +232,37 @@ EXPECTED_CONFIG_RESPONSE_IMMUTABLE_MARKER["version"] = False
 EXPECTED_CONFIG_RESPONSE_IMMUTABLE_MARKER["dtool_lookup_server_dependency_graph_plugin"]["version"] = False
 EXPECTED_CONFIG_RESPONSE_IMMUTABLE_MARKER["dtool_lookup_server_direct_mongo_plugin"]["version"] = False
 EXPECTED_CONFIG_RESPONSE_IMMUTABLE_MARKER["dtool_lookup_server_direct_mongo_plugin"]["allow_direct_aggregation"] = False
+
+
+# user info
+
+DEFAULT_USER_INFO_USER_NAME = 'testuser'
+EXPECTED_DEFAULT_USER_INFO_RESPONSE = {
+    'is_admin': True,
+    'register_permissions_on_base_uris': [],
+    'search_permissions_on_base_uris': ['smb://test-share', 's3://test-bucket'],
+    'username': 'testuser'
+}
+EXPECTED_DEFAULT_USER_INFO_RESPONSE_IMMUTABLE_MARKER = _make_marker(EXPECTED_DEFAULT_USER_INFO_RESPONSE)
+
+
+# admin routes
+
+# list users
+
+EXPECTED_DEFAULT_LIST_USERS_RESPONSE = [{
+    'is_admin': True,
+    'register_permissions_on_base_uris': [],
+    'search_permissions_on_base_uris': ['smb://test-share'],
+    'username': 'testuser'
+}]
+EXPECTED_DEFAULT_LIST_USERS_RESPONSE_IMMUTABLE_MARKER = _make_marker(EXPECTED_DEFAULT_LIST_USERS_RESPONSE)
+
+# permission info
+DEFAULT_PERMISSION_INFO_BASE_URI = 'smb://test-share'
+EXPECTED_DEFAULT_PERMISSION_INFO_RESPONSE = {
+    'base_uri': 'smb://test-share',
+    'users_with_register_permissions': [],
+    'users_with_search_permissions': ['testuser']
+}
+EXPECTED_DEFAULT_PERMISSION_INFO_RESPONSE_IMMUTABLE_MARKER = _make_marker(EXPECTED_DEFAULT_PERMISSION_INFO_RESPONSE)
