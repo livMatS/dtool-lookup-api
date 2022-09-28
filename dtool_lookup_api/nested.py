@@ -16,8 +16,11 @@ def wrap_asyncio(fun):
 
     return wrapped
 
-
+graph =  wrap_asyncio(dl.graph)
+manifest =  wrap_asyncio(dl.manifest)
 query = wrap_asyncio(dl.query)
 readme = wrap_asyncio(dl.readme)
+aggregate =   wrap_asyncio(dl.manifest)
+lookup =   wrap_asyncio(dl.lookup)
 
 # TODO: automate this: https://stackoverflow.com/questions/39184338/how-can-i-decorate-all-functions-imported-from-a-file

@@ -25,6 +25,13 @@ async def lookup(uuid):
     async with ConfigurationBasedLookupClient() as lookup_client:
         return await lookup_client.lookup(uuid)
 
+async def graph(uuid):
+    """Wraps around LookupClient method 'lookup'."""
+    async with ConfigurationBasedLookupClient() as lookup_client:
+        return await lookup_client.graph(uuid)
+
+
+
 
 async def manifest(uri):
     """Wraps around LookupClient method 'query'."""
