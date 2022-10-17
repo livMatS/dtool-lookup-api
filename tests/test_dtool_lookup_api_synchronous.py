@@ -2,6 +2,7 @@
 
 import logging
 import pytest
+import yaml
 
 from utils import _log_nested_dict, _compare
 
@@ -46,7 +47,7 @@ def test_all():
 
 
 @pytest.mark.usefixtures("dtool_lookup_server", "dtool_config")
-def test_defaut_aggregation():
+def test_default_aggregation():
     """Will send a direct mongo query request to the server."""
     from dtool_lookup_api.synchronous import aggregate
 
@@ -91,7 +92,7 @@ def test_config():
 
 
 @pytest.mark.usefixtures("dtool_lookup_server", "dtool_config")
-def test_defaut_lookup():
+def test_default_lookup():
     """Will send a direct mongo query request to the server."""
     from dtool_lookup_api.synchronous import lookup
 
@@ -104,7 +105,7 @@ def test_defaut_lookup():
     _log_nested_dict(logger.debug, response)
 
     compares = _compare(
-        response,
+        sorted(response, key=lambda r: r["uri"]),
         EXPECTED_DEFAULT_LOOKUP_RESPONSE,
         EXPECTED_DEFAULT_LOOKUP_RESPONSE_IMMUTABLE_MARKER
     )
@@ -112,7 +113,7 @@ def test_defaut_lookup():
 
 
 @pytest.mark.usefixtures("dtool_lookup_server", "dtool_config")
-def test_defaut_manifest():
+def test_default_manifest():
     """Will send a direct mongo query request to the server."""
     from dtool_lookup_api.synchronous import manifest
 
@@ -133,7 +134,7 @@ def test_defaut_manifest():
 
 
 @pytest.mark.usefixtures("dtool_lookup_server", "dtool_config")
-def test_defaut_query():
+def test_default_query():
     """Will send a direct mongo query request to the server."""
     from dtool_lookup_api.synchronous import query
 

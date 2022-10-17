@@ -101,16 +101,20 @@ EXPECTED_DEFAULT_LOOKUP_RESPONSE = sorted([
         'creator_username': 'jotelha',
         'frozen_at': 1604864525.691079,
         'name': 'simple_test_dataset',
+        'number_of_items': 1,
+        'size_in_bytes': 17,
         'uri': 's3://test-bucket/1a1f9fad-8589-413e-9602-5bbd66bfe675',
         'uuid': '1a1f9fad-8589-413e-9602-5bbd66bfe675'
     }, {
-        "base_uri": "smb://test-share",
-        "created_at": 1604860720.736269,
-        "creator_username": "jotelha",
-        "frozen_at": 1604921621.719575,
-        "name": "simple_test_dataset",
-        "uri": "smb://test-share/1a1f9fad-8589-413e-9602-5bbd66bfe675",
-        "uuid": "1a1f9fad-8589-413e-9602-5bbd66bfe675"
+        'base_uri': 'smb://test-share',
+        'created_at': 1604860720.736269,
+        'creator_username': 'jotelha',
+        'frozen_at': 1604921621.719575,
+        'name': 'simple_test_dataset',
+        'number_of_items': 1,
+        'size_in_bytes': 17,
+        'uri': 'smb://test-share/1a1f9fad-8589-413e-9602-5bbd66bfe675',
+        'uuid': '1a1f9fad-8589-413e-9602-5bbd66bfe675'
     }
 ], key=lambda r: r["uri"])
 EXPECTED_DEFAULT_LOOKUP_RESPONSE_IMMUTABLE_MARKER = _make_marker(EXPECTED_DEFAULT_LOOKUP_RESPONSE)
@@ -188,6 +192,11 @@ EXPECTED_DEFAULT_README_RESPONSE = {
 }
 
 EXPECTED_DEFAULT_README_RESPONSE_IMMUTABLE_MARKER = _make_marker(EXPECTED_DEFAULT_README_RESPONSE)
+# yaml.load converts date-like strings to datetime objects unasked if not quoted
+# hence exclude from comparison
+EXPECTED_DEFAULT_README_RESPONSE_IMMUTABLE_MARKER["creation_date"] = False
+EXPECTED_DEFAULT_README_RESPONSE_IMMUTABLE_MARKER["expiration_date"] = False
+
 
 # search
 
