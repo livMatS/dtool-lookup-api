@@ -173,7 +173,16 @@ class TokenBasedLookupClient:
 
     async def readme(self, uri):
         """Request the README.yml of a dataset by URI."""
-        return await self._post('/dataset/readme', dict(uri=uri))
+        response = await self._post('/dataset/readme', dict(uri=uri))
+        # in versions <= 0.17.2, dtool-lookup-server would return readme
+        # as json, from then on as plain text. Following block makes readme
+        # query backwards-compatible.
+        try:
+            readme = yaml.safe_load(response)
+        except yaml.YAMLError as exc:
+            self.logger.warning(exc)
+            readme = response
+        return readme
 
     async def manifest(self, uri):
         """Request the manifest of a dataset by URI."""
