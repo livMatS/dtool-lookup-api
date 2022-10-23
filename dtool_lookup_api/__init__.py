@@ -27,5 +27,21 @@
 from .version import version as __version__
 
 # use synchronous API as default
-from .synchronous import (config, all, lookup, manifest, query, readme, search, list_users, register_user,
-                          permission_info, update_permissions)
+from .synchronous import (
+    all,
+    aggregate,
+    config,
+    graph,
+    list_base_uris,
+    list_users,
+    lookup,
+    manifest,
+    permission_info,
+    query,
+    readme,
+    register_base_uri,
+    register_user,
+    search,
+    summary,
+    update_permissions,
+    user_info)

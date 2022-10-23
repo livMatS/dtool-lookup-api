@@ -115,7 +115,7 @@ class TokenBasedLookupClient:
                 headers=self.header,
                 json=json,
                 ssl=self.verify_ssl) as r:
-            try:  # workaround for other non-json, non-method properties, better solutions welcme
+            try:  # workaround for other non-json, non-method properties, better solutions welcome
                 json = await getattr(r, method)()
             except TypeError:
                 json = getattr(r, method)
@@ -133,7 +133,7 @@ class TokenBasedLookupClient:
     async def aggregate(self, aggregation):
         """Direct mongo aggregation, requires server-side direct mongo plugin."""
         if isinstance(aggregation, str):
-            query = json.loads(aggregation)
+            aggregation = json.loads(aggregation)
         return await self._post('/mongo/aggregate', dict(aggregation=aggregation))
 
     async def search(self, keyword):
@@ -188,12 +188,13 @@ class TokenBasedLookupClient:
         return await self._get(f'/user/info/{user}')
 
     async def list_users(self):
-        """Request a list of users. (Needs admin privilges.)"""
+        """Request a list of users. (Needs admin privileges.)"""
         return await self._get('/admin/user/list')
 
     async def register_base_uri(self, base_uri):
         """Register a base URI. (Needs admin privileges.)"""
-        return await self._post('/admin/base_uri/register', dict(base_uri=base_uri))
+        return await self._post('/admin/base_uri/register', dict(base_uri=base_uri),
+                                method='status') == 201
 
     async def list_base_uris(self):
         """List all registered base URIs. (Needs admin privileges.)"""
@@ -213,7 +214,8 @@ class TokenBasedLookupClient:
         return await self._post('/admin/permission/update_on_base_uri', dict(
             base_uri=base_uri,
             users_with_search_permissions=users_with_search_permissions,
-            users_with_register_permissions=users_with_register_permissions))
+            users_with_register_permissions=users_with_register_permissions),
+            method='status') == 201
 
 
 class CredentialsBasedLookupClient(TokenBasedLookupClient):
