@@ -1,6 +1,13 @@
 CHANGELOG
 =========
 
+0.5.1 (23Oct22)
+---------------
+
+- Fixed erroneous interpretation of server response in `register_base_uri` and `update_permissions`.
+- Fixed parsing of text to JSON in `aggregate`.
+- Made all synchronous methods available at top-level via imports in `__init__.py`
+
 0.5.0 (6Dec21)
 --------------
 
