@@ -385,6 +385,6 @@ eventually. All tests have been confirmed to work with the
     :alt: GitHub tag (latest by date)
     :target: https://github.com/IMTEK-Simulation/dtool-lookup-api/tags
 
-.. |github tests| image:: https://img.shields.io/github/workflow/status/IMTEK-Simulation/dtool-lookup-api/test?label=tests
+.. |github tests| image:: https://img.shields.io/github/actions/workflow/status/livMatS/dtool-lookup-api/test.yml?branch=master
     :alt: GitHub Workflow Status
-    :target: https://github.com/IMTEK-Simulation/dtool-lookup-api/actions?query=workflow%3Atest
+    :target: https://github.com/livMatS/dtool-lookup-api/actions/workflows/test.yml
