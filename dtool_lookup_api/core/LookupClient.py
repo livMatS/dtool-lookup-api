@@ -109,7 +109,23 @@ class TokenBasedLookupClient:
             self._check_json(json)
             return json
 
-    async def _post(self, route, json, method='json'):
+    async def _post(self, route, json, method='json', headers={}):
+        """Wrapper for http post methpod.
+
+        Parameters
+        ----------
+        route : str
+        json : dict
+            request data
+        method : str, default 'json'
+            method do interpret response data
+        headers : dict
+            dict filled with response headers
+
+        Returns
+        -------
+        list or dict
+            parsed json response"""
         async with self.session.post(
                 f'{self.lookup_url}{route}',
                 headers=self.header,
@@ -120,6 +136,7 @@ class TokenBasedLookupClient:
             except TypeError:
                 json = getattr(r, method)
             self._check_json(json)
+            headers.update(**r.headers)
             return json
 
     async def summary(self):
@@ -136,9 +153,35 @@ class TokenBasedLookupClient:
             aggregation = json.loads(aggregation)
         return await self._post('/mongo/aggregate', dict(aggregation=aggregation))
 
-    async def search(self, keyword):
-        """Free text search"""
-        return await self._post('/dataset/search', dict(free_text=keyword))
+    async def search(self, keyword, page_number=1, page_size=10, pagination={}):
+        """Free text search
+
+        Paramters
+        ---------
+        keyword : str
+            free text search text
+        page_number : int
+        page_size : int
+        pagination: dict
+            dictionary filled with data from the X-Pagination response header, e.g.
+                '{"total": 124, "total_pages": 13, "first_page": 1, "last_page": 13, "page": 1, "next_page": 2}'
+
+        Returns
+        -------
+        json : list of dict
+            search results
+        """
+        headers = {}
+        dataset_list = await self._post('/dataset/search?page=' + str(page_number),
+                                {'free_text': keyword}, headers=headers)
+
+        if 'X-Pagination' in headers:
+            p = json.loads(headers['X-Pagination'])
+            pagination.update(**p)
+        else:
+            logger = logging.getLogger(__name__)
+            logger.warning("Server returned no pagination information. Server version outdated.")
+        return dataset_list
 
     # The direct-mongo plugin offers the same functionality as /dataset/search
     # plus an extra keyword "query" to contain plain mongo on the /mongo/query
@@ -147,6 +190,7 @@ class TokenBasedLookupClient:
     # query and by_query are interchangeable
     async def query(self, query):
         """Direct mongo query, requires server-side direct mongo plugin."""
+        print("QUERY")
         return await self.by_query(query)
 
     async def by_query(self, query):
