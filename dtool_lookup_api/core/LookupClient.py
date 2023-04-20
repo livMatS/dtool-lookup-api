@@ -190,7 +190,6 @@ class TokenBasedLookupClient:
     # query and by_query are interchangeable
     async def query(self, query):
         """Direct mongo query, requires server-side direct mongo plugin."""
-        print("QUERY")
         return await self.by_query(query)
 
     async def by_query(self, query):
