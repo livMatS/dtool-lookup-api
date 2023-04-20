@@ -147,6 +147,7 @@ class TokenBasedLookupClient:
         """List all registered datasets."""
         return await self._get('/dataset/list')
 
+    # TODO: needs pagination
     async def aggregate(self, aggregation):
         """Direct mongo aggregation, requires server-side direct mongo plugin."""
         if isinstance(aggregation, str):
@@ -188,10 +189,12 @@ class TokenBasedLookupClient:
     # route.
 
     # query and by_query are interchangeable
+    # TODO: needs pagination
     async def query(self, query):
         """Direct mongo query, requires server-side direct mongo plugin."""
         return await self.by_query(query)
 
+    # TODO: needs pagination
     async def by_query(self, query):
         """Direct mongo query, , requires server-side direct mongo plugin"""
         if isinstance(query, str):
@@ -199,14 +202,17 @@ class TokenBasedLookupClient:
         return await self._post('/mongo/query', dict(query=query))
 
     # lookup and by_uuid are interchangeable
+    # TODO: needs pagination
     async def lookup(self, uuid):
         """Search for a specific uuid."""
         return await self.by_uuid(uuid)
 
+    # TODO: needs pagination
     async def by_uuid(self, uuid):
         """Search for a specific uuid."""
         return await self._get(f'/dataset/lookup/{uuid}')
 
+    # TODO: needs pagination
     async def graph(self, uuid, dependency_keys=None):
         """Request dependency graph for specific uuid"""
         if dependency_keys is None:
@@ -230,6 +236,7 @@ class TokenBasedLookupClient:
         """Request user info."""
         return await self._get(f'/user/info/{user}')
 
+    # TODO: needs pagination
     async def list_users(self):
         """Request a list of users. (Needs admin privileges.)"""
         return await self._get('/admin/user/list')
@@ -239,6 +246,7 @@ class TokenBasedLookupClient:
         return await self._post('/admin/base_uri/register', dict(base_uri=base_uri),
                                 method='status') == 201
 
+    # TODO: needs pagination
     async def list_base_uris(self):
         """List all registered base URIs. (Needs admin privileges.)"""
         return await self._get('/admin/base_uri/list')
