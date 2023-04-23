@@ -24,7 +24,6 @@
 
 """dtool_lookup_api.core.LookupClient module."""
 
-
 import yaml
 import json
 import logging
@@ -60,6 +59,7 @@ async def authenticate(auth_url, username, password, verify_ssl=True):
 
 class TokenBasedLookupClient:
     """Core Python interface for communication with dtool lookup server."""
+
     def __init__(self, lookup_url, token=None, verify_ssl=True):
         logger = logging.getLogger(__name__)
 
@@ -173,8 +173,8 @@ class TokenBasedLookupClient:
             search results
         """
         headers = {}
-        dataset_list = await self._post('/dataset/search?page=' + str(page_number),
-                                {'free_text': keyword}, headers=headers)
+        dataset_list = await self._post('/dataset/search?page=' + str(page_number) + '&page_size=' + str(page_size),
+                                        {'free_text': keyword}, headers=headers)
 
         if 'X-Pagination' in headers:
             p = json.loads(headers['X-Pagination'])
@@ -189,29 +189,48 @@ class TokenBasedLookupClient:
     # route.
 
     # query and by_query are interchangeable
-    # TODO: needs pagination
-    async def query(self, query):
-        """Direct mongo query, requires server-side direct mongo plugin."""
-        return await self.by_query(query)
 
-    # TODO: needs pagination
-    async def by_query(self, query):
-        """Direct mongo query, , requires server-side direct mongo plugin"""
+    async def query(self, query, page_number=1, page_size=10, pagination={}):
+        """Direct mongo query, requires server-side direct mongo plugin."""
+        return await self.by_query(query, page_number=page_number, page_size=page_size, pagination=pagination)
+
+    async def by_query(self, query, page_number=1, page_size=10, pagination={}):
+        """Direct mongo query, requires server-side direct mongo plugin."""
         if isinstance(query, str):
             query = json.loads(query)
-        return await self._post('/mongo/query', dict(query=query))
+
+        headers, mongodataset_list = await self._post(
+            '/mongo/query?page=' + str(page_number) + '&page_size=' + str(page_size), dict(query=query))
+
+        if 'X-Pagination' in headers:
+            p = json.loads(headers['X-Pagination'])
+            pagination.update(p)
+        else:
+            logger = logging.getLogger(__name__)
+            logger.warning("Server returned no pagination information. Server version outdated.")
+
+        return mongodataset_list
 
     # lookup and by_uuid are interchangeable
-    # TODO: needs pagination
-    async def lookup(self, uuid):
-        """Search for a specific uuid."""
-        return await self.by_uuid(uuid)
 
-    # TODO: needs pagination
-    async def by_uuid(self, uuid):
+    async def lookup(self, uuid,page_number=1, page_size=10, pagination={}):
         """Search for a specific uuid."""
-        return await self._get(f'/dataset/lookup/{uuid}')
+        return await self.by_uuid(uuid, page_number=page_number, page_size=page_size, pagination=pagination)
 
+
+    async def by_uuid(self, uuid,page_number=1, page_size=10, pagination={}):
+        """Search for a specific uuid."""
+
+        headers, lookup_list= await self._get(f'/dataset/lookup/{uuid}?page=' + str(page_number) + '&page_size=' + str(page_size))
+
+        if 'X-Pagination' in headers:
+            p = json.loads(headers['X-Pagination'])
+            pagination.update(p)
+        else:
+            logger = logging.getLogger(__name__)
+            logger.warning("Server returned no pagination information. Server version outdated.")
+
+        return lookup_list
     # TODO: needs pagination
     async def graph(self, uuid, dependency_keys=None):
         """Request dependency graph for specific uuid"""
@@ -236,21 +255,40 @@ class TokenBasedLookupClient:
         """Request user info."""
         return await self._get(f'/user/info/{user}')
 
-    # TODO: needs pagination
-    async def list_users(self):
-        """Request a list of users. (Needs admin privileges.)"""
-        return await self._get('/admin/user/list')
 
+    async def list_users(self, page_number=1, page_size=10, pagination={}):
+        """Request a list of users. (Needs admin privileges.)"""
+        headers, list_users = await self._get('/admin/user/list?page=' + str(page_number) + '&page_size=' + str(page_size))
+        if 'X-Pagination' in headers:
+            p = json.loads(headers['X-Pagination'])
+            pagination.update(p)
+        else:
+            logger = logging.getLogger(__name__)
+            logger.warning("Server returned no pagination information. Server version outdated.")
+
+        return list_users
     async def register_base_uri(self, base_uri):
         """Register a base URI. (Needs admin privileges.)"""
         return await self._post('/admin/base_uri/register', dict(base_uri=base_uri),
                                 method='status') == 201
 
-    # TODO: needs pagination
-    async def list_base_uris(self):
-        """List all registered base URIs. (Needs admin privileges.)"""
-        return await self._get('/admin/base_uri/list')
 
+
+    async def list_base_uris(self, page_number=1, page_size=10, pagination={}):
+        """List all registered base URIs. (Needs admin privileges.)"""
+
+
+        headers, base_uris_list = await self._get(
+            '/admin/base_uri/list?page=' + str(page_number) + '&page_size=' + str(page_size))
+
+        if 'X-Pagination' in headers:
+            p = json.loads(headers['X-Pagination'])
+            pagination.update(p)
+        else:
+            logger = logging.getLogger(__name__)
+            logger.warning("Server returned no pagination information. Server version outdated.")
+
+        return base_uris_list
     async def register_user(self, username, is_admin=False):
         """Register a user. (Needs admin privileges.)"""
         return await self._post('/admin/user/register', [dict(username=username, is_admin=is_admin)],
@@ -266,11 +304,12 @@ class TokenBasedLookupClient:
             base_uri=base_uri,
             users_with_search_permissions=users_with_search_permissions,
             users_with_register_permissions=users_with_register_permissions),
-            method='status') == 201
+                                method='status') == 201
 
 
 class CredentialsBasedLookupClient(TokenBasedLookupClient):
     """Request new token for every session based on user credentials."""
+
     def __init__(self, lookup_url, auth_url, username, password,
                  verify_ssl=True):
         logger = logging.getLogger(__name__)
