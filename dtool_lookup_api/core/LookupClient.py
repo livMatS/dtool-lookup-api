@@ -235,7 +235,7 @@ class TokenBasedLookupClient:
     async def by_uuid(self, uuid,page_number=1, page_size=10, pagination={}):
         """Search for a specific uuid."""
         headers = {}
-        lookup_list= await self._get(f'/dataset/lookup/{uuid}?page=' + str(page_number) + '&page_size=' + str(page_size),
+        lookup_list= await self._get(f'/dataset/lookup/{uuid}?page={page_number}&page_size={page_size}',
                                      headers=headers)
 
         if 'X-Pagination' in headers:
@@ -284,6 +284,7 @@ class TokenBasedLookupClient:
             logger.warning("Server returned no pagination information. Server version outdated.")
 
         return list_users
+
     async def register_base_uri(self, base_uri):
         """Register a base URI. (Needs admin privileges.)"""
         return await self._post('/admin/base_uri/register', dict(base_uri=base_uri),
