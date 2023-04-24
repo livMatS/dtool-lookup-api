@@ -100,17 +100,29 @@ class TokenBasedLookupClient:
         if isinstance(json, dict) and 'msg' in json:
             raise LookupServerError(json['msg'])
 
-    async def _get(self, route):
-        """Return information from a specific route."""
+    async def _get(self, route, headers={}):
+        """Wrapper for http get method.
+
+                Parameters
+                ----------
+                route : str
+                headers : dict
+                    dict filled with response headers
+
+                Returns
+                -------
+                list or dict
+                    parsed json response"""
         async with self.session.get(
                 f'{self.lookup_url}{route}',
                 headers=self.header, ssl=self.verify_ssl) as r:
             json = await r.json()
             self._check_json(json)
+            headers.update(**r.headers)
             return json
 
     async def _post(self, route, json, method='json', headers={}):
-        """Wrapper for http post methpod.
+        """Wrapper for http post method.
 
         Parameters
         ----------
@@ -196,11 +208,14 @@ class TokenBasedLookupClient:
 
     async def by_query(self, query, page_number=1, page_size=10, pagination={}):
         """Direct mongo query, requires server-side direct mongo plugin."""
+        headers = {}
+
         if isinstance(query, str):
             query = json.loads(query)
 
-        headers, mongodataset_list = await self._post(
-            '/mongo/query?page=' + str(page_number) + '&page_size=' + str(page_size), dict(query=query))
+        mongodataset_list = await self._post(
+            '/mongo/query?page=' + str(page_number) + '&page_size=' + str(page_size), dict(query=query),
+            headers=headers)
 
         if 'X-Pagination' in headers:
             p = json.loads(headers['X-Pagination'])
@@ -217,11 +232,11 @@ class TokenBasedLookupClient:
         """Search for a specific uuid."""
         return await self.by_uuid(uuid, page_number=page_number, page_size=page_size, pagination=pagination)
 
-
     async def by_uuid(self, uuid,page_number=1, page_size=10, pagination={}):
         """Search for a specific uuid."""
-
-        headers, lookup_list= await self._get(f'/dataset/lookup/{uuid}?page=' + str(page_number) + '&page_size=' + str(page_size))
+        headers = {}
+        lookup_list= await self._get(f'/dataset/lookup/{uuid}?page=' + str(page_number) + '&page_size=' + str(page_size),
+                                     headers=headers)
 
         if 'X-Pagination' in headers:
             p = json.loads(headers['X-Pagination'])
@@ -231,6 +246,7 @@ class TokenBasedLookupClient:
             logger.warning("Server returned no pagination information. Server version outdated.")
 
         return lookup_list
+
     # TODO: needs pagination
     async def graph(self, uuid, dependency_keys=None):
         """Request dependency graph for specific uuid"""
@@ -255,10 +271,11 @@ class TokenBasedLookupClient:
         """Request user info."""
         return await self._get(f'/user/info/{user}')
 
-
     async def list_users(self, page_number=1, page_size=10, pagination={}):
         """Request a list of users. (Needs admin privileges.)"""
-        headers, list_users = await self._get('/admin/user/list?page=' + str(page_number) + '&page_size=' + str(page_size))
+        headers = {}
+        list_users = await self._get('/admin/user/list?page=' + str(page_number) + '&page_size=' + str(page_size),
+                                     headers=headers)
         if 'X-Pagination' in headers:
             p = json.loads(headers['X-Pagination'])
             pagination.update(p)
@@ -272,14 +289,13 @@ class TokenBasedLookupClient:
         return await self._post('/admin/base_uri/register', dict(base_uri=base_uri),
                                 method='status') == 201
 
-
-
     async def list_base_uris(self, page_number=1, page_size=10, pagination={}):
         """List all registered base URIs. (Needs admin privileges.)"""
 
-
-        headers, base_uris_list = await self._get(
-            '/admin/base_uri/list?page=' + str(page_number) + '&page_size=' + str(page_size))
+        headers = {}
+        base_uris_list = await self._get(
+            '/admin/base_uri/list?page=' + str(page_number) + '&page_size=' + str(page_size),
+            headers=headers)
 
         if 'X-Pagination' in headers:
             p = json.loads(headers['X-Pagination'])
@@ -289,6 +305,7 @@ class TokenBasedLookupClient:
             logger.warning("Server returned no pagination information. Server version outdated.")
 
         return base_uris_list
+
     async def register_user(self, username, is_admin=False):
         """Register a user. (Needs admin privileges.)"""
         return await self._post('/admin/user/register', [dict(username=username, is_admin=is_admin)],
