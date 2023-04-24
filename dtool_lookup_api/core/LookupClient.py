@@ -228,11 +228,11 @@ class TokenBasedLookupClient:
 
     # lookup and by_uuid are interchangeable
 
-    async def lookup(self, uuid,page_number=1, page_size=10, pagination={}):
+    async def lookup(self, uuid, page_number=1, page_size=10, pagination={}):
         """Search for a specific uuid."""
         return await self.by_uuid(uuid, page_number=page_number, page_size=page_size, pagination=pagination)
 
-    async def by_uuid(self, uuid,page_number=1, page_size=10, pagination={}):
+    async def by_uuid(self, uuid, page_number=1, page_size=10, pagination={}):
         """Search for a specific uuid."""
         headers = {}
         lookup_list= await self._get(f'/dataset/lookup/{uuid}?page={page_number}&page_size={page_size}',
@@ -272,7 +272,21 @@ class TokenBasedLookupClient:
         return await self._get(f'/user/info/{user}')
 
     async def list_users(self, page_number=1, page_size=10, pagination={}):
-        """Request a list of users. (Needs admin privileges.)"""
+        """Request a list of users. (Needs admin privileges.)
+
+        Paramters
+        ---------
+        page_number : int
+        page_size : int
+        pagination: dict
+            dictionary filled with data from the X-Pagination response header, e.g.
+                '{"total": 124, "total_pages": 13, "first_page": 1, "last_page": 13, "page": 1, "next_page": 2}'
+
+        Returns
+        -------
+        json : list
+            list of registered users
+        """
         headers = {}
         list_users = await self._get('/admin/user/list?page=' + str(page_number) + '&page_size=' + str(page_size),
                                      headers=headers)
