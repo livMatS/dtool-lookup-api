@@ -173,9 +173,9 @@ class TokenBasedLookupClient:
         if isinstance(aggregation, str):
             aggregation = json.loads(aggregation)
 
-            headers = {}
+        headers = {}
         aggregation_result = await self._post(f'/mongo/aggregate?page={page_number}&page_size={page_size}',
-                                          dict(aggregation=aggregation), headers=headers)
+                                              dict(aggregation=aggregation), headers=headers)
 
         if 'X-Pagination' in headers:
             p = json.loads(headers['X-Pagination'])
