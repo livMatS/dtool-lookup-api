@@ -100,11 +100,11 @@ class TokenBasedLookupClient:
         if isinstance(json, dict) and 'msg' in json:
             raise LookupServerError(json['msg'])
 
-    async def _get(self, route):
+    async def _get(self, route, headers=None):
         """Return information from a specific route."""
         async with self.session.get(
                 f'{self.lookup_url}{route}',
-                headers=self.header, ssl=self.verify_ssl) as r:
+                headers=headers or self.header, ssl=self.verify_ssl) as r:
             json = await r.json()
             self._check_json(json)
             return json
