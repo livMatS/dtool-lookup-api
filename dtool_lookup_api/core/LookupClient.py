@@ -147,14 +147,45 @@ class TokenBasedLookupClient:
         """List all registered datasets."""
         return await self._get('/dataset/list')
 
-    # TODO: needs pagination
-    async def aggregate(self, aggregation):
-        """Direct mongo aggregation, requires server-side direct mongo plugin."""
+    async def aggregate(self, aggregation, page_number=1, page_size=20, pagination={}):
+
+        """
+              Execute a direct MongoDB aggregation.
+
+              Parameters
+              ----------
+              aggregation : str or dict
+                  The MongoDB aggregation pipeline to be executed.
+              page_number : int, optional
+                  The page number of the results, default is 1.
+              page_size : int, optional
+                  The number of results per page, default is 20.
+              pagination: dict, optional
+                  Dictionary filled with data from the X-Pagination response header, e.g.
+                      '{"total": 124, "total_pages": 13, "first_page": 1, "last_page": 13, "page": 1, "next_page": 2}'
+
+              Returns
+              -------
+              list of dict
+                  Aggregation results.
+              """
+
         if isinstance(aggregation, str):
             aggregation = json.loads(aggregation)
-        return await self._post('/mongo/aggregate', dict(aggregation=aggregation))
 
-    async def search(self, keyword, page_number=1, page_size=10, pagination={}):
+            headers = {}
+        aggregation_result = await self._post(f'/mongo/aggregate?page={page_number}&page_size={page_size}',
+                                          dict(aggregation=aggregation), headers=headers)
+
+        if 'X-Pagination' in headers:
+            p = json.loads(headers['X-Pagination'])
+            pagination.update(**p)
+        else:
+            logger = logging.getLogger(__name__)
+            logger.warning("Server returned no pagination information. Server version outdated.")
+        return aggregation_result
+
+    async def search(self, keyword, page_number=1, page_size=20, pagination={}):
         """Free text search
 
         Paramters
@@ -173,8 +204,9 @@ class TokenBasedLookupClient:
             search results
         """
         headers = {}
-        dataset_list = await self._post('/dataset/search?page=' + str(page_number) + '&page_size=' + str(page_size),
-                                        {'free_text': keyword}, headers=headers)
+        dataset_list = await self._post(
+            f'/dataset/search?page={page_number}&page_size={page_size}',
+            {'free_text': keyword}, headers=headers)
 
         if 'X-Pagination' in headers:
             p = json.loads(headers['X-Pagination'])
@@ -196,11 +228,33 @@ class TokenBasedLookupClient:
 
     async def by_query(self, query, page_number=1, page_size=10, pagination={}):
         """Direct mongo query, requires server-side direct mongo plugin."""
+        """
+            Execute a direct MongoDB query using the by_query method.
+
+            Parameters
+            ----------
+            query : str or dict
+                The MongoDB query to be executed.
+            page_number : int, optional
+                The page number of the results, default is 1.
+            page_size : int, optional
+                The number of results per page, default is 10.
+            pagination: dict, optional
+                Dictionary filled with data from the X-Pagination response header, e.g.
+                    '{"total": 124, "total_pages": 13, "first_page": 1, "last_page": 13, "page": 1, "next_page": 2}'
+
+            Returns
+            -------
+            list of dict
+                Query results.
+            """
         if isinstance(query, str):
             query = json.loads(query)
 
-        headers, mongodataset_list = await self._post(
-            '/mongo/query?page=' + str(page_number) + '&page_size=' + str(page_size), dict(query=query))
+        headers = {}
+
+        query_result = await self._post(
+            f'/mongo/query?page={page_number}&page_size={page_size}', dict(query=query), headers=headers)
 
         if 'X-Pagination' in headers:
             p = json.loads(headers['X-Pagination'])
@@ -209,19 +263,39 @@ class TokenBasedLookupClient:
             logger = logging.getLogger(__name__)
             logger.warning("Server returned no pagination information. Server version outdated.")
 
-        return mongodataset_list
+        return query_result
 
     # lookup and by_uuid are interchangeable
 
-    async def lookup(self, uuid,page_number=1, page_size=10, pagination={}):
+    async def lookup(self, uuid, page_number=1, page_size=10, pagination={}):
         """Search for a specific uuid."""
         return await self.by_uuid(uuid, page_number=page_number, page_size=page_size, pagination=pagination)
 
+    async def by_uuid(self, uuid, page_number=1, page_size=10, pagination={}):
+        """
+           Search for a specific UUID in the dataset.
 
-    async def by_uuid(self, uuid,page_number=1, page_size=10, pagination={}):
-        """Search for a specific uuid."""
+           Parameters
+           ----------
+           uuid : str
+               The unique identifier (UUID) of the dataset to be searched.
+           page_number : int, optional
+               The page number of the results, default is 1.
+           page_size : int, optional
+               The number of results per page, default is 10.
+           pagination: dict, optional
+               Dictionary filled with data from the X-Pagination response header, e.g.
+                   '{"total": 124, "total_pages": 13, "first_page": 1, "last_page": 13, "page": 1, "next_page": 2}'
 
-        headers, lookup_list= await self._get(f'/dataset/lookup/{uuid}?page=' + str(page_number) + '&page_size=' + str(page_size))
+           Returns
+           -------
+           list of dict
+               Query results for the specified UUID.
+           """
+        headers = {}
+
+        lookup_list = await self._get(
+            f'/dataset/lookup/{uuid}?page={page_number}&page_size={page_size}',headers=headers)
 
         if 'X-Pagination' in headers:
             p = json.loads(headers['X-Pagination'])
@@ -231,13 +305,47 @@ class TokenBasedLookupClient:
             logger.warning("Server returned no pagination information. Server version outdated.")
 
         return lookup_list
-    # TODO: needs pagination
-    async def graph(self, uuid, dependency_keys=None):
-        """Request dependency graph for specific uuid"""
+
+    async def graph(self, uuid, dependency_keys=None, page_number=1, page_size=10, pagination={}):
+        """
+        Request dependency graph for a specific UUID.
+
+        Parameters
+        ----------
+        uuid : str
+            The unique identifier of the dataset for which the dependency graph is requested.
+        dependency_keys : list of str, optional
+            A list of dependency keys to filter the dependency graph. If not provided, the entire dependency graph will be returned.
+        page_number : int, optional
+            The page number of the results, default is 1.
+        page_size : int, optional
+            The number of results per page, default is 10.
+        pagination: dict, optional
+            Dictionary filled with data from the X-Pagination response header, e.g.
+                '{"total": 124, "total_pages": 13, "first_page": 1, "last_page": 13, "page": 1, "next_page": 2}'
+
+        Returns
+        -------
+        list of dict
+            Dependency graph results.
+        """
+
+        headers = {}
+
         if dependency_keys is None:
-            return await self._get(f'/graph/lookup/{uuid}')
+            dependency_graph = await self._get(f'/graph/lookup/{uuid}?page={page_number}&page_size={page_size}',
+                                               headers=headers)
+
+            if 'X-Pagination' in headers:
+                p = json.loads(headers['X-Pagination'])
+                pagination.update(p)
+            else:
+                logger = logging.getLogger(__name__)
+                logger.warning("Server returned no pagination information. Server version outdated.")
         else:  # TODO: validity check on dependency key list
-            return await self._post(f'/graph/lookup/{uuid}', dependency_keys)
+            dependency_graph = await self._post(f'/graph/lookup/{uuid}', dependency_keys)
+
+        return dependency_graph
 
     async def readme(self, uri):
         """Request the README.yml of a dataset by URI."""
@@ -255,10 +363,31 @@ class TokenBasedLookupClient:
         """Request user info."""
         return await self._get(f'/user/info/{user}')
 
-
     async def list_users(self, page_number=1, page_size=10, pagination={}):
-        """Request a list of users. (Needs admin privileges.)"""
-        headers, list_users = await self._get('/admin/user/list?page=' + str(page_number) + '&page_size=' + str(page_size))
+        """
+           Request a list of users. (Needs admin privileges.)
+
+           Parameters
+           ----------
+           page_number : int, optional
+               The page number of the results, default is 1.
+           page_size : int, optional
+               The number of results per page, default is 10.
+           pagination: dict, optional
+               Dictionary filled with data from the X-Pagination response header, e.g.
+                   '{"total": 124, "total_pages": 13, "first_page": 1, "last_page": 13, "page": 1, "next_page": 2}'
+
+           Returns
+           -------
+           list of dict
+               User information including username, email, roles, etc.
+           """
+
+        headers = {}
+
+        list_users = await self._get(
+            f'/admin/user/list?page={page_number}&page_size={page_size}', headers=headers)
+
         if 'X-Pagination' in headers:
             p = json.loads(headers['X-Pagination'])
             pagination.update(p)
@@ -267,19 +396,35 @@ class TokenBasedLookupClient:
             logger.warning("Server returned no pagination information. Server version outdated.")
 
         return list_users
+
     async def register_base_uri(self, base_uri):
         """Register a base URI. (Needs admin privileges.)"""
         return await self._post('/admin/base_uri/register', dict(base_uri=base_uri),
                                 method='status') == 201
 
-
-
     async def list_base_uris(self, page_number=1, page_size=10, pagination={}):
-        """List all registered base URIs. (Needs admin privileges.)"""
+        """
+           List all registered base URIs. (Needs admin privileges.)
 
+           Parameters
+           ----------
+           page_number : int, optional
+               The page number of the results, default is 1.
+           page_size : int, optional
+               The number of results per page, default is 10.
+           pagination: dict, optional
+               Dictionary filled with data from the X-Pagination response header, e.g.
+                   '{"total": 124, "total_pages": 13, "first_page": 1, "last_page": 13, "page": 1, "next_page": 2}'
 
-        headers, base_uris_list = await self._get(
-            '/admin/base_uri/list?page=' + str(page_number) + '&page_size=' + str(page_size))
+           Returns
+           -------
+           list of dict
+               Registered base URIs information including name, URI, and description.
+           """
+        headers = {}
+
+        base_uris_list = await self._get(
+            f'/admin/base_uri/list?page={page_number}&page_size={page_size}', headers=headers)
 
         if 'X-Pagination' in headers:
             p = json.loads(headers['X-Pagination'])
@@ -289,6 +434,7 @@ class TokenBasedLookupClient:
             logger.warning("Server returned no pagination information. Server version outdated.")
 
         return base_uris_list
+
     async def register_user(self, username, is_admin=False):
         """Register a user. (Needs admin privileges.)"""
         return await self._post('/admin/user/register', [dict(username=username, is_admin=is_admin)],
