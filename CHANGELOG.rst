@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+unreleased
+-----------
+
+- Server-side pagination
+
 0.5.1 (23Oct22)
 ---------------
 
