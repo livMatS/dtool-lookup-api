@@ -1,8 +1,8 @@
 CHANGELOG
 =========
 
-unreleased
------------
+0.6.0 (26Apr23)
+---------------
 
 - Server-side pagination
 
