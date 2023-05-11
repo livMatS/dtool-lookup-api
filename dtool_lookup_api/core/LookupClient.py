@@ -143,9 +143,21 @@ class TokenBasedLookupClient:
         """Overall summary of datasets accessible to a user."""
         return await self._get('/dataset/summary')
 
-    async def all(self):
+    async def all(self, page_number=1, page_size=20, pagination={}):
         """List all registered datasets."""
-        return await self._get('/dataset/list')
+        headers = {}
+        dataset_list = await self._get(f'/dataset/list?page={page_number}&page_size={page_size}', headers=headers)
+
+        if 'X-Pagination' in headers:
+            p = json.loads(headers['X-Pagination'])
+            pagination.update(**p)
+        else:
+            logger = logging.getLogger(__name__)
+            logger.warning("Server returned no pagination information. Server version outdated.")
+
+        return dataset_list
+
+
 
     async def aggregate(self, aggregation, page_number=1, page_size=20, pagination={}):
 
