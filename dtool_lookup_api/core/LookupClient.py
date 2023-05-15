@@ -107,6 +107,7 @@ class TokenBasedLookupClient:
                 headers=headers or self.header, ssl=self.verify_ssl) as r:
             json = await r.json()
             self._check_json(json)
+            headers.update(**r.headers)
             return json
 
     async def _post(self, route, json, method='json', headers={}):
