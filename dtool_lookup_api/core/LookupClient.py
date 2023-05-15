@@ -355,7 +355,7 @@ class TokenBasedLookupClient:
                 logger = logging.getLogger(__name__)
                 logger.warning("Server returned no pagination information. Server version outdated.")
         else:  # TODO: validity check on dependency key list
-            dependency_graph = await self._post(f'/graph/lookup/{uuid}', dependency_keys)
+            dependency_graph = await self._post(f'/graph/lookup/{uuid}', {"dependency_keys": dependency_keys})
 
         return dependency_graph
 
