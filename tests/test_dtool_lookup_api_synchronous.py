@@ -2,8 +2,9 @@
 
 import logging
 import pytest
+import yaml
 
-from utils import _log_nested_dict, _compare
+from utils import _log_nested_dict, _compare, NoDatesSafeLoader
 
 # TODO: in need for more elegant way to outsource default queries and expected responses
 from metadata import (
@@ -166,10 +167,14 @@ def test_default_readme():
     assert response is not None
 
     logger.debug("Response:")
-    _log_nested_dict(logger.debug, response)
+    logger.debug(response)
+
+    logger.debug("Parsed:")
+    parsed_readme = yaml.load(response, Loader=NoDatesSafeLoader)
+    _log_nested_dict(logger.debug, parsed_readme)
 
     compares = _compare(
-        response,
+        parsed_readme,
         EXPECTED_DEFAULT_README_RESPONSE,
         EXPECTED_DEFAULT_README_RESPONSE_IMMUTABLE_MARKER
     )
