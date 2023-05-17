@@ -198,24 +198,21 @@ EXPECTED_DEFAULT_SEARCH_RESPONSE_IMMUTABLE_MARKER = ALL_METADTA_IMMUTABLE_MARKER
 # config
 
 EXPECTED_CONFIG_RESPONSE = {
-    "dtool_lookup_server_dependency_graph_plugin": {
-        "dependency_keys": [
-            "readme.derived_from.uuid",
-            "annotations.source_dataset_uuid"
-        ],
-        "dynamic_dependency_keys": True,
-        "enable_dependency_view": True,
-        "force_rebuild_dependency_view": False,
-        "mongo_dependency_view_bookkeeping": "dep_views",
-        "mongo_dependency_view_cache_size": 10,
-        "mongo_dependency_view_prefix": "dep:",
-        "version": "0.1.3"
-    },
-    "dtool_lookup_server_direct_mongo_plugin": {
-        "allow_direct_aggregation": False,
-        "allow_direct_query": True,
-        "version": "0.1.2"
-    },
+    # dependency graph plugin
+    "dependency_keys": [
+        "readme.derived_from.uuid",
+        "annotations.source_dataset_uuid"
+    ],
+    "dynamic_dependency_keys": True,
+    "enable_dependency_view": True,
+    "force_rebuild_dependency_view": False,
+    "mongo_dependency_view_bookkeeping": "dep_views",
+    "mongo_dependency_view_cache_size": 10,
+    "mongo_dependency_view_prefix": "dep:",
+    # direct mongo plugin
+    "allow_direct_aggregation": False,
+    "allow_direct_query": True,
+    # other
     "jsonify_prettyprint_regular": True,
     "jwt_algorithm": "RS256",
     "jwt_header_name": "Authorization",
@@ -223,15 +220,11 @@ EXPECTED_CONFIG_RESPONSE = {
     "jwt_public_key": "",
     "jwt_token_location": "headers",
     "sqlalchemy_track_modifications": False,
-    "version": "0.15.0"
 }
 
 EXPECTED_CONFIG_RESPONSE_IMMUTABLE_MARKER = _make_marker(EXPECTED_CONFIG_RESPONSE)
 EXPECTED_CONFIG_RESPONSE_IMMUTABLE_MARKER["jwt_public_key"] = False
-EXPECTED_CONFIG_RESPONSE_IMMUTABLE_MARKER["version"] = False
-EXPECTED_CONFIG_RESPONSE_IMMUTABLE_MARKER["dtool_lookup_server_dependency_graph_plugin"]["version"] = False
-EXPECTED_CONFIG_RESPONSE_IMMUTABLE_MARKER["dtool_lookup_server_direct_mongo_plugin"]["version"] = False
-EXPECTED_CONFIG_RESPONSE_IMMUTABLE_MARKER["dtool_lookup_server_direct_mongo_plugin"]["allow_direct_aggregation"] = False
+# EXPECTED_CONFIG_RESPONSE_IMMUTABLE_MARKER["dtool_lookup_server_direct_mongo_plugin"]["allow_direct_aggregation"] = False
 
 
 # user info
