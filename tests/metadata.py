@@ -156,7 +156,7 @@ EXPECTED_DEFAULT_MANIFEST_RESPONSE_IMMUTABLE_MARKER["items"]["eb58eb70ebcddf630f
 # query
 
 DEFAULT_QUERY = {
-    'base_uri': 'smb://test-share',
+    #'base_uri': 'smb://test-share',
     'name': {'$regex': 'test'},
 }
 EXPECTED_DEFAULT_QUERY_RESPONSE = [ALL_METADTA[1]]
