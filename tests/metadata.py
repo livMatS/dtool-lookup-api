@@ -210,7 +210,7 @@ EXPECTED_CONFIG_RESPONSE = {
     "mongo_dependency_view_cache_size": 10,
     "mongo_dependency_view_prefix": "dep:",
     # direct mongo plugin
-    "allow_direct_aggregation": False,
+    "allow_direct_aggregation": True,
     "allow_direct_query": True,
     # other
     "jsonify_prettyprint_regular": True,
