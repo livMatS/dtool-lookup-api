@@ -245,8 +245,6 @@ EXPECTED_DEFAULT_USER_INFO_RESPONSE_IMMUTABLE_MARKER = _make_marker(EXPECTED_DEF
 
 EXPECTED_DEFAULT_LIST_USERS_RESPONSE = [{
     'is_admin': True,
-    'register_permissions_on_base_uris': [],
-    'search_permissions_on_base_uris': ['smb://test-share'],
     'username': 'testuser'
 }]
 EXPECTED_DEFAULT_LIST_USERS_RESPONSE_IMMUTABLE_MARKER = _make_marker(EXPECTED_DEFAULT_LIST_USERS_RESPONSE)
