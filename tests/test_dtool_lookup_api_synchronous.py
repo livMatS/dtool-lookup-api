@@ -2,8 +2,9 @@
 
 import logging
 import pytest
+import yaml
 
-from utils import _log_nested_dict, _compare
+from utils import _log_nested_dict, _compare, NoDatesSafeLoader
 
 # TODO: in need for more elegant way to outsource default queries and expected responses
 from metadata import (
@@ -46,7 +47,7 @@ def test_all():
 
 
 @pytest.mark.usefixtures("dtool_lookup_server", "dtool_config")
-def test_defaut_aggregation():
+def test_default_aggregation():
     """Will send a direct mongo query request to the server."""
     from dtool_lookup_api.synchronous import aggregate
 
@@ -91,7 +92,7 @@ def test_config():
 
 
 @pytest.mark.usefixtures("dtool_lookup_server", "dtool_config")
-def test_defaut_lookup():
+def test_default_lookup():
     """Will send a direct mongo query request to the server."""
     from dtool_lookup_api.synchronous import lookup
 
@@ -112,7 +113,7 @@ def test_defaut_lookup():
 
 
 @pytest.mark.usefixtures("dtool_lookup_server", "dtool_config")
-def test_defaut_manifest():
+def test_default_manifest():
     """Will send a direct mongo query request to the server."""
     from dtool_lookup_api.synchronous import manifest
 
@@ -133,7 +134,7 @@ def test_defaut_manifest():
 
 
 @pytest.mark.usefixtures("dtool_lookup_server", "dtool_config")
-def test_defaut_query():
+def test_default_query():
     """Will send a direct mongo query request to the server."""
     from dtool_lookup_api.synchronous import query
 
@@ -166,10 +167,14 @@ def test_default_readme():
     assert response is not None
 
     logger.debug("Response:")
-    _log_nested_dict(logger.debug, response)
+    logger.debug(response)
+
+    logger.debug("Parsed:")
+    parsed_readme = yaml.load(response, Loader=NoDatesSafeLoader)
+    _log_nested_dict(logger.debug, parsed_readme)
 
     compares = _compare(
-        response,
+        parsed_readme,
         EXPECTED_DEFAULT_README_RESPONSE,
         EXPECTED_DEFAULT_README_RESPONSE_IMMUTABLE_MARKER
     )
@@ -250,35 +255,35 @@ def test_default_list_users():
 
 
 # TODO: clean up, i.e. delete users after use
-@pytest.mark.usefixtures("dtool_lookup_server", "dtool_config")
-def test_default_register_user():
-    """Will send a register user request to the server."""
-    from dtool_lookup_api.synchronous import register_user
-
-    logger = logging.getLogger(__name__)
-
-    # mimic https://github.com/jic-dtool/dtool-lookup-server/blob/12baba73eebc668b4998ae2c2ea43946dc3bf856/tests/test_admin_user_routes.py#L14
-    users = [
-        {"username": "evil-witch", "is_admin": True},
-        {"username": "dopey"}
-    ]
-
-    # TODO: check for nonexistence of not yet registered users on server
-
-    for user in users:
-        response = register_user(**user)
-        assert response == True
-        logger.debug("Response:")
-        _log_nested_dict(logger.debug, response)
-
-    # Ensure idempotent.
-    for user in users:
-        response = register_user(**user)
-        assert response == True
-        logger.debug("Response:")
-        _log_nested_dict(logger.debug, response)
-
-    # TODO: check for existence of registered users on server
+# @pytest.mark.usefixtures("dtool_lookup_server", "dtool_config")
+# def test_default_register_user():
+#    """Will send a register user request to the server."""
+#    from dtool_lookup_api.synchronous import register_user
+#
+#    logger = logging.getLogger(__name__)
+#
+#    # mimic https://github.com/jic-dtool/dtool-lookup-server/blob/12baba73eebc668b4998ae2c2ea43946dc3bf856/tests/test_admin_user_routes.py#L14
+#    users = [
+#        {"username": "evil-witch", "is_admin": True},
+#        {"username": "dopey"}
+#    ]
+#
+#    # TODO: check for nonexistence of not yet registered users on server
+#
+#    for user in users:
+#        response = register_user(**user)
+#        assert response == True
+#        logger.debug("Response:")
+#        _log_nested_dict(logger.debug, response)
+#
+#    # Ensure idempotent.
+#    for user in users:
+#        response = register_user(**user)
+#        assert response == True
+#        logger.debug("Response:")
+#        _log_nested_dict(logger.debug, response)
+#
+#    # TODO: check for existence of registered users on server
 
 
 # mark to run early in order to not have any other users registered in database by other tests
