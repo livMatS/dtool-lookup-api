@@ -1,8 +1,8 @@
 CHANGELOG
 =========
 
-unreleased
-----------
+0.6.1 (12Jul23)
+---------------
 
 - New dependency graph request schema in use.
 
