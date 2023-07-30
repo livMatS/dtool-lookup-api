@@ -376,6 +376,10 @@ class TokenBasedLookupClient:
         """Request user info."""
         return await self._get(f'/user/info/{user}')
 
+    async def get_config_versions(self):
+        """Request config versions from the server"""
+        return await self._get('/config/versions')
+
     async def list_users(self, page_number=1, page_size=10, pagination={}):
         """
            Request a list of users. (Needs admin privileges.)
