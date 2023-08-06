@@ -20,7 +20,8 @@ from metadata import (
     # EXPECTED_DEFAULT_REGISTER_USER_RESPONSE, EXPECTED_DEFAULT_REGISTER_USER_RESPONSE_IMMUTABLE_MARKER,
     DEFAULT_PERMISSION_INFO_BASE_URI, EXPECTED_DEFAULT_PERMISSION_INFO_RESPONSE, EXPECTED_DEFAULT_PERMISSION_INFO_RESPONSE_IMMUTABLE_MARKER,
     # EXPECTED_DEFAULT_UPDATE_PERMISSIONS_RESPONSE, EXPECTED_DEFAULT_UPDATE_PERMISSIONS_RESPONSE_IMMUTABLE_MARKER,
-    DEFAULT_USER_INFO_USER_NAME, EXPECTED_DEFAULT_USER_INFO_RESPONSE, EXPECTED_DEFAULT_USER_INFO_RESPONSE_IMMUTABLE_MARKER,
+    DEFAULT_USER_INFO_USER_NAME, EXPECTED_DEFAULT_USER_INFO_RESPONSE, EXPECTED_DEFAULT_USER_INFO_RESPONSE_IMMUTABLE_MARKER,EXPECTED_DEFAULT_VERSIONS_RESPONSE,
+    EXPECTED_DEFAULT_VERSIONS_RESPONSE_IMMUTABLE_MARKER,
 )
 
 
@@ -333,3 +334,24 @@ def test_default_permission_info():
 #         EXPECTED_DEFAULT_UPDATE_PERMISSIONS_RESPONSE_IMMUTABLE_MARKER
 #     )
 #     assert compares
+
+@pytest.mark.usefixtures("dtool_lookup_server", "dtool_config")
+async def test_versions():
+    """Will send a request for versions to the server."""
+    from dtool_lookup_api.synchronous import versions
+
+    logger = logging.getLogger(__name__)
+
+    response = await versions()
+    assert response is not None
+
+    logger.debug("Response:")
+    _log_nested_dict(logger.debug, response)
+
+    compares = _compare(
+        response,
+        EXPECTED_DEFAULT_VERSIONS_RESPONSE,
+        EXPECTED_DEFAULT_VERSIONS_RESPONSE_IMMUTABLE_MARKER,
+    )
+
+    assert compares
