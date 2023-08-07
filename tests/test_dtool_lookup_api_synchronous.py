@@ -336,13 +336,13 @@ def test_default_permission_info():
 #     assert compares
 
 @pytest.mark.usefixtures("dtool_lookup_server", "dtool_config")
-async def test_versions():
+def test_versions():
     """Will send a request for versions to the server."""
     from dtool_lookup_api.synchronous import versions
 
     logger = logging.getLogger(__name__)
 
-    response = await versions()
+    response = versions()
     assert response is not None
 
     logger.debug("Response:")
