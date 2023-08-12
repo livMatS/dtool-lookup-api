@@ -204,6 +204,10 @@ def test_default_search():
     )
     assert compares
 
+    # Check pagination in the response headers
+    pagination_header = response.headers.get('x-pagination')
+    assert pagination_header is not None, "Missing x-pagination header"
+
 
 # mark to run early in order to not have any other users registered in database by other tests
 @pytest.mark.first
