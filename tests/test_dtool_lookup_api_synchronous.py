@@ -204,9 +204,33 @@ def test_default_search():
     )
     assert compares
 
-    # Check pagination in the response headers
-    pagination_header = response.headers.get('x-pagination')
-    assert pagination_header is not None, "Missing x-pagination header"
+
+@pytest.mark.usefixtures("dtool_lookup_server", "dtool_config")
+async def test_search_pagination():
+
+    from dtool_lookup_api.synchronous import search
+
+    keyword = "test_keyword"
+    page_number = 1
+    page_size = 10
+    pagination = {}
+
+    dataset_list = search(keyword, page_number, page_size, pagination)
+
+    # Validate that pagination dict was populated
+    assert pagination  # Ensure that pagination dict is not empty
+
+    # Validate that necessary keys are present
+    expected_keys = ['total', 'total_pages', 'first_page', 'last_page', 'page', 'next_page']
+    for key in expected_keys:
+        assert key in pagination, f"Missing key {key} in pagination"
+
+    # Optional: Check specific expected values (if necessary)
+    assert pagination['total'] >= 0
+    assert pagination['page'] <= pagination['total_pages']
+
+
+
 
 
 # mark to run early in order to not have any other users registered in database by other tests
