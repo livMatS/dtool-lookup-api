@@ -206,7 +206,7 @@ def test_default_search():
 
 
 @pytest.mark.usefixtures("dtool_lookup_server", "dtool_config")
-async def test_search_pagination():
+def test_search_pagination():
 
     from dtool_lookup_api.synchronous import search
 
