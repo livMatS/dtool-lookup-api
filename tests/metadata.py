@@ -260,7 +260,7 @@ EXPECTED_DEFAULT_PERMISSION_INFO_RESPONSE_IMMUTABLE_MARKER = _make_marker(EXPECT
 
 
 #version info
-EXPECTED_DEFAULT_VERSIONS_RESPONSE_REGEX = {
+EXPECTED_DEFAULT_VERSIONS_RESPONSE = {
     "dtool_lookup_server": r"\d+\.\d+\.\d+",
     "dtool_lookup_server_dependency_graph_plugin": r"\d+\.\d+\.\d+(\.dev\d+)?",
     "dtool_lookup_server_direct_mongo_plugin": r"\d+\.\d+\.\d+(\.dev\d+)?",
