@@ -21,7 +21,7 @@ from metadata import (
     DEFAULT_PERMISSION_INFO_BASE_URI, EXPECTED_DEFAULT_PERMISSION_INFO_RESPONSE, EXPECTED_DEFAULT_PERMISSION_INFO_RESPONSE_IMMUTABLE_MARKER,
     # EXPECTED_DEFAULT_UPDATE_PERMISSIONS_RESPONSE, EXPECTED_DEFAULT_UPDATE_PERMISSIONS_RESPONSE_IMMUTABLE_MARKER,
     DEFAULT_USER_INFO_USER_NAME, EXPECTED_DEFAULT_USER_INFO_RESPONSE, EXPECTED_DEFAULT_USER_INFO_RESPONSE_IMMUTABLE_MARKER,EXPECTED_DEFAULT_VERSIONS_RESPONSE,
-    EXPECTED_DEFAULT_VERSIONS_RESPONSE_IMMUTABLE_MARKER,
+    EXPECTED_DEFAULT_VERSIONS_RESPONSE_IMMUTABLE_MARKER,PAGINATION_PARAMETERS
 )
 
 
@@ -206,19 +206,17 @@ def test_default_search():
 
 
 @pytest.mark.usefixtures("dtool_lookup_server", "dtool_config")
-def test_search_pagination():
+def test_pagination():
 
     from dtool_lookup_api.synchronous import search
 
-    keyword = DEFAULT_SEARCH_TEXT
-    page_number = 1
-    page_size = 10
-    pagination = {}
 
-    dataset_list = search(keyword, page_number, page_size, pagination)
+
+    # Using ** to unpack dictionary values as function arguments
+    dataset_list = search(**PAGINATION_PARAMETERS)
 
     # Validate that pagination dict was populated
-    assert pagination  # Ensure that pagination dict is not empty
+    assert pagination
 
     # Here, we only check the keys that are present in the pagination dictionary
     if 'total' in pagination:
@@ -248,11 +246,6 @@ def test_search_pagination():
     missing_keys = [key for key in expected_keys if key not in pagination]
     for key in missing_keys:
         print(f"Optional key {key} is not present in pagination")
-
-
-
-
-
 
 # mark to run early in order to not have any other users registered in database by other tests
 @pytest.mark.first
