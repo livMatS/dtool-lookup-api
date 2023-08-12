@@ -210,7 +210,7 @@ def test_search_pagination():
 
     from dtool_lookup_api.synchronous import search
 
-    keyword = "test_keyword"
+    keyword = DEFAULT_SEARCH_TEXT
     page_number = 1
     page_size = 10
     pagination = {}
