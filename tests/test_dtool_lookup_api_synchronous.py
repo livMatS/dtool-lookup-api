@@ -216,6 +216,7 @@ def test_pagination():
     dataset_list = search(**PAGINATION_PARAMETERS)
 
     # Validate that pagination dict was populated
+    pagination = PAGINATION_PARAMETERS["pagination"]
     assert pagination
 
     # Here, we only check the keys that are present in the pagination dictionary
