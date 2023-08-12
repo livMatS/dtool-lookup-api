@@ -205,7 +205,7 @@ def test_default_search():
     assert compares
 
 
-@@pytest.mark.usefixtures("dtool_lookup_server", "dtool_config")
+@pytest.mark.usefixtures("dtool_lookup_server", "dtool_config")
 def test_search_pagination():
 
     from dtool_lookup_api.synchronous import search
