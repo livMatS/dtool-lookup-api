@@ -194,7 +194,12 @@ EXPECTED_DEFAULT_README_RESPONSE_IMMUTABLE_MARKER = _make_marker(EXPECTED_DEFAUL
 DEFAULT_SEARCH_TEXT = "test"
 EXPECTED_DEFAULT_SEARCH_RESPONSE = ALL_METADTA
 EXPECTED_DEFAULT_SEARCH_RESPONSE_IMMUTABLE_MARKER = ALL_METADTA_IMMUTABLE_MARKER
-
+PAGINATION_PARAMETERS = {
+        "keyword": "test",
+        "page_number": 1,
+        "page_size": 10,
+        "pagination": {}
+    }
 # config
 
 EXPECTED_CONFIG_RESPONSE = {
@@ -257,3 +262,24 @@ EXPECTED_DEFAULT_PERMISSION_INFO_RESPONSE = {
     'users_with_search_permissions': ['testuser']
 }
 EXPECTED_DEFAULT_PERMISSION_INFO_RESPONSE_IMMUTABLE_MARKER = _make_marker(EXPECTED_DEFAULT_PERMISSION_INFO_RESPONSE)
+
+
+#version info
+EXPECTED_DEFAULT_VERSIONS_RESPONSE = {
+    "dtool_lookup_server": "0.17.2",
+    "dtool_lookup_server_dependency_graph_plugin": "0.1.6.dev24",
+    "dtool_lookup_server_direct_mongo_plugin": "0.1.5.dev35",
+    "dtool_lookup_server_notification_plugin": "0.2.3.dev19",
+    "dtool_lookup_server_retrieve_plugin_mongo": "0.1.0",
+    "dtool_lookup_server_search_plugin_mongo": "0.1.0"
+}
+
+
+EXPECTED_DEFAULT_VERSIONS_RESPONSE_IMMUTABLE_MARKER = {
+    "dtool_lookup_server": False,
+    "dtool_lookup_server_dependency_graph_plugin": False,
+    "dtool_lookup_server_direct_mongo_plugin": False,
+    "dtool_lookup_server_notification_plugin": False,
+    "dtool_lookup_server_retrieve_plugin_mongo": False,
+    "dtool_lookup_server_search_plugin_mongo": False,
+}

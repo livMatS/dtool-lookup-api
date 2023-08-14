@@ -20,7 +20,8 @@ from metadata import (
     # EXPECTED_DEFAULT_REGISTER_USER_RESPONSE, EXPECTED_DEFAULT_REGISTER_USER_RESPONSE_IMMUTABLE_MARKER,
     DEFAULT_PERMISSION_INFO_BASE_URI, EXPECTED_DEFAULT_PERMISSION_INFO_RESPONSE, EXPECTED_DEFAULT_PERMISSION_INFO_RESPONSE_IMMUTABLE_MARKER,
     # EXPECTED_DEFAULT_UPDATE_PERMISSIONS_RESPONSE, EXPECTED_DEFAULT_UPDATE_PERMISSIONS_RESPONSE_IMMUTABLE_MARKER,
-    DEFAULT_USER_INFO_USER_NAME, EXPECTED_DEFAULT_USER_INFO_RESPONSE, EXPECTED_DEFAULT_USER_INFO_RESPONSE_IMMUTABLE_MARKER,
+    DEFAULT_USER_INFO_USER_NAME, EXPECTED_DEFAULT_USER_INFO_RESPONSE, EXPECTED_DEFAULT_USER_INFO_RESPONSE_IMMUTABLE_MARKER,EXPECTED_DEFAULT_VERSIONS_RESPONSE,
+    EXPECTED_DEFAULT_VERSIONS_RESPONSE_IMMUTABLE_MARKER,PAGINATION_PARAMETERS
 )
 
 
@@ -204,6 +205,49 @@ def test_default_search():
     assert compares
 
 
+@pytest.mark.usefixtures("dtool_lookup_server", "dtool_config")
+def test_pagination():
+
+    from dtool_lookup_api.synchronous import search
+
+
+
+    # Using ** to unpack dictionary values as function arguments
+    dataset_list = search(**PAGINATION_PARAMETERS)
+
+    # Validate that pagination dict was populated
+    pagination = PAGINATION_PARAMETERS["pagination"]
+    assert pagination
+
+    # Here, we only check the keys that are present in the pagination dictionary
+    if 'total' in pagination:
+        assert pagination['total'] >= 0
+
+    if 'page' in pagination and 'total_pages' in pagination:
+        # Ensure current page is less than or equal to total pages
+        assert pagination['page'] <= pagination['total_pages']
+
+        # If on the first page, ensure that `first_page` is equivalent to the current page
+        if pagination['page'] == 1 and 'first_page' in pagination:
+            assert pagination['first_page'] == 1
+
+        # If on the last page, ensure there isn't a next_page and that `last_page` is equivalent to the current page
+        if pagination['page'] == pagination['total_pages']:
+            assert 'next_page' not in pagination
+            if 'last_page' in pagination:
+                assert pagination['last_page'] == pagination['page']
+
+    # Check if `next_page` makes sense, given the total pages and the current page
+    if 'next_page' in pagination and 'total_pages' in pagination:
+        assert pagination['next_page'] <= pagination['total_pages']
+        assert pagination['next_page'] > pagination.get('page', 0)
+
+    # Print out keys that were not present for debugging or information
+    expected_keys = ['total', 'total_pages', 'first_page', 'last_page', 'page', 'next_page']
+    missing_keys = [key for key in expected_keys if key not in pagination]
+    for key in missing_keys:
+        print(f"Optional key {key} is not present in pagination")
+
 # mark to run early in order to not have any other users registered in database by other tests
 @pytest.mark.first
 @pytest.mark.usefixtures("dtool_lookup_server", "dtool_config")
@@ -333,3 +377,24 @@ def test_default_permission_info():
 #         EXPECTED_DEFAULT_UPDATE_PERMISSIONS_RESPONSE_IMMUTABLE_MARKER
 #     )
 #     assert compares
+
+@pytest.mark.usefixtures("dtool_lookup_server", "dtool_config")
+def test_versions():
+    """Will send a request for versions to the server."""
+    from dtool_lookup_api.synchronous import versions
+
+    logger = logging.getLogger(__name__)
+
+    response = versions()
+    assert response is not None
+
+    logger.debug("Response:")
+    _log_nested_dict(logger.debug, response)
+
+    compares = _compare(
+        response,
+        EXPECTED_DEFAULT_VERSIONS_RESPONSE,
+        EXPECTED_DEFAULT_VERSIONS_RESPONSE_IMMUTABLE_MARKER,
+    )
+
+    assert compares
