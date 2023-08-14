@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+0.7.0 (14Aug23)
+---------------
+
+- New versions method for retrieving server and server side plugin version information.
+
 0.6.1 (12Jul23)
 ---------------
 
