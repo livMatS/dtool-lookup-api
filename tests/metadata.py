@@ -272,7 +272,6 @@ EXPECTED_DEFAULT_VERSIONS_RESPONSE = {
     "dtool_lookup_server_notification_plugin": "0.2.3.dev19",
     "dtool_lookup_server_retrieve_plugin_mongo": "0.1.0",
     "dtool_lookup_server_search_plugin_mongo": "0.1.0"
-    "dtool_lookup_server_search_plugin_mongo": "0.1.0",
 }
 
 
