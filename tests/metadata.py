@@ -266,12 +266,13 @@ EXPECTED_DEFAULT_PERMISSION_INFO_RESPONSE_IMMUTABLE_MARKER = _make_marker(EXPECT
 
 #version info
 EXPECTED_DEFAULT_VERSIONS_RESPONSE = {
-    "dtool_lookup_server": r"\d+\.\d+\.\d+",
-    "dtool_lookup_server_dependency_graph_plugin": r"\d+\.\d+\.\d+(\.dev\d+)?",
-    "dtool_lookup_server_direct_mongo_plugin": r"\d+\.\d+\.\d+(\.dev\d+)?",
-    "dtool_lookup_server_notification_plugin": r"\d+\.\d+\.\d+(\.dev\d+)?",
-    "dtool_lookup_server_retrieve_plugin_mongo": r"\d+\.\d+\.\d+",
-    "dtool_lookup_server_search_plugin_mongo": r"\d+\.\d+\.\d+",
+    "dtool_lookup_server": "0.17.2",
+    "dtool_lookup_server_dependency_graph_plugin": "0.1.6.dev24",
+    "dtool_lookup_server_direct_mongo_plugin": "0.1.5.dev35",
+    "dtool_lookup_server_notification_plugin": "0.2.3.dev19",
+    "dtool_lookup_server_retrieve_plugin_mongo": "0.1.0",
+    "dtool_lookup_server_search_plugin_mongo": "0.1.0"
+    "dtool_lookup_server_search_plugin_mongo": "0.1.0",
 }
 
 
