@@ -3,7 +3,7 @@
 from utils import _make_marker
 
 # TODO: right now, the expected metadata content depends on what's to be found within
-# https://github.com/jotelha/dtool-lookup-server-container-composition/tree/master/tests/dtool/simple_test_dataset
+# https://github.com/livMatS/dserver-container-composition/tree/main/tests/dtool/simple_test_dataset
 # That should become independent of the testing framework, ideally by providing our own datasets.
 
 # all
@@ -229,7 +229,7 @@ EXPECTED_CONFIG_RESPONSE = {
 
 EXPECTED_CONFIG_RESPONSE_IMMUTABLE_MARKER = _make_marker(EXPECTED_CONFIG_RESPONSE)
 EXPECTED_CONFIG_RESPONSE_IMMUTABLE_MARKER["jwt_public_key"] = False
-# EXPECTED_CONFIG_RESPONSE_IMMUTABLE_MARKER["dtool_lookup_server_direct_mongo_plugin"]["allow_direct_aggregation"] = False
+# EXPECTED_CONFIG_RESPONSE_IMMUTABLE_MARKER["dserver_server_direct_mongo_plugin"]["allow_direct_aggregation"] = False
 
 
 # user info
@@ -266,20 +266,20 @@ EXPECTED_DEFAULT_PERMISSION_INFO_RESPONSE_IMMUTABLE_MARKER = _make_marker(EXPECT
 
 #version info
 EXPECTED_DEFAULT_VERSIONS_RESPONSE = {
-    "dtool_lookup_server": "0.17.2",
-    "dtool_lookup_server_dependency_graph_plugin": "0.1.6.dev24",
-    "dtool_lookup_server_direct_mongo_plugin": "0.1.5.dev35",
-    "dtool_lookup_server_notification_plugin": "0.2.3.dev19",
-    "dtool_lookup_server_retrieve_plugin_mongo": "0.1.0",
-    "dtool_lookup_server_search_plugin_mongo": "0.1.0"
+    "dserver_server": "0.17.2",
+    "dserver_server_dependency_graph_plugin": "0.1.6.dev24",
+    "dserver_server_direct_mongo_plugin": "0.1.5.dev35",
+    "dserver_server_notification_plugin": "0.2.3.dev19",
+    "dserver_server_retrieve_plugin_mongo": "0.1.0",
+    "dserver_server_search_plugin_mongo": "0.1.0"
 }
 
 
 EXPECTED_DEFAULT_VERSIONS_RESPONSE_IMMUTABLE_MARKER = {
-    "dtool_lookup_server": False,
-    "dtool_lookup_server_dependency_graph_plugin": False,
-    "dtool_lookup_server_direct_mongo_plugin": False,
-    "dtool_lookup_server_notification_plugin": False,
-    "dtool_lookup_server_retrieve_plugin_mongo": False,
-    "dtool_lookup_server_search_plugin_mongo": False,
+    "dserver_server": False,
+    "dserver_server_dependency_graph_plugin": False,
+    "dserver_server_direct_mongo_plugin": False,
+    "dserver_server_notification_plugin": False,
+    "dserver_server_retrieve_plugin_mongo": False,
+    "dserver_server_search_plugin_mongo": False,
 }

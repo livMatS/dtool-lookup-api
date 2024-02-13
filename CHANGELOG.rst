@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+unpublished
+-----------
+
+- Rebranded from ``dtool_lookup_api`` to ``dserver_api``.
+
 0.7.0 (14Aug23)
 ---------------
 
@@ -19,14 +24,14 @@ CHANGELOG
 0.5.1 (23Oct22)
 ---------------
 
-- Fixed erroneous interpretation of server response in `register_base_uri` and `update_permissions`.
-- Fixed parsing of text to JSON in `aggregate`.
-- Made all synchronous methods available at top-level via imports in `__init__.py`
+- Fixed erroneous interpretation of server response in ``register_base_uri`` and ``update_permissions``.
+- Fixed parsing of text to JSON in ``aggregate``.
+- Made all synchronous methods available at top-level via imports in ``__init__.py``
 
 0.5.0 (6Dec21)
 --------------
 
-- Automatically create `synchronous` and `asynchronous` modules.
+- Automatically create ``synchronous`` and ``asynchronous`` modules.
 - Detect server errors (in particular if a token expires) and raise exceptions.
 
 0.4.1 (3Dec21)
@@ -37,7 +42,7 @@ CHANGELOG
 0.4.0 (27Nov21)
 ---------------
 
-- Added `user_info` method for accessing server route `/user/info`.
+- Added ``user_info`` method for accessing server route ``/user/info``.
 
 0.2.0 (30Aug21)
 ---------------

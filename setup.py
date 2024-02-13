@@ -3,7 +3,7 @@ import os
 from setuptools import setup
 from setuptools_scm import get_version
 
-url = "https://github.com/IMTEK-Simulation/dtool-lookup-api"
+url = "https://github.com/livMatS/dserver-api"
 readme = open('README.rst').read()
 version = get_version(root='.', relative_to=__file__)
 
@@ -15,10 +15,10 @@ def local_scheme(version):
 
 
 setup(
-    name="dtool-lookup-api",
-    packages=["dtool_lookup_api"],
+    name="dserver-api",
+    packages=["dserver_api"],
     description="This package offers both synchronous and asynchronous implementations of a standardized Python API "
-                "to communicate with the dtool lookup server.",
+                "to communicate with dserver.",
     long_description=readme,
     include_package_data=True,
     author="Johannes Laurin Hoermann",
@@ -26,7 +26,7 @@ setup(
     use_scm_version={
         "root": '.',
         "relative_to": __file__,
-        "write_to": os.path.join("dtool_lookup_api", "version.py"),
+        "write_to": os.path.join("dserver_api", "version.py"),
         "local_scheme": local_scheme},
     url=url,
     setup_requires=['setuptools_scm'],

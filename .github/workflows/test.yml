@@ -3,9 +3,9 @@ name: test
 on:
   push:
     branches:
-      - master
+      - main
   pull_request:
 
 jobs:
   test:
-    uses: livMatS/dtool-framework-workflows/.github/workflows/dtool-lookup-api-test.yml@master
+    uses: livMatS/dtool-framework-workflows/.github/workflows/dserver-api-test.yml@main

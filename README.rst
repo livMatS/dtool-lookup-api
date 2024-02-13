@@ -3,26 +3,26 @@ README
 
 |PyPI| |github tag| |github tests|
 
-Python API for interacting with dtool lookup server.
+Python API for interacting with dserver.
 
-This package offers a class-based asynchronous lookup API within ``dtool_lookup_api.core.LookupClient``,
-a simple class-less wrapper around it at ``dtool_lookup_api.asynchronous``,
-and a synchronous interface on top at ``dtool_lookup_api.synchronous``.
+This package offers a class-based asynchronous lookup API within ``dserver_api.core.LookupClient``,
+a simple class-less wrapper around it at ``dserver_api.asynchronous``,
+and a synchronous interface on top at ``dserver_api.synchronous``.
 
-Direct imports of utility functions from `dtool_lookup_api` in the examples below forward to the synchronous API variant.
+Direct imports of utility functions from `dserver_api` in the examples below forward to the synchronous API variant.
 
 
 Installation
 ------------
 
-To install the dtool_lookup_api package.
+To install the dserver_api package.
 
 .. code-block:: bash
 
-    pip install dtool_lookup_api
+    pip install dserver_api
 
-This package depends on a `dtool-lookup-server
-<https://github.com/jic-dtool/dtool-lookup-server>`_ instance to talk to.
+This package depends on a `dserver
+<https://github.com/jic-dtool/dserver>`_ instance to talk to.
 
 Configuration
 -------------
@@ -31,22 +31,22 @@ The API needs to know the URL of the lookup server
 
 .. code-block:: bash
 
-    export DTOOL_LOOKUP_SERVER_URL=https://localhost:5000
+    export DSERVER_URL=https://localhost:5000
 
 You may also need specify an access token generated on the server
 
 .. code-block:: bash
 
-    export DTOOL_LOOKUP_SERVER_TOKEN=$(flask user token testuser)
+    export DSERVER_TOKEN=$(flask user token testuser)
 
 
 Instead of specifying the access token directly, it is also possible to provide
 
 .. code-block:: bash
 
-    export DTOOL_LOOKUP_SERVER_TOKEN_GENERATOR_URL=https://localhost:5001
-    export DTOOL_LOOKUP_SERVER_USERNAME=my-username
-    export DTOOL_LOOKUP_SERVER_PASSWORD=my-password
+    export DSERVER_TOKEN_GENERATOR_URL=https://localhost:5001
+    export DSERVER_USERNAME=my-username
+    export DSERVER_PASSWORD=my-password
 
 for the API to request a token. This, however, is intended only for testing
 purposes and strongly discouraged in a production environment, as your password
@@ -56,8 +56,8 @@ Our recommended setup is a combination of
 
 .. code-block:: bash
 
-    export DTOOL_LOOKUP_SERVER_URL=https://localhost:5000
-    export DTOOL_LOOKUP_SERVER_TOKEN_GENERATOR_URL=https://localhost:5001
+    export DSERVER_URL=https://localhost:5000
+    export DSERVER_TOKEN_GENERATOR_URL=https://localhost:5001
 
 in the config. If used interactively, the API will then ask for your
 credentials at the first interaction and cache the provided values for this
@@ -65,7 +65,7 @@ session, i.e.
 
 .. code-block::
 
-    In [1]: from dtool_lookup_api import query
+    In [1]: from dserver_api import query
        ...: res = query(
        ...:     {
        ...:         'readme.owners.name': {'$regex': '^Testing User$'},
@@ -87,7 +87,7 @@ session, i.e.
       'uri': 'smb://test-share/1a1f9fad-8589-413e-9602-5bbd66bfe675',
       'uuid': '1a1f9fad-8589-413e-9602-5bbd66bfe675'}]
 
-    In [3]: from dtool_lookup_api import all
+    In [3]: from dserver_api import all
        ...: all()
     Out[4]:
     [{'base_uri': 'smb://test-share',
@@ -102,11 +102,11 @@ Credentials caching and interactive prompting are turned off with
 
 .. code-block::
 
-  In [1]: import dtool_lookup_api.core.config
-     ...: dtool_lookup_api.core.config.Config.interactive = False
-     ...: dtool_lookup_api.core.config.Config.cache = False
+  In [1]: import dserver_api.core.config
+     ...: dserver_api.core.config.Config.interactive = False
+     ...: dserver_api.core.config.Config.cache = False
 
-  In [2]: from dtool_lookup_api import all
+  In [2]: from dserver_api import all
      ...: all()
   ...
   RuntimeError: Authentication failed
@@ -115,7 +115,7 @@ For testing purposes, it is possible to disable SSL certificates validation with
 
 .. code-block:: bash
 
-    export DTOOL_LOOKUP_SERVER_VERIFY_SSL=false
+    export DSERVER_VERIFY_SSL=false
 
 As usual, these settings may be specified within the default dtool configuration
 file as well, i.e. at ``~/.config/dtool/dtool.json``
@@ -123,8 +123,8 @@ file as well, i.e. at ``~/.config/dtool/dtool.json``
 .. code-block:: bash
 
     {
-        "DTOOL_LOOKUP_SERVER_TOKEN_GENERATOR_URL": "https://localhost:5001/token",
-        "DTOOL_LOOKUP_SERVER_URL": "https://localhost:5000"
+        "DSERVER_TOKEN_GENERATOR_URL": "https://localhost:5001/token",
+        "DSERVER_URL": "https://localhost:5000"
     }
 
 
@@ -135,7 +135,7 @@ To list all registered datasets
 
 .. code-block::
 
-    In [1]: from dtool_lookup_api import all
+    In [1]: from dserver_api import all
        ...: res = all()
 
     In [2]: res
@@ -157,7 +157,7 @@ To lookup URIs from a dataset UUID within Python
 
 .. code-block::
 
-    In [1]: from dtool_lookup_api import lookup
+    In [1]: from dserver_api import lookup
        ...: uuid = "1a1f9fad-8589-413e-9602-5bbd66bfe675"
        ...: res = lookup(uuid)
 
@@ -179,7 +179,7 @@ Full text search for the word "test"
 
 .. code-block::
 
-    In [1]: from dtool_lookup_api import search
+    In [1]: from dserver_api import search
         ...: res = search("test")
 
     In [2]: res
@@ -203,7 +203,7 @@ Request the manifest of a particular dataset by URI
 
 .. code-block::
 
-    In [1]: from dtool_lookup_api import manifest
+    In [1]: from dserver_api import manifest
        ...: uri = 'smb://test-share/1a1f9fad-8589-413e-9602-5bbd66bfe675'
        ...: res = manifest(uri)
 
@@ -224,7 +224,7 @@ Request the readme cotent of a particular dataset by URI
 
 .. code-block::
 
-    In [1]: from dtool_lookup_api import readme
+    In [1]: from dserver_api import readme
         ..: res = readme('smb://test-share/1a1f9fad-8589-413e-9602-5bbd66bfe675')
 
     In [2]: res
@@ -251,7 +251,7 @@ expression pattern, send a direct mongo language query to the server with
 
 .. code-block::
 
-    In [15]: from dtool_lookup_api import query
+    In [15]: from dserver_api import query
         ...: res = query(
         ...:     {
         ...:         'base_uri': 'smb://test-share',
@@ -277,7 +277,7 @@ It is possible to search readme content via
 
 .. code-block::
 
-    In [21]: from dtool_lookup_api import query
+    In [21]: from dserver_api import query
         ...: res = query(
         ...:     {
         ...:         'readme.owners.name': {'$regex': '^Testing User$'},
@@ -297,11 +297,11 @@ It is possible to search readme content via
       'uri': 'smb://test-share/1a1f9fad-8589-413e-9602-5bbd66bfe675',
       'uuid': '1a1f9fad-8589-413e-9602-5bbd66bfe675'}]
 
-This requires the server-side `dtool-lookup-server-direct-mongo-plugin
-<https://github.com/IMTEK-Simulation/dtool-lookup-server-direct-mongo-plugin>`_.
+This requires the server-side `dserver-direct-mongo-plugin
+<https://github.com/livMatS/dserver-direct-mongo-plugin>`_.
 
 TODO: Response from server-side direct mongo plugin still yields dates as strings.
-Fix within https://github.com/IMTEK-Simulation/dtool-lookup-server-direct-mongo-plugin.
+Fix within https://github.com/IMTEK-Simulation/dserver-direct-mongo-plugin.
 
 
 Usage on Jupyter notebook
@@ -313,7 +313,7 @@ Directly use the asynchronous api instead
 
 .. code-block:: python
 
-    import dtool_lookup_api.asynchronous as dl
+    import dserver_api.asynchronous as dl
     res = await dl.query({
         'base_uri': 'smb://test-share',
         'name': {'$regex': 'test'},
@@ -324,7 +324,7 @@ The code below can be executed in both contexts:
 
 .. code-block:: python
 
-    import dtool_lookup_api.asynchronous as dl
+    import dserver_api.asynchronous as dl
     if asyncio.get_event_loop().is_running():
         # then we are in jupyter notebook
         # this allows nested event loops, i.e. calls to asyncio.run inside the notebook as well
@@ -346,10 +346,10 @@ See https://github.com/jupyter/notebook/issues/3397#issuecomment-419386811, http
 Testing
 -------
 
-Tests require the presence of a working dtool lookup server ecosystem.
+Tests require the presence of a working dserver ecosystem.
 The testing workflow within :code:`.github/workflows/test.yml` uses the
-`dtool-lookup-server-container-composition
-<https://github.com/jotelha/dtool-lookup-server-container-composition>`_
+`dserver-container-composition
+<https://github.com/jotelha/dserver-container-composition>`_
 to provide a mock ecosystem. It is possible to run the workflow locally
 with the help of `docker <https://www.docker.com/>`_ and
 `act <https://github.com/nektos/act>`_.
@@ -365,26 +365,26 @@ from within this repository. :code:`$GITHUB_TOKEN` must hold a valid
 The user must be member of the :code:`docker` group.
 The :code:`--bind` option avoids quirky permission errors by running
 the test in the current directory. This will however result in the
-local creation of two subdirectories :code:`dtool-lookup-server-container-composition`
+local creation of two subdirectories :code:`dserver-container-composition`
 and :code:`workflow` during testing, which may be removed with
 
 .. code-block:: bash
 
-  rm -rf dtool-lookup-server-container-composition
+  rm -rf dserver-container-composition
   sudo rm -rf workflow
 
 eventually. All tests have been confirmed to work with the
 :code:`catthehacker/ubuntu:full-20.04` `runner <https://github.com/nektos/act#runners>`_.
 
 
-.. |PyPI| image:: https://img.shields.io/pypi/v/dtool-lookup-api
+.. |PyPI| image:: https://img.shields.io/pypi/v/dserver-api
     :alt: PyPI
-    :target: https://pypi.org/project/dtool-lookup-api/
+    :target: https://pypi.org/project/dserver-api/
 
-.. |github tag| image:: https://img.shields.io/github/v/tag/IMTEK-Simulation/dtool-lookup-api
+.. |github tag| image:: https://img.shields.io/github/v/tag/livMatS/dserver-api
     :alt: GitHub tag (latest by date)
-    :target: https://github.com/IMTEK-Simulation/dtool-lookup-api/tags
+    :target: https://github.com/livMatS/dserver-api/tags
 
-.. |github tests| image:: https://img.shields.io/github/actions/workflow/status/livMatS/dtool-lookup-api/test.yml?branch=master
+.. |github tests| image:: https://img.shields.io/github/actions/workflow/status/livMatS/dserver-api/test.yml?branch=main
     :alt: GitHub Workflow Status
-    :target: https://github.com/livMatS/dtool-lookup-api/actions/workflows/test.yml
+    :target: https://github.com/livMatS/dserver-api/actions/workflows/test.yml

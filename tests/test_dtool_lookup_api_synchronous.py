@@ -25,9 +25,9 @@ from metadata import (
 )
 
 
-@pytest.mark.usefixtures("dtool_lookup_server", "dtool_config")
+@pytest.mark.usefixtures("dserver_server", "dtool_config")
 def test_all():
-    from dtool_lookup_api.synchronous import all
+    from dserver_api.synchronous import all
     """Will send a request to list all registered datasets to the server."""
 
     logger = logging.getLogger(__name__)
@@ -47,10 +47,10 @@ def test_all():
     assert compares
 
 
-@pytest.mark.usefixtures("dtool_lookup_server", "dtool_config")
+@pytest.mark.usefixtures("dserver_server", "dtool_config")
 def test_default_aggregation():
     """Will send a direct mongo query request to the server."""
-    from dtool_lookup_api.synchronous import aggregate
+    from dserver_api.synchronous import aggregate
 
     logger = logging.getLogger(__name__)
 
@@ -70,10 +70,10 @@ def test_default_aggregation():
     assert compares
 
 
-@pytest.mark.usefixtures("dtool_lookup_server", "dtool_config")
+@pytest.mark.usefixtures("dserver_server", "dtool_config")
 def test_config():
     """Will send an request for configuration info to the server."""
-    from dtool_lookup_api.synchronous import config
+    from dserver_api.synchronous import config
 
     logger = logging.getLogger(__name__)
 
@@ -92,10 +92,10 @@ def test_config():
     assert compares
 
 
-@pytest.mark.usefixtures("dtool_lookup_server", "dtool_config")
+@pytest.mark.usefixtures("dserver_server", "dtool_config")
 def test_default_lookup():
     """Will send a direct mongo query request to the server."""
-    from dtool_lookup_api.synchronous import lookup
+    from dserver_api.synchronous import lookup
 
     logger = logging.getLogger(__name__)
 
@@ -113,10 +113,10 @@ def test_default_lookup():
     assert compares
 
 
-@pytest.mark.usefixtures("dtool_lookup_server", "dtool_config")
+@pytest.mark.usefixtures("dserver_server", "dtool_config")
 def test_default_manifest():
     """Will send a direct mongo query request to the server."""
-    from dtool_lookup_api.synchronous import manifest
+    from dserver_api.synchronous import manifest
 
     logger = logging.getLogger(__name__)
 
@@ -134,10 +134,10 @@ def test_default_manifest():
     assert compares
 
 
-@pytest.mark.usefixtures("dtool_lookup_server", "dtool_config")
+@pytest.mark.usefixtures("dserver_server", "dtool_config")
 def test_default_query():
     """Will send a direct mongo query request to the server."""
-    from dtool_lookup_api.synchronous import query
+    from dserver_api.synchronous import query
 
     logger = logging.getLogger(__name__)
 
@@ -157,10 +157,10 @@ def test_default_query():
     assert compares
 
 
-@pytest.mark.usefixtures("dtool_lookup_server", "dtool_config")
+@pytest.mark.usefixtures("dserver_server", "dtool_config")
 def test_default_readme():
     """Will send an empty search request to the server."""
-    from dtool_lookup_api.synchronous import readme
+    from dserver_api.synchronous import readme
 
     logger = logging.getLogger(__name__)
 
@@ -182,10 +182,10 @@ def test_default_readme():
     assert compares
 
 
-@pytest.mark.usefixtures("dtool_lookup_server", "dtool_config")
+@pytest.mark.usefixtures("dserver_server", "dtool_config")
 def test_default_search():
     """Will send an empty search request to the server."""
-    from dtool_lookup_api.synchronous import search
+    from dserver_api.synchronous import search
 
     logger = logging.getLogger(__name__)
 
@@ -205,10 +205,10 @@ def test_default_search():
     assert compares
 
 
-@pytest.mark.usefixtures("dtool_lookup_server", "dtool_config")
+@pytest.mark.usefixtures("dserver_server", "dtool_config")
 def test_pagination():
 
-    from dtool_lookup_api.synchronous import search
+    from dserver_api.synchronous import search
 
 
 
@@ -250,10 +250,10 @@ def test_pagination():
 
 # mark to run early in order to not have any other users registered in database by other tests
 @pytest.mark.first
-@pytest.mark.usefixtures("dtool_lookup_server", "dtool_config")
+@pytest.mark.usefixtures("dserver_server", "dtool_config")
 def test_user_info():
     """Will send a user info request to the server."""
-    from dtool_lookup_api.synchronous import user_info
+    from dserver_api.synchronous import user_info
 
     logger = logging.getLogger(__name__)
 
@@ -275,10 +275,10 @@ def test_user_info():
 
 # mark to run early in order to not have any other users registered in database by other tests
 @pytest.mark.first
-@pytest.mark.usefixtures("dtool_lookup_server", "dtool_config")
+@pytest.mark.usefixtures("dserver_server", "dtool_config")
 def test_default_list_users():
     """Will send a list users request to the server."""
-    from dtool_lookup_api.synchronous import list_users
+    from dserver_api.synchronous import list_users
 
     logger = logging.getLogger(__name__)
 
@@ -299,14 +299,14 @@ def test_default_list_users():
 
 
 # TODO: clean up, i.e. delete users after use
-# @pytest.mark.usefixtures("dtool_lookup_server", "dtool_config")
+# @pytest.mark.usefixtures("dserver_server", "dtool_config")
 # def test_default_register_user():
 #    """Will send a register user request to the server."""
-#    from dtool_lookup_api.synchronous import register_user
+#    from dserver_api.synchronous import register_user
 #
 #    logger = logging.getLogger(__name__)
 #
-#    # mimic https://github.com/jic-dtool/dtool-lookup-server/blob/12baba73eebc668b4998ae2c2ea43946dc3bf856/tests/test_admin_user_routes.py#L14
+#    # mimic https://github.com/jic-dtool/dserver/blob/12baba73eebc668b4998ae2c2ea43946dc3bf856/tests/test_admin_user_routes.py#L14
 #    users = [
 #        {"username": "evil-witch", "is_admin": True},
 #        {"username": "dopey"}
@@ -332,10 +332,10 @@ def test_default_list_users():
 
 # mark to run early in order to not have any other users registered in database by other tests
 @pytest.mark.first
-@pytest.mark.usefixtures("dtool_lookup_server", "dtool_config")
+@pytest.mark.usefixtures("dserver_server", "dtool_config")
 def test_default_permission_info():
     """Will send a permission info request to the server."""
-    from dtool_lookup_api.synchronous import permission_info
+    from dserver_api.synchronous import permission_info
 
     logger = logging.getLogger(__name__)
 
@@ -356,10 +356,10 @@ def test_default_permission_info():
 
 
 # TODO: test for update_permissions
-# @pytest.mark.usefixtures("dtool_lookup_server", "dtool_config")
+# @pytest.mark.usefixtures("dserver_server", "dtool_config")
 # def test_default_update_permissions():
 #     """Will send a permission info request to the server."""
-#     from dtool_lookup_api.synchronous import update_permissions
+#     from dserver_api.synchronous import update_permissions
 #
 #     logger = logging.getLogger(__name__)
 #
@@ -378,10 +378,10 @@ def test_default_permission_info():
 #     )
 #     assert compares
 
-@pytest.mark.usefixtures("dtool_lookup_server", "dtool_config")
+@pytest.mark.usefixtures("dserver_server", "dtool_config")
 def test_versions():
     """Will send a request for versions to the server."""
-    from dtool_lookup_api.synchronous import versions
+    from dserver_api.synchronous import versions
 
     logger = logging.getLogger(__name__)
 

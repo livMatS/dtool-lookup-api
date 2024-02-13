@@ -1,5 +1,5 @@
 # custom
-dtool_lookup_api/version.py
+dserver_api/version.py
 build
 .idea
 

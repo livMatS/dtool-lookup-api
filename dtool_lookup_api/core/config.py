@@ -22,7 +22,7 @@
 # SOFTWARE.
 #
 
-"""dtool_lookup_api.core.config module."""
+"""dserver_api.core.config module."""
 
 import logging
 
@@ -32,12 +32,12 @@ import dtoolcore.utils
 
 CONFIG_PATH = dtoolcore.utils.DEFAULT_CONFIG_PATH
 
-DTOOL_LOOKUP_SERVER_URL_KEY = "DTOOL_LOOKUP_SERVER_URL"
-DTOOL_LOOKUP_SERVER_TOKEN_KEY = "DTOOL_LOOKUP_SERVER_TOKEN"
-DTOOL_LOOKUP_SERVER_TOKEN_GENERATOR_URL_KEY = "DTOOL_LOOKUP_SERVER_TOKEN_GENERATOR_URL"
-DTOOL_LOOKUP_SERVER_USERNAME_KEY = "DTOOL_LOOKUP_SERVER_USERNAME"
-DTOOL_LOOKUP_SERVER_PASSWORD_KEY = "DTOOL_LOOKUP_SERVER_PASSWORD"
-DTOOL_LOOKUP_SERVER_VERIFY_SSL_KEY = "DTOOL_LOOKUP_SERVER_VERIFY_SSL"
+DSERVER_URL_KEY = "DSERVER_URL"
+DSERVER_TOKEN_KEY = "DSERVER_TOKEN"
+DSERVER_TOKEN_GENERATOR_URL_KEY = "DSERVER_TOKEN_GENERATOR_URL"
+DSERVER_USERNAME_KEY = "DSERVER_USERNAME"
+DSERVER_PASSWORD_KEY = "DSERVER_PASSWORD"
+DSERVER_VERIFY_SSL_KEY = "DSERVER_VERIFY_SSL"
 
 AFFIRMATIVE_EXPRESSIONS = ['true', '1', 'y', 'yes', 'on']
 NEGATIVE_EXPRESSIONS = ['false', '0', 'n', 'no', 'off']
@@ -45,7 +45,7 @@ NEGATIVE_EXPRESSIONS = ['false', '0', 'n', 'no', 'off']
 logger = logging.getLogger(__name__)
 
 class DtoolLookupAPIConfig():
-    """Connect to dtool lookup server session."""
+    """Connect to dserver session."""
 
     def __init__(self, interactive=True, cache=True):
         """If interactive set True, allow prompting for username and password.
@@ -66,44 +66,44 @@ class DtoolLookupAPIConfig():
                 self.username is None or self.password is None or self.auth_url is None):
             logger.warning(
                 'Please provide either %s or a pair of credentials %s and %s together with %s.',
-                DTOOL_LOOKUP_SERVER_TOKEN_KEY, DTOOL_LOOKUP_SERVER_USERNAME_KEY,
-                DTOOL_LOOKUP_SERVER_PASSWORD_KEY, DTOOL_LOOKUP_SERVER_TOKEN_GENERATOR_URL_KEY)
+                DSERVER_TOKEN_KEY, DSERVER_USERNAME_KEY,
+                DSERVER_PASSWORD_KEY, DSERVER_TOKEN_GENERATOR_URL_KEY)
 
         self.interactive = interactive
 
     @property
     def lookup_url(self):
-        lookup_url = dtoolcore.utils.get_config_value(DTOOL_LOOKUP_SERVER_URL_KEY)
+        lookup_url = dtoolcore.utils.get_config_value(DSERVER_URL_KEY)
         if lookup_url is None:
-            logger.warning('Please provide %s', DTOOL_LOOKUP_SERVER_URL_KEY)
+            logger.warning('Please provide %s', DSERVER_URL_KEY)
         return lookup_url
 
     @lookup_url.setter
     def lookup_url(self, value):
-        dtoolcore.utils.write_config_value_to_file(DTOOL_LOOKUP_SERVER_URL_KEY, value)
+        dtoolcore.utils.write_config_value_to_file(DSERVER_URL_KEY, value)
 
     # optional
     @property
     def token(self):
         return dtoolcore.utils.get_config_value_from_file(
-            DTOOL_LOOKUP_SERVER_TOKEN_KEY, default="")
+            DSERVER_TOKEN_KEY, default="")
 
     @token.setter
     def token(self, token):
-        dtoolcore.utils.write_config_value_to_file(DTOOL_LOOKUP_SERVER_TOKEN_KEY, token)
+        dtoolcore.utils.write_config_value_to_file(DSERVER_TOKEN_KEY, token)
 
     @property
     def auth_url(self):
-        return dtoolcore.utils.get_config_value(DTOOL_LOOKUP_SERVER_TOKEN_GENERATOR_URL_KEY, default="")
+        return dtoolcore.utils.get_config_value(DSERVER_TOKEN_GENERATOR_URL_KEY, default="")
 
     @auth_url.setter
     def auth_url(self, value):
-        dtoolcore.utils.write_config_value_to_file(DTOOL_LOOKUP_SERVER_TOKEN_GENERATOR_URL_KEY, value)
+        dtoolcore.utils.write_config_value_to_file(DSERVER_TOKEN_GENERATOR_URL_KEY, value)
 
     @property
     def username(self):
         if self._username_cache is None:
-            username = dtoolcore.utils.get_config_value(DTOOL_LOOKUP_SERVER_USERNAME_KEY)
+            username = dtoolcore.utils.get_config_value(DSERVER_USERNAME_KEY)
             if username is None and self.interactive:
                 username = input("Authentication URL {:s} username:".format(self.auth_url))
             if self.cache:
@@ -114,12 +114,12 @@ class DtoolLookupAPIConfig():
 
     @username.setter
     def username(self, value):
-        dtoolcore.utils.write_config_value_to_file(DTOOL_LOOKUP_SERVER_USERNAME_KEY, value)
+        dtoolcore.utils.write_config_value_to_file(DSERVER_USERNAME_KEY, value)
 
     @property
     def password(self):
         if self._password_cache is None:
-            password = dtoolcore.utils.get_config_value(DTOOL_LOOKUP_SERVER_PASSWORD_KEY)
+            password = dtoolcore.utils.get_config_value(DSERVER_PASSWORD_KEY)
             if password is None and self.interactive:
                 password = getpass("Authentication URL {:s} password:".format(self.auth_url))
             if self.cache:
@@ -130,11 +130,11 @@ class DtoolLookupAPIConfig():
 
     @password.setter
     def password(self, value):
-        dtoolcore.utils.write_config_value_to_file(DTOOL_LOOKUP_SERVER_PASSWORD_KEY, value)
+        dtoolcore.utils.write_config_value_to_file(DSERVER_PASSWORD_KEY, value)
 
     @property
     def verify_ssl(self):
-        verify_ssl = dtoolcore.utils.get_config_value(DTOOL_LOOKUP_SERVER_VERIFY_SSL_KEY)
+        verify_ssl = dtoolcore.utils.get_config_value(DSERVER_VERIFY_SSL_KEY)
         if isinstance(verify_ssl, str) and verify_ssl.lower() in NEGATIVE_EXPRESSIONS:
             verify_ssl = False
         elif not isinstance(verify_ssl, bool):
@@ -143,7 +143,7 @@ class DtoolLookupAPIConfig():
 
     @verify_ssl.setter
     def verify_ssl(self, value):
-        dtoolcore.utils.write_config_value_to_file(DTOOL_LOOKUP_SERVER_VERIFY_SSL_KEY,
+        dtoolcore.utils.write_config_value_to_file(DSERVER_VERIFY_SSL_KEY,
                                                    AFFIRMATIVE_EXPRESSIONS[0] if value else NEGATIVE_EXPRESSIONS[0])
 
 

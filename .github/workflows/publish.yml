@@ -3,7 +3,7 @@ name: publish
 on:
   push:
     branches:
-      - master
+      - main
     tags:
       - '*'
 
@@ -25,7 +25,7 @@ jobs:
     - name: Install requirements
       run: |
         pip install --upgrade setuptools wheel setuptools-scm[toml] importlib-metadata
-        pip install git+https://github.com/jic-dtool/dtool-lookup-server.git@master
+        pip install git+https://github.com/livMatS/dserver.git@main
         pip list
 
     - name: Package distribution

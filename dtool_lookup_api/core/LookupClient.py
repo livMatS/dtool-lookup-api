@@ -22,7 +22,7 @@
 # SOFTWARE.
 #
 
-"""dtool_lookup_api.core.LookupClient module."""
+"""dserver_api.core.LookupClient module."""
 
 import yaml
 import json
@@ -58,7 +58,7 @@ async def authenticate(auth_url, username, password, verify_ssl=True):
 
 
 class TokenBasedLookupClient:
-    """Core Python interface for communication with dtool lookup server."""
+    """Core Python interface for communication with dserver."""
 
     def __init__(self, lookup_url, token=None, verify_ssl=True):
         logger = logging.getLogger(__name__)
