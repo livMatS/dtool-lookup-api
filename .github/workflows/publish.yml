@@ -51,4 +51,4 @@ jobs:
 
     - name: Make release on github
       if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags')
-      uses: softprops/action-gh-release@v1
+      uses: softprops/action-gh-release@v2
