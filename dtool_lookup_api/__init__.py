@@ -22,7 +22,7 @@
 # SOFTWARE.
 #
 
-"""dserver_api package."""
+"""dtool_lookup_api package."""
 
 from .version import version as __version__
 

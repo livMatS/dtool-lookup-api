@@ -22,7 +22,7 @@
 # SOFTWARE.
 #
 
-"""dserver_api.core.config module."""
+"""dtool_lookup_api.core.config module."""
 
 import logging
 

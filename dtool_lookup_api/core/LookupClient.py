@@ -22,7 +22,7 @@
 # SOFTWARE.
 #
 
-"""dserver_api.core.LookupClient module."""
+"""dtool_lookup_api.core.LookupClient module."""
 
 import yaml
 import json

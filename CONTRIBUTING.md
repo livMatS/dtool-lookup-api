@@ -1,4 +1,4 @@
-Contributing to dserver-api
+Contributing to dtool-lookup-api
 ===========================
 
 Code style
@@ -9,14 +9,14 @@ breaks.
 Structure
 ---------
 
-At the core of `dserver-api` is the `dserver_api.core.LookupClient.TokenBasedLookupClient` 
+At the core of `dtool-lookup-api` is the `dtool_lookup_api.core.LookupClient.TokenBasedLookupClient` 
 object. This object defines several asynchronous methods that translate the `dserver`'s REST
 API (e.g. https://demo.dtool.dev/lookup/doc/swagger) into a Python interface 
 that's usable as an asynchronous context. Derived from `TokenBasedLookupClient` are the
 `CredentialsBasedLookupClient` and `ConfigurationBasedLookupClient`, which offer the
 ame interface but extend the mechanisms of authentication against the server.
 
-The modules `dserver_api.synchronous` and `dserver_api.asynchronous`
+The modules `dtool_lookup_api.synchronous` and `dtool_lookup_api.asynchronous`
 wrap these core objects to provide simple functional interfaces to the lookup API
 in both synchronous and asynchronous settings.
 

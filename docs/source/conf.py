@@ -45,10 +45,10 @@ source_suffix = '.rst'
 master_doc = 'index'
 
 # General information about the project.
-project = u"dserver_api"
+project = u"dtool_lookup_api"
 copyright = u"2020, IMTEK Simulation"
 author = u"Johannes Laurin Hoermann"
-repo_name = u"dserver_api"
+repo_name = u"dtool_lookup_api"
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the

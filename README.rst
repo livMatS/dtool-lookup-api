@@ -5,21 +5,21 @@ README
 
 Python API for interacting with dserver.
 
-This package offers a class-based asynchronous lookup API within ``dserver_api.core.LookupClient``,
-a simple class-less wrapper around it at ``dserver_api.asynchronous``,
-and a synchronous interface on top at ``dserver_api.synchronous``.
+This package offers a class-based asynchronous lookup API within ``dtool_lookup_api.core.LookupClient``,
+a simple class-less wrapper around it at ``dtool_lookup_api.asynchronous``,
+and a synchronous interface on top at ``dtool_lookup_api.synchronous``.
 
-Direct imports of utility functions from `dserver_api` in the examples below forward to the synchronous API variant.
+Direct imports of utility functions from `dtool_lookup_api` in the examples below forward to the synchronous API variant.
 
 
 Installation
 ------------
 
-To install the dserver_api package.
+To install the dtool_lookup_api package.
 
 .. code-block:: bash
 
-    pip install dserver_api
+    pip install dtool_lookup_api
 
 This package depends on a `dserver
 <https://github.com/jic-dtool/dserver>`_ instance to talk to.
@@ -65,7 +65,7 @@ session, i.e.
 
 .. code-block::
 
-    In [1]: from dserver_api import query
+    In [1]: from dtool_lookup_api import query
        ...: res = query(
        ...:     {
        ...:         'readme.owners.name': {'$regex': '^Testing User$'},
@@ -87,7 +87,7 @@ session, i.e.
       'uri': 'smb://test-share/1a1f9fad-8589-413e-9602-5bbd66bfe675',
       'uuid': '1a1f9fad-8589-413e-9602-5bbd66bfe675'}]
 
-    In [3]: from dserver_api import all
+    In [3]: from dtool_lookup_api import all
        ...: all()
     Out[4]:
     [{'base_uri': 'smb://test-share',
@@ -102,11 +102,11 @@ Credentials caching and interactive prompting are turned off with
 
 .. code-block::
 
-  In [1]: import dserver_api.core.config
-     ...: dserver_api.core.config.Config.interactive = False
-     ...: dserver_api.core.config.Config.cache = False
+  In [1]: import dtool_lookup_api.core.config
+     ...: dtool_lookup_api.core.config.Config.interactive = False
+     ...: dtool_lookup_api.core.config.Config.cache = False
 
-  In [2]: from dserver_api import all
+  In [2]: from dtool_lookup_api import all
      ...: all()
   ...
   RuntimeError: Authentication failed
@@ -135,7 +135,7 @@ To list all registered datasets
 
 .. code-block::
 
-    In [1]: from dserver_api import all
+    In [1]: from dtool_lookup_api import all
        ...: res = all()
 
     In [2]: res
@@ -157,7 +157,7 @@ To lookup URIs from a dataset UUID within Python
 
 .. code-block::
 
-    In [1]: from dserver_api import lookup
+    In [1]: from dtool_lookup_api import lookup
        ...: uuid = "1a1f9fad-8589-413e-9602-5bbd66bfe675"
        ...: res = lookup(uuid)
 
@@ -179,7 +179,7 @@ Full text search for the word "test"
 
 .. code-block::
 
-    In [1]: from dserver_api import search
+    In [1]: from dtool_lookup_api import search
         ...: res = search("test")
 
     In [2]: res
@@ -203,7 +203,7 @@ Request the manifest of a particular dataset by URI
 
 .. code-block::
 
-    In [1]: from dserver_api import manifest
+    In [1]: from dtool_lookup_api import manifest
        ...: uri = 'smb://test-share/1a1f9fad-8589-413e-9602-5bbd66bfe675'
        ...: res = manifest(uri)
 
@@ -224,7 +224,7 @@ Request the readme cotent of a particular dataset by URI
 
 .. code-block::
 
-    In [1]: from dserver_api import readme
+    In [1]: from dtool_lookup_api import readme
         ..: res = readme('smb://test-share/1a1f9fad-8589-413e-9602-5bbd66bfe675')
 
     In [2]: res
@@ -251,7 +251,7 @@ expression pattern, send a direct mongo language query to the server with
 
 .. code-block::
 
-    In [15]: from dserver_api import query
+    In [15]: from dtool_lookup_api import query
         ...: res = query(
         ...:     {
         ...:         'base_uri': 'smb://test-share',
@@ -277,7 +277,7 @@ It is possible to search readme content via
 
 .. code-block::
 
-    In [21]: from dserver_api import query
+    In [21]: from dtool_lookup_api import query
         ...: res = query(
         ...:     {
         ...:         'readme.owners.name': {'$regex': '^Testing User$'},
@@ -313,7 +313,7 @@ Directly use the asynchronous api instead
 
 .. code-block:: python
 
-    import dserver_api.asynchronous as dl
+    import dtool_lookup_api.asynchronous as dl
     res = await dl.query({
         'base_uri': 'smb://test-share',
         'name': {'$regex': 'test'},
@@ -324,7 +324,7 @@ The code below can be executed in both contexts:
 
 .. code-block:: python
 
-    import dserver_api.asynchronous as dl
+    import dtool_lookup_api.asynchronous as dl
     if asyncio.get_event_loop().is_running():
         # then we are in jupyter notebook
         # this allows nested event loops, i.e. calls to asyncio.run inside the notebook as well
@@ -377,14 +377,14 @@ eventually. All tests have been confirmed to work with the
 :code:`catthehacker/ubuntu:full-20.04` `runner <https://github.com/nektos/act#runners>`_.
 
 
-.. |PyPI| image:: https://img.shields.io/pypi/v/dserver-api
+.. |PyPI| image:: https://img.shields.io/pypi/v/dtool-lookup-api
     :alt: PyPI
-    :target: https://pypi.org/project/dserver-api/
+    :target: https://pypi.org/project/dtool-lookup-api/
 
-.. |github tag| image:: https://img.shields.io/github/v/tag/livMatS/dserver-api
+.. |github tag| image:: https://img.shields.io/github/v/tag/livMatS/dtool-lookup-api
     :alt: GitHub tag (latest by date)
-    :target: https://github.com/livMatS/dserver-api/tags
+    :target: https://github.com/livMatS/dtool-lookup-api/tags
 
-.. |github tests| image:: https://img.shields.io/github/actions/workflow/status/livMatS/dserver-api/test.yml?branch=main
+.. |github tests| image:: https://img.shields.io/github/actions/workflow/status/livMatS/dtool-lookup-api/test.yml?branch=main
     :alt: GitHub Workflow Status
-    :target: https://github.com/livMatS/dserver-api/actions/workflows/test.yml
+    :target: https://github.com/livMatS/dtool-lookup-api/actions/workflows/test.yml

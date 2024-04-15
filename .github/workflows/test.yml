@@ -8,4 +8,4 @@ on:
 
 jobs:
   test:
-    uses: livMatS/dtool-framework-workflows/.github/workflows/dserver-api-test.yml@main
+    uses: livMatS/dtool-framework-workflows/.github/workflows/dtool-lookup-api-test.yml@main
