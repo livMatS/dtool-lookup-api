@@ -4,8 +4,6 @@ CHANGELOG
 unpublished
 -----------
 
-- Rebranded from ``dtool_lookup_api`` to ``dserver_api``.
-
 0.7.0 (14Aug23)
 ---------------
 
