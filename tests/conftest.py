@@ -17,7 +17,7 @@ DSERVER_ADDRESS_AND_CREDENTIALS = {
 
 # TODO: dserver testing instance provision not handled
 @pytest.fixture(scope="session")
-def dserver_server(request):
+def dserver(request):
     pass  # stub
 
 

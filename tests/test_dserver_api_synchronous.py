@@ -25,7 +25,7 @@ from metadata import (
 )
 
 
-@pytest.mark.usefixtures("dserver_server", "dtool_config")
+@pytest.mark.usefixtures("dserver", "dtool_config")
 def test_all():
     from dtool_lookup_api.synchronous import all
     """Will send a request to list all registered datasets to the server."""
@@ -47,7 +47,7 @@ def test_all():
     assert compares
 
 
-@pytest.mark.usefixtures("dserver_server", "dtool_config")
+@pytest.mark.usefixtures("dserver", "dtool_config")
 def test_default_aggregation():
     """Will send a direct mongo query request to the server."""
     from dtool_lookup_api.synchronous import aggregate
@@ -70,7 +70,7 @@ def test_default_aggregation():
     assert compares
 
 
-@pytest.mark.usefixtures("dserver_server", "dtool_config")
+@pytest.mark.usefixtures("dserver", "dtool_config")
 def test_config():
     """Will send an request for configuration info to the server."""
     from dtool_lookup_api.synchronous import config
@@ -92,7 +92,7 @@ def test_config():
     assert compares
 
 
-@pytest.mark.usefixtures("dserver_server", "dtool_config")
+@pytest.mark.usefixtures("dserver", "dtool_config")
 def test_default_lookup():
     """Will send a direct mongo query request to the server."""
     from dtool_lookup_api.synchronous import lookup
@@ -113,7 +113,7 @@ def test_default_lookup():
     assert compares
 
 
-@pytest.mark.usefixtures("dserver_server", "dtool_config")
+@pytest.mark.usefixtures("dserver", "dtool_config")
 def test_default_manifest():
     """Will send a direct mongo query request to the server."""
     from dtool_lookup_api.synchronous import manifest
@@ -134,7 +134,7 @@ def test_default_manifest():
     assert compares
 
 
-@pytest.mark.usefixtures("dserver_server", "dtool_config")
+@pytest.mark.usefixtures("dserver", "dtool_config")
 def test_default_query():
     """Will send a direct mongo query request to the server."""
     from dtool_lookup_api.synchronous import query
@@ -157,7 +157,7 @@ def test_default_query():
     assert compares
 
 
-@pytest.mark.usefixtures("dserver_server", "dtool_config")
+@pytest.mark.usefixtures("dserver", "dtool_config")
 def test_default_readme():
     """Will send an empty search request to the server."""
     from dtool_lookup_api.synchronous import readme
@@ -182,7 +182,7 @@ def test_default_readme():
     assert compares
 
 
-@pytest.mark.usefixtures("dserver_server", "dtool_config")
+@pytest.mark.usefixtures("dserver", "dtool_config")
 def test_default_search():
     """Will send an empty search request to the server."""
     from dtool_lookup_api.synchronous import search
@@ -205,7 +205,7 @@ def test_default_search():
     assert compares
 
 
-@pytest.mark.usefixtures("dserver_server", "dtool_config")
+@pytest.mark.usefixtures("dserver", "dtool_config")
 def test_pagination():
 
     from dtool_lookup_api.synchronous import search
@@ -250,7 +250,7 @@ def test_pagination():
 
 # mark to run early in order to not have any other users registered in database by other tests
 @pytest.mark.first
-@pytest.mark.usefixtures("dserver_server", "dtool_config")
+@pytest.mark.usefixtures("dserver", "dtool_config")
 def test_user_info():
     """Will send a user info request to the server."""
     from dtool_lookup_api.synchronous import user_info
@@ -275,7 +275,7 @@ def test_user_info():
 
 # mark to run early in order to not have any other users registered in database by other tests
 @pytest.mark.first
-@pytest.mark.usefixtures("dserver_server", "dtool_config")
+@pytest.mark.usefixtures("dserver", "dtool_config")
 def test_default_list_users():
     """Will send a list users request to the server."""
     from dtool_lookup_api.synchronous import list_users
@@ -299,7 +299,7 @@ def test_default_list_users():
 
 
 # TODO: clean up, i.e. delete users after use
-# @pytest.mark.usefixtures("dserver_server", "dtool_config")
+# @pytest.mark.usefixtures("dserver", "dtool_config")
 # def test_default_register_user():
 #    """Will send a register user request to the server."""
 #    from dtool_lookup_api.synchronous import register_user
@@ -332,7 +332,7 @@ def test_default_list_users():
 
 # mark to run early in order to not have any other users registered in database by other tests
 @pytest.mark.first
-@pytest.mark.usefixtures("dserver_server", "dtool_config")
+@pytest.mark.usefixtures("dserver", "dtool_config")
 def test_default_permission_info():
     """Will send a permission info request to the server."""
     from dtool_lookup_api.synchronous import permission_info
@@ -356,7 +356,7 @@ def test_default_permission_info():
 
 
 # TODO: test for update_permissions
-# @pytest.mark.usefixtures("dserver_server", "dtool_config")
+# @pytest.mark.usefixtures("dserver", "dtool_config")
 # def test_default_update_permissions():
 #     """Will send a permission info request to the server."""
 #     from dtool_lookup_api.synchronous import update_permissions
@@ -378,7 +378,7 @@ def test_default_permission_info():
 #     )
 #     assert compares
 
-@pytest.mark.usefixtures("dserver_server", "dtool_config")
+@pytest.mark.usefixtures("dserver", "dtool_config")
 def test_versions():
     """Will send a request for versions to the server."""
     from dtool_lookup_api.synchronous import versions
