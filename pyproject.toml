@@ -1,0 +1,38 @@
+[build-system]
+requires = ["setuptools>=42", "setuptools_scm[toml]>=6.3"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "dtool-lookup-api"
+description = "This package offers both synchronous and asynchronous implementations of a standardized Python API to communicate with dserver."
+license = {file = "LICENSE"}
+authors = [
+    {name = "Johannes L. Hörmann", email = "johannes.laurin@gmail.com"},
+]
+dynamic = ["version"]
+dependencies = [
+        "asgiref",
+        "aiohttp",
+        "dtoolcore>=3.9.0",
+        "PyYAML",
+    ]
+
+[project.optional-dependencies]
+test = [
+    "pytest",
+    "pytest-cov",
+    "pytest-ordering"
+]
+
+[project.urls]
+Documentation = "https://github.com/livMatS/dtool-lookup-api"
+Repository = "https://livmats.github.io/dtool-lookup-api"
+Changelog = "https://github.com/livMatS/dtool-lookup-api/blob/main/CHANGELOG.rst"
+
+[tool.setuptools_scm]
+version_scheme = "guess-next-dev"
+local_scheme = "no-local-version"
+write_to = "dtool_lookup_api/version.py"
+
+[tool.setuptools]
+packages = ["dtool_lookup_api"]
