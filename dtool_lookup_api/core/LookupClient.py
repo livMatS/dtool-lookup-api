@@ -158,30 +158,27 @@ class TokenBasedLookupClient:
 
         return dataset_list
 
-
-
     async def aggregate(self, aggregation, page_number=1, page_size=20, pagination={}):
-
         """
-              Execute a direct MongoDB aggregation.
+        Execute a direct MongoDB aggregation.
 
-              Parameters
-              ----------
-              aggregation : str or dict
-                  The MongoDB aggregation pipeline to be executed.
-              page_number : int, optional
-                  The page number of the results, default is 1.
-              page_size : int, optional
-                  The number of results per page, default is 20.
-              pagination: dict, optional
-                  Dictionary filled with data from the X-Pagination response header, e.g.
-                      '{"total": 124, "total_pages": 13, "first_page": 1, "last_page": 13, "page": 1, "next_page": 2}'
+        Parameters
+        ----------
+        aggregation : str or dict
+            The MongoDB aggregation pipeline to be executed.
+        page_number : int, optional
+            The page number of the results, default is 1.
+        page_size : int, optional
+            The number of results per page, default is 20.
+        pagination: dict, optional
+            Dictionary filled with data from the X-Pagination response header, e.g.
+                '{"total": 124, "total_pages": 13, "first_page": 1, "last_page": 13, "page": 1, "next_page": 2}'
 
-              Returns
-              -------
-              list of dict
-                  Aggregation results.
-              """
+        Returns
+        -------
+        list of dict
+            Aggregation results.
+        """
 
         if isinstance(aggregation, str):
             aggregation = json.loads(aggregation)
@@ -198,18 +195,21 @@ class TokenBasedLookupClient:
             logger.warning("Server returned no pagination information. Server version outdated.")
         return aggregation_result
 
-    async def search(self, keyword, page_number=1, page_size=20, pagination={}):
-        """Free text search
+    async def search(self, keyword, page_number=1, page_size=10, pagination={}):
+        """
+        Free text search.
 
-        Paramters
-        ---------
+        Parameters
+        ----------
         keyword : str
             free text search text
-        page_number : int
-        page_size : int
-        pagination: dict
+        page_number : int, optional
+            The page number of the results, default is 1.
+        page_size : int, optional
+            The number of results per page, default is 10.
+        pagination : dict
             dictionary filled with data from the X-Pagination response header, e.g.
-                '{"total": 124, "total_pages": 13, "first_page": 1, "last_page": 13, "page": 1, "next_page": 2}'
+            '{"total": 124, "total_pages": 13, "first_page": 1, "last_page": 13, "page": 1, "next_page": 2}'
 
         Returns
         -------
@@ -240,27 +240,26 @@ class TokenBasedLookupClient:
         return await self.by_query(query, page_number=page_number, page_size=page_size, pagination=pagination)
 
     async def by_query(self, query, page_number=1, page_size=10, pagination={}):
-        """Direct mongo query, requires server-side direct mongo plugin."""
         """
-            Execute a direct MongoDB query using the by_query method.
+        Direct mongo query, requires server-side direct mongo plugin.
 
-            Parameters
-            ----------
-            query : str or dict
-                The MongoDB query to be executed.
-            page_number : int, optional
-                The page number of the results, default is 1.
-            page_size : int, optional
-                The number of results per page, default is 10.
-            pagination: dict, optional
-                Dictionary filled with data from the X-Pagination response header, e.g.
-                    '{"total": 124, "total_pages": 13, "first_page": 1, "last_page": 13, "page": 1, "next_page": 2}'
+        Parameters
+        ----------
+        query : str or dict
+            The MongoDB query to be executed.
+        page_number : int, optional
+            The page number of the results, default is 1.
+        page_size : int, optional
+            The number of results per page, default is 10.
+        pagination: dict, optional
+            Dictionary filled with data from the X-Pagination response header, e.g.
+                '{"total": 124, "total_pages": 13, "first_page": 1, "last_page": 13, "page": 1, "next_page": 2}'
 
-            Returns
-            -------
-            list of dict
-                Query results.
-            """
+        Returns
+        -------
+        list of dict
+            Query results.
+        """
         if isinstance(query, str):
             query = json.loads(query)
 
@@ -286,25 +285,25 @@ class TokenBasedLookupClient:
 
     async def by_uuid(self, uuid, page_number=1, page_size=10, pagination={}):
         """
-           Search for a specific UUID in the dataset.
+        Search for a specific UUID in the dataset.
 
-           Parameters
-           ----------
-           uuid : str
-               The unique identifier (UUID) of the dataset to be searched.
-           page_number : int, optional
-               The page number of the results, default is 1.
-           page_size : int, optional
-               The number of results per page, default is 10.
-           pagination: dict, optional
-               Dictionary filled with data from the X-Pagination response header, e.g.
-                   '{"total": 124, "total_pages": 13, "first_page": 1, "last_page": 13, "page": 1, "next_page": 2}'
+        Parameters
+        ----------
+        uuid : str
+            The unique identifier (UUID) of the dataset to be searched.
+        page_number : int, optional
+            The page number of the results, default is 1.
+        page_size : int, optional
+            The number of results per page, default is 10.
+        pagination: dict, optional
+            Dictionary filled with data from the X-Pagination response header, e.g.
+                '{"total": 124, "total_pages": 13, "first_page": 1, "last_page": 13, "page": 1, "next_page": 2}'
 
-           Returns
-           -------
-           list of dict
-               Query results for the specified UUID.
-           """
+        Returns
+        -------
+        list of dict
+            Query results for the specified UUID.
+        """
         headers = {}
 
         lookup_list = await self._get(
