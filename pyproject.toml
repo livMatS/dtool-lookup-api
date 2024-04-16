@@ -23,6 +23,11 @@ test = [
     "pytest-cov",
     "pytest-ordering"
 ]
+docs = [
+    "sphinx",
+    "sphinx_rtd_theme",
+    "sphinxcontrib-spelling"
+]
 
 [project.urls]
 Documentation = "https://github.com/livMatS/dtool-lookup-api"

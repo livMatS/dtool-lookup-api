@@ -4,7 +4,7 @@
 # You can set these variables from the command line.
 SPHINXOPTS    =
 SPHINXBUILD   = sphinx-build
-SPHINXPROJ    = dserver_client
+SPHINXPROJ    = dtool_lookup_api
 SOURCEDIR     = source
 BUILDDIR      = build
 
