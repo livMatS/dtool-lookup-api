@@ -4,6 +4,8 @@ CHANGELOG
 unpublished
 -----------
 
+- migrate from ``setup.py`` to ``pyproject.toml``
+
 0.7.0 (14Aug23)
 ---------------
 
