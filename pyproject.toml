@@ -5,7 +5,7 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "dtool-lookup-api"
 description = "This package offers both synchronous and asynchronous implementations of a standardized Python API to communicate with dserver."
-readme = "README.rst
+readme = "README.rst"
 license = {file = "LICENSE"}
 authors = [
     {name = "Johannes L. Hörmann", email = "johannes.laurin@gmail.com"},
