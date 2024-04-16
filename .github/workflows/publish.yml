@@ -24,13 +24,12 @@ jobs:
 
     - name: Install requirements
       run: |
-        pip install --upgrade setuptools wheel setuptools-scm[toml] importlib-metadata
-        pip install git+https://github.com/livMatS/dserver.git@main
-        pip list
+        pip install --upgrade pip
+        pip install --upgrade build
 
     - name: Package distribution
       run: |
-        python setup.py sdist bdist_wheel
+        python -m build
 
     - name: Publish distribution to Test PyPI
       uses: pypa/gh-action-pypi-publish@release/v1
