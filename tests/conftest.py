@@ -1,14 +1,14 @@
 """Test fixtures."""
 
-# TODO: Tests for different authentication mechnanisms
+# TODO: Tests for different authentication mechanisms
 
 import pytest
 
 from environ import TemporaryOSEnviron
 
 DSERVER_ADDRESS_AND_CREDENTIALS = {
-    "DSERVER_URL": "https://localhost:5000",
-    "DSERVER_TOKEN_GENERATOR_URL": "https://localhost:5001/token",
+    "DSERVER_URL": "https://demo.dtool.dev/lookup",
+    "DSERVER_TOKEN_GENERATOR_URL": "https://demo.dtool.dev/token",
     "DSERVER_USERNAME": "testuser",
     "DSERVER_PASSWORD": "test_password",
     "DSERVER_VERIFY_SSL": False,

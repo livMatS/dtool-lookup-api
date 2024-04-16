@@ -5,6 +5,7 @@ unpublished
 -----------
 
 - migrate from ``setup.py`` to ``pyproject.toml``
+- make unit tests run against ``demo.dtool.dev`` by default
 
 0.7.0 (14Aug23)
 ---------------

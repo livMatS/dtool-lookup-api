@@ -346,6 +346,28 @@ See https://github.com/jupyter/notebook/issues/3397#issuecomment-419386811, http
 Testing
 -------
 
+Install editable with testing requirements with
+
+.. code-block:: bash
+
+    pip install -e .[test]
+
+By default, tests rely on the `demo.dtool.dev` demonstrator instance.
+
+This can be changed by configuring
+
+.. code-block:: python
+
+    DSERVER_ADDRESS_AND_CREDENTIALS = {
+        "DSERVER_URL": "https://demo.dtool.dev/lookup",
+        "DSERVER_TOKEN_GENERATOR_URL": "https://demo.dtool.dev/token",
+        "DSERVER_USERNAME": "testuser",
+        "DSERVER_PASSWORD": "test_password",
+        "DSERVER_VERIFY_SSL": False,
+    }
+
+within ``tests/conftest.py``.
+
 Tests require the presence of a working dserver ecosystem.
 The testing workflow within :code:`.github/workflows/test.yml` uses the
 `dserver-container-composition
