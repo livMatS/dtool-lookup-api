@@ -48,7 +48,7 @@ source_suffix = '.rst'
 master_doc = 'index'
 
 # General information about the project.
-project = u"dtool_lookup_api"
+project = u"dtool-lookup-api"
 copyright = u"2020, IMTEK Simulation"
 author = u"Johannes Laurin Hoermann"
 repo_name = u"dtool_lookup_api"
