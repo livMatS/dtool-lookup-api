@@ -28,20 +28,46 @@ from .version import version as __version__
 
 # use synchronous API as default
 from .synchronous import (
-    all,
+    # config
+    get_config,
+    get_versions,
+    # uris
+    get_datasets,
+    get_dataset,
+    # register_dataset, to be implemented
+    # delete_dataset, to be implemented
+    # uuids
+    get_datasets_by_uuid,
+    # metadata retrieval
+    get_manifest,
+    get_readme,
+    get_annotations,
+    get_tags,
+    # users
+    get_users,
+    get_user,
+    register_user,
+    delete_user,
+    get_summary,
+    # base-uris
+    get_base_uris,
+    get_base_uri,
+    register_base_uri,
+    delete_base_uri,
+    # server-side plugin-dependent functionality
     aggregate,
-    config,
+    query,
     graph,
+    # deprecated
+    all,
+    search,
+    config,
+    versions,
     list_base_uris,
     list_users,
     lookup,
     manifest,
-    permission_info,
-    query,
     readme,
-    register_base_uri,
-    register_user,
-    search,
     summary,
-    update_permissions,
-    user_info)
+    user_info
+    )

@@ -31,7 +31,7 @@ docs = [
 ]
 
 [project.urls]
-Documentation = "https://github.com/livMatS/dtool-lookup-api"
+Documentation = "https://dtool-lookup-api.readthedocs.io"
 Repository = "https://livmats.github.io/dtool-lookup-api"
 Changelog = "https://github.com/livMatS/dtool-lookup-api/blob/main/CHANGELOG.rst"
 
