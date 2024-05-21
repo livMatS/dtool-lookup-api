@@ -4,6 +4,8 @@ CHANGELOG
 unpublished
 -----------
 
+- model ``query`` method analoguous to ``search`` method.
+- remodel Python API to be closer to dserver REST API, mark old methods as deprecated
 - migrate from ``setup.py`` to ``pyproject.toml``
 - make unit tests run against ``demo.dtool.dev`` by default
 
