@@ -279,6 +279,8 @@ class TokenBasedLookupClient:
             post_body.update({'base_uris': base_uris})
         if uuids is not None:
             post_body.update({'uuids': uuids})
+        if tags is not None:
+            post_body.update({'tags': tags})
 
         dataset_list = await self._post(
             f'/uris?page={page_number}&page_size={page_size}',
@@ -543,7 +545,9 @@ class TokenBasedLookupClient:
             logger.warning("Server returned no pagination information. Server version outdated.")
         return aggregation_result
 
-    async def query(self, query, page_number=1, page_size=10, pagination={}):
+    async def query(self, query, creator_usernames=None,
+                    base_uris=None, uuids=None, tags=None,
+                    page_number=1, page_size=10, pagination={}):
         """
         Direct mongo query, requires server-side direct mongo plugin.
 
@@ -551,26 +555,44 @@ class TokenBasedLookupClient:
         ----------
         query : str or dict
             The MongoDB query to be executed.
+        creator_usernames: list of str, optional
+            select datasets created by any of these specific users
+        base_uris: list of str, optional
+            select datasets living on any of these base URIs
+        uuids: list of str, optional
+            select datasets matching any of these UUIDs
+        tags: list of str, optional
+            select datasets matching all provided tags
         page_number : int, optional
             The page number of the results, default is 1.
         page_size : int, optional
             The number of results per page, default is 10.
-        pagination: dict, optional
-            Dictionary filled with data from the X-Pagination response header, e.g.
-                '{"total": 124, "total_pages": 13, "first_page": 1, "last_page": 13, "page": 1, "next_page": 2}'
+        pagination : dict
+            dictionary filled with data from the X-Pagination response header, e.g.
+            '{"total": 124, "total_pages": 13, "first_page": 1, "last_page": 13, "page": 1, "next_page": 2}'
 
         Returns
         -------
-        list of dict
-            Query results.
+        json : list of dict
+            query results
         """
+
         if isinstance(query, str):
             query = json.loads(query)
 
         headers = {}
+        post_body = {'query': query}
+        if creator_usernames is not None:
+            post_body.update({'creator_usernames': creator_usernames})
+        if base_uris is not None:
+            post_body.update({'base_uris': base_uris})
+        if uuids is not None:
+            post_body.update({'uuids': uuids})
+        if tags is not None:
+            post_body.update({'tags': tags})
 
         query_result = await self._post(
-            f'/mongo/query?page={page_number}&page_size={page_size}', dict(query=query), headers=headers)
+            f'/mongo/query?page={page_number}&page_size={page_size}', post_body, headers=headers)
 
         if 'X-Pagination' in headers:
             p = json.loads(headers['X-Pagination'])
@@ -728,6 +750,7 @@ class TokenBasedLookupClient:
         return await self.get_base_uris(page_number=page_number,
                                         page_size=page_size,
                                         pagination=pagination)
+
     @deprecated(replacement="query")
     async def by_query(self, query, page_number=1, page_size=10, pagination={}):
         """Direct mongo query, requires server-side direct mongo plugin."""
