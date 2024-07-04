@@ -1,7 +1,27 @@
 README
 ======
 
-|PyPI| |github tag| |github tests|
+.. |dtool| image:: https://github.com/livMatS/dtool-lookup-api/blob/main/icons/22x22/dtool_logo.png?raw=True
+    :height: 20px
+    :target: https://github.com/livMatS/dtool-lookup-api
+
+.. |pypi| image:: https://img.shields.io/pypi/v/dtool-lookup-api
+    :alt: PyPI
+    :target: https://pypi.org/project/dtool-lookup-api/
+
+.. |tag| image:: https://img.shields.io/github/v/tag/livMatS/dtool-lookup-api
+    :alt: GitHub tag (latest by date)
+    :target: https://github.com/livMatS/dtool-lookup-api/tags
+
+.. |tests| image:: https://img.shields.io/github/actions/workflow/status/livMatS/dtool-lookup-api/test.yml?branch=main&label=tests
+    :alt: GitHub Workflow Status
+    :target: https://github.com/livMatS/dtool-lookup-api/actions/workflows/test.yml
+
+.. |docs| image:: https://readthedocs.org/projects/dtool-lookup-api/badge/?version=latest
+   :target: https://readthedocs.org/projects/dtool-lookup-api?badge=latest
+   :alt: Documentation Status
+
+|dtool| |pypi| |tag| |tests| |docs|
 
 Python API for interacting with dserver.
 
@@ -397,16 +417,3 @@ and :code:`workflow` during testing, which may be removed with
 
 eventually. All tests have been confirmed to work with the
 :code:`catthehacker/ubuntu:full-20.04` `runner <https://github.com/nektos/act#runners>`_.
-
-
-.. |PyPI| image:: https://img.shields.io/pypi/v/dtool-lookup-api
-    :alt: PyPI
-    :target: https://pypi.org/project/dtool-lookup-api/
-
-.. |github tag| image:: https://img.shields.io/github/v/tag/livMatS/dtool-lookup-api
-    :alt: GitHub tag (latest by date)
-    :target: https://github.com/livMatS/dtool-lookup-api/tags
-
-.. |github tests| image:: https://img.shields.io/github/actions/workflow/status/livMatS/dtool-lookup-api/test.yml?branch=main
-    :alt: GitHub Workflow Status
-    :target: https://github.com/livMatS/dtool-lookup-api/actions/workflows/test.yml
