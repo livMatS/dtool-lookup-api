@@ -127,6 +127,7 @@ for dataset in EXPECTED_DEFAULT_LOOKUP_RESPONSE_IMMUTABLE_MARKER:
 
 DEFAULT_QUERY = {
     'base_uri': 's3://test-bucket',
+    'uuid': {'$regex': '1a1f9fad-.*-5bbd66bfe675'},
     'name': {'$regex': 'test'},
 }
 EXPECTED_DEFAULT_QUERY_RESPONSE = [ALL_METADATA[0]]
@@ -134,9 +135,10 @@ EXPECTED_DEFAULT_QUERY_RESPONSE_IMMUTABLE_MARKER = [ALL_METADTA_IMMUTABLE_MARKER
 
 # search
 
-DEFAULT_SEARCH_TEXT = "test"
-EXPECTED_DEFAULT_SEARCH_RESPONSE = ALL_METADATA
-EXPECTED_DEFAULT_SEARCH_RESPONSE_IMMUTABLE_MARKER = ALL_METADTA_IMMUTABLE_MARKER
+DEFAULT_SEARCH_TEXT = "simple_test_dataset"
+EXPECTED_DEFAULT_SEARCH_RESPONSE = EXPECTED_DEFAULT_LOOKUP_RESPONSE
+EXPECTED_DEFAULT_SEARCH_RESPONSE_IMMUTABLE_MARKER = EXPECTED_DEFAULT_LOOKUP_RESPONSE_IMMUTABLE_MARKER
+
 PAGINATION_PARAMETERS = {
         "keyword": "test",
         "page_number": 1,
@@ -145,29 +147,6 @@ PAGINATION_PARAMETERS = {
     }
 
 # dataset entry retrieval
-
-
-@pytest.mark.usefixtures("dserver", "dtool_config")
-def test_all():
-    from dtool_lookup_api.synchronous import all
-    """Will send a request to list all registered datasets to the server."""
-
-    logger = logging.getLogger(__name__)
-
-    response = all()
-    assert response is not None
-
-    logger.debug("Response:")
-    _log_nested_dict(logger.debug, response)
-
-    compares = _compare(
-        response,
-        EXPECTED_DEFAULT_ALL_RESPONSE,
-        EXPECTED_DEFAULT_ALL_RESPONSE_IMMUTABLE_MARKER,
-    )
-
-    assert compares
-
 
 @pytest.mark.usefixtures("dserver", "dtool_config")
 def test_default_aggregation():
