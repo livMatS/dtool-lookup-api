@@ -155,8 +155,8 @@ To list all registered datasets
 
 .. code-block::
 
-    In [1]: from dtool_lookup_api import all
-       ...: res = all()
+    In [1]: from dtool_lookup_api import get_datasets
+       ...: res = get_datasets()
 
     In [2]: res
     Out[2]:
@@ -177,9 +177,9 @@ To lookup URIs from a dataset UUID within Python
 
 .. code-block::
 
-    In [1]: from dtool_lookup_api import lookup
+    In [1]: from dtool_lookup_api import get_datasets_by_uuid
        ...: uuid = "1a1f9fad-8589-413e-9602-5bbd66bfe675"
-       ...: res = lookup(uuid)
+       ...: res = get_datasets_by_uuid(uuid)
 
     In [2]: res
     Out[2]:
@@ -199,8 +199,8 @@ Full text search for the word "test"
 
 .. code-block::
 
-    In [1]: from dtool_lookup_api import search
-        ...: res = search("test")
+    In [1]: from dtool_lookup_api import get_datasets
+        ...: res = get_datasets(free_text="test")
 
     In [2]: res
     Out[2]:
@@ -223,9 +223,9 @@ Request the manifest of a particular dataset by URI
 
 .. code-block::
 
-    In [1]: from dtool_lookup_api import manifest
+    In [1]: from dtool_lookup_api import get_manifest
        ...: uri = 'smb://test-share/1a1f9fad-8589-413e-9602-5bbd66bfe675'
-       ...: res = manifest(uri)
+       ...: res = get_manifest(uri)
 
     In [2]: res
     Out[2]:
@@ -240,14 +240,15 @@ Request the manifest of a particular dataset by URI
 Readme
 ------
 
-Request the readme cotent of a particular dataset by URI
+Request the readme content of a particular dataset by URI
 
 .. code-block::
 
-    In [1]: from dtool_lookup_api import readme
-        ..: res = readme('smb://test-share/1a1f9fad-8589-413e-9602-5bbd66bfe675')
+    In [1]: from dtool_lookup_api import get_readme
+        ..: res = get_readme('smb://test-share/1a1f9fad-8589-413e-9602-5bbd66bfe675')
 
-    In [2]: res
+    In [2]: import yaml
+        ..: yaml.safe_load(res)
     Out[2]:
     {'creation_date': '2020-11-08',
     'description': 'testing description',
@@ -387,33 +388,3 @@ This can be changed by configuring
     }
 
 within ``tests/conftest.py``.
-
-Tests require the presence of a working dserver ecosystem.
-The testing workflow within :code:`.github/workflows/test.yml` uses the
-`dserver-container-composition
-<https://github.com/jotelha/dserver-container-composition>`_
-to provide a mock ecosystem. It is possible to run the workflow locally
-with the help of `docker <https://www.docker.com/>`_ and
-`act <https://github.com/nektos/act>`_.
-
-After `installing and configuring act <https://github.com/nektos/act#installation>`_, run
-
-.. code-block:: bash
-
-  act -P ubuntu-latest=catthehacker/ubuntu:full-latest -s GITHUB_TOKEN=$GITHUB_TOKEN -W .github/workflows/test.yml --bind
-
-from within this repository. :code:`$GITHUB_TOKEN` must hold a valid
-`access token <https://github.com/settings/tokens>`_.
-The user must be member of the :code:`docker` group.
-The :code:`--bind` option avoids quirky permission errors by running
-the test in the current directory. This will however result in the
-local creation of two subdirectories :code:`dserver-container-composition`
-and :code:`workflow` during testing, which may be removed with
-
-.. code-block:: bash
-
-  rm -rf dserver-container-composition
-  sudo rm -rf workflow
-
-eventually. All tests have been confirmed to work with the
-:code:`catthehacker/ubuntu:full-20.04` `runner <https://github.com/nektos/act#runners>`_.
