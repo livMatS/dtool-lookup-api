@@ -660,17 +660,9 @@ class TokenBasedLookupClient:
     @deprecated(replacement="get_datasets")
     async def all(self, page_number=1, page_size=20, pagination={}):
         """List all registered datasets."""
-        headers = {}
-        dataset_list = await self._get(f'/dataset/list?page={page_number}&page_size={page_size}', headers=headers)
-
-        if 'X-Pagination' in headers:
-            p = json.loads(headers['X-Pagination'])
-            pagination.update(**p)
-        else:
-            logger = logging.getLogger(__name__)
-            logger.warning("Server returned no pagination information. Server version outdated.")
-
-        return dataset_list
+        return await self.get_datasets(page_number=page_number,
+                                       page_size=page_size,
+                                       pagination=pagination)
 
     @deprecated(replacement="get_datasets")
     async def search(self, keyword, page_number=1, page_size=10, pagination={}):
@@ -715,7 +707,7 @@ class TokenBasedLookupClient:
     @deprecated(replacement="get_datasets_by_uuid")
     async def by_uuid(self, uuid, page_number=1, page_size=10, pagination={}):
         """Search for entries by a specific UUID."""
-        return self.get_datasets_by_uuid(uuid=uuid, page_number=page_number, page_size=page_size, pagination=pagination)
+        return await self.get_datasets_by_uuid(uuid=uuid, page_number=page_number, page_size=page_size, pagination=pagination)
 
     @deprecated(replacement="get_readme")
     async def readme(self, uri):
