@@ -39,7 +39,7 @@ EXPECTED_CONFIG_RESPONSE_IMMUTABLE_MARKER["jwt_public_key"] = False
 #version info
 
 EXPECTED_DEFAULT_VERSIONS_RESPONSE = {
-    "dserver": "0.17.2",
+    "dservercore": "0.17.2",
     "dserver_dependency_graph_plugin": "0.1.6.dev24",
     "dserver_direct_mongo_plugin": "0.1.5.dev35",
     "dserver_notification_plugin": "0.2.3.dev19",
@@ -49,7 +49,7 @@ EXPECTED_DEFAULT_VERSIONS_RESPONSE = {
 
 
 EXPECTED_DEFAULT_VERSIONS_RESPONSE_IMMUTABLE_MARKER = {
-    "dserver": False,
+    "dservercore": False,
     "dserver_dependency_graph_plugin": False,
     "dserver_direct_mongo_plugin": False,
     "dserver_notification_plugin": False,
