@@ -3,7 +3,6 @@
 import logging
 import pytest
 import yaml
-
 from utils import _log_nested_dict, _compare, NoDatesSafeLoader, _make_marker
 
 
@@ -123,6 +122,27 @@ for dataset in EXPECTED_DEFAULT_LOOKUP_RESPONSE_IMMUTABLE_MARKER:
         }
     )
 
+#dataset
+DEFAULT_DATASET="s3://test-bucket/1a1f9fad-8589-413e-9602-5bbd66bfe675"
+EXPECTED_DEFAULT_DATASET_RESPONSE = {
+        'base_uri': 's3://test-bucket',
+        'created_at': 1604860720.736269,
+        'creator_username': 'jotelha',
+        'frozen_at': 1604864525.691079,
+        'name': 'simple_test_dataset',
+        'uri': 's3://test-bucket/1a1f9fad-8589-413e-9602-5bbd66bfe675',
+        'uuid': '1a1f9fad-8589-413e-9602-5bbd66bfe675'
+    }
+EXPECTED_DEFAULT_DATASET_RESPONSE_IMMUTABLE_MARKER = {
+        'base_uri': 's3://test-bucket',
+        'created_at': 1604860720.736269,
+        'creator_username': 'jotelha',
+        'frozen_at': 1604864525.691079,
+        'name': 'simple_test_dataset',
+        'uri': 's3://test-bucket/1a1f9fad-8589-413e-9602-5bbd66bfe675',
+        'uuid': '1a1f9fad-8589-413e-9602-5bbd66bfe675'
+    }
+
 # query
 
 DEFAULT_QUERY = {
@@ -175,7 +195,7 @@ def test_default_aggregation():
 def test_default_get_datasets_by_uuid():
     """Will send a direct mongo query request to the server."""
     from dtool_lookup_api.synchronous import get_datasets_by_uuid
-
+   
     logger = logging.getLogger(__name__)
 
     response = get_datasets_by_uuid(DEFAULT_LOOKUP_UUID)
@@ -189,6 +209,28 @@ def test_default_get_datasets_by_uuid():
         EXPECTED_DEFAULT_LOOKUP_RESPONSE,
         EXPECTED_DEFAULT_LOOKUP_RESPONSE_IMMUTABLE_MARKER
     )
+    assert compares
+
+@pytest.mark.usefixtures("dserver", "dtool_config")
+def test_default_get_dataset():
+    """Will send a direct mongo query request to the server."""
+    from dtool_lookup_api.synchronous import get_dataset
+
+    logger = logging.getLogger(__name__)
+
+    response = get_dataset(DEFAULT_DATASET)
+    assert response is not None
+
+    logger.debug("Response:")
+    _log_nested_dict(logger.debug, response)
+  
+  
+    compares = _compare(
+        response,
+        EXPECTED_DEFAULT_DATASET_RESPONSE,
+        EXPECTED_DEFAULT_DATASET_RESPONSE_IMMUTABLE_MARKER
+    )
+
     assert compares
 
 
