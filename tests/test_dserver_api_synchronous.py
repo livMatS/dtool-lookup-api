@@ -3,7 +3,6 @@
 import logging
 import pytest
 import yaml
-
 from utils import _log_nested_dict, _compare, NoDatesSafeLoader, _make_marker
 
 
@@ -123,6 +122,53 @@ for dataset in EXPECTED_DEFAULT_LOOKUP_RESPONSE_IMMUTABLE_MARKER:
         }
     )
 
+# dataset
+DEFAULT_DATASET="s3://test-bucket/1a1f9fad-8589-413e-9602-5bbd66bfe675"
+EXPECTED_DEFAULT_DATASET_RESPONSE = {
+        'base_uri': 's3://test-bucket',
+        'created_at': 1604860720.736269,
+        'creator_username': 'jotelha',
+        'frozen_at': 1604864525.691079,
+        'name': 'simple_test_dataset',
+        'uri': 's3://test-bucket/1a1f9fad-8589-413e-9602-5bbd66bfe675',
+        'uuid': '1a1f9fad-8589-413e-9602-5bbd66bfe675'
+    }
+EXPECTED_DEFAULT_DATASET_RESPONSE_IMMUTABLE_MARKER=EXPECTED_DEFAULT_LOOKUP_RESPONSE_IMMUTABLE_MARKER[0]
+
+# base_uri
+
+DEFAULT_BASE_URI = EXPECTED_DEFAULT_ALL_RESPONSE[1]['base_uri']
+
+EXPECTED_DEFAULT_BASE_URI_RESPONSE = {'base_uri': 's3://test-bucket', 'users_with_register_permissions': [], 'users_with_search_permissions': ['testuser']}
+
+EXPECTED_DEFAULT_BASE_URI_RESPONSE_IMMUTABLE_MARKER =_make_marker(EXPECTED_DEFAULT_BASE_URI_RESPONSE)
+
+# base_uris
+
+EXPECTED_DEFAULT_BASE_URIS_RESPONSE = [{'base_uri': 's3://test-bucket'}, {'base_uri': 'smb://test-share'}]
+
+EXPECTED_DEFAULT_BASE_URIS_RESPONSE_IMMUTABLE_MARKER =_make_marker(EXPECTED_DEFAULT_BASE_URIS_RESPONSE)
+
+# summary
+
+EXPECTED_DEFAULT_SUMMARY_RESPONSE = {'base_uris': ['s3://test-bucket', 'smb://test-share'], 'creator_usernames': ['jotelha'], 'datasets_per_base_uri': {'s3://test-bucket': 1, 'smb://test-share': 283}, 'datasets_per_creator': {'jotelha': 284}, 'datasets_per_tag': {'first-half': 140, 'second-third': 94}, 'number_of_datasets': 284, 'tags': ['first-half', 'second-third']}
+
+EXPECTED_DEFAULT_SUMMARY_RESPONSE_IMMUTABLE_MARKER =_make_marker(EXPECTED_DEFAULT_SUMMARY_RESPONSE)
+
+# manifest
+
+EXPECTED_DEFAULT_MANIFEST_URI =  EXPECTED_DEFAULT_ALL_RESPONSE[1]['uri']
+
+EXPECTED_DEFAULT_MANIFEST_RESPONSE = {'dtoolcore_version': '3.18.3', 'hash_function': 'md5sum_hexdigest', 'items': {'eb58eb70ebcddf630feeea28834f5256c207edfd': {'hash': '2f7d9c3e0cfd47e8fcab0c12447b2bf0', 'relpath': 'simple_text_file.txt', 'size_in_bytes': 17, 'utc_timestamp': 1720529941.0}}}
+
+EXPECTED_DEFAULT_MANIFEST_RESPONSE_IMMUTABLE_MARKER =_make_marker(EXPECTED_DEFAULT_MANIFEST_RESPONSE)
+
+# user
+
+EXPECTED_DEFAULT_USER_RESPONSE = [{'is_admin': True, 'username': 'testuser'}]
+EXPECTED_DEFAULT_USER_RESPONSE_IMMUTABLE_MARKER =_make_marker(EXPECTED_DEFAULT_USER_RESPONSE)
+
+
 # query
 
 DEFAULT_QUERY = {
@@ -175,7 +221,7 @@ def test_default_aggregation():
 def test_default_get_datasets_by_uuid():
     """Will send a direct mongo query request to the server."""
     from dtool_lookup_api.synchronous import get_datasets_by_uuid
-
+   
     logger = logging.getLogger(__name__)
 
     response = get_datasets_by_uuid(DEFAULT_LOOKUP_UUID)
@@ -190,6 +236,135 @@ def test_default_get_datasets_by_uuid():
         EXPECTED_DEFAULT_LOOKUP_RESPONSE_IMMUTABLE_MARKER
     )
     assert compares
+
+@pytest.mark.usefixtures("dserver", "dtool_config")
+def test_default_get_dataset():
+    """Will send a direct mongo query request to the server."""
+    from dtool_lookup_api.synchronous import get_dataset
+
+    logger = logging.getLogger(__name__)
+
+    response = get_dataset(DEFAULT_DATASET)
+    assert response is not None
+
+    logger.debug("Response:")
+    _log_nested_dict(logger.debug, response)
+  
+  
+    compares = _compare(
+        response,
+        EXPECTED_DEFAULT_DATASET_RESPONSE,
+        EXPECTED_DEFAULT_DATASET_RESPONSE_IMMUTABLE_MARKER
+    )
+
+    assert compares
+
+
+@pytest.mark.usefixtures("dserver", "dtool_config")
+def test_default_get_base_uri():
+    """Will send a direct mongo query request to the server."""
+    from dtool_lookup_api.synchronous import get_base_uri
+
+    logger = logging.getLogger(__name__)
+
+    response = get_base_uri(DEFAULT_BASE_URI)
+    assert response is not None
+
+    logger.debug("Response:")
+    _log_nested_dict(logger.debug, response)
+    
+    compares = _compare(
+        response,
+        EXPECTED_DEFAULT_BASE_URI_RESPONSE,
+        EXPECTED_DEFAULT_BASE_URI_RESPONSE_IMMUTABLE_MARKER
+    )
+
+    assert compares
+
+@pytest.mark.usefixtures("dserver", "dtool_config")
+def test_default_get_base_uris():
+    """Will send a direct mongo query request to the server."""
+    from dtool_lookup_api.synchronous import get_base_uris
+
+    logger = logging.getLogger(__name__)
+
+    response = get_base_uris()
+    assert response is not None
+
+    logger.debug("Response:")
+    _log_nested_dict(logger.debug, response)
+      
+    compares = _compare(
+        response,
+        EXPECTED_DEFAULT_BASE_URIS_RESPONSE,
+        EXPECTED_DEFAULT_BASE_URIS_RESPONSE_IMMUTABLE_MARKER
+    )
+
+    assert compares
+
+@pytest.mark.usefixtures("dserver", "dtool_config")
+def test_default_get_summary():
+    """Will send a direct mongo query request to the server."""
+    from dtool_lookup_api.synchronous import get_summary
+
+    logger = logging.getLogger(__name__)
+
+    response = get_summary()
+    assert response is not None
+
+    logger.debug("Response:")
+    _log_nested_dict(logger.debug, response)
+      
+    compares = _compare(
+        response,
+        EXPECTED_DEFAULT_SUMMARY_RESPONSE,
+        EXPECTED_DEFAULT_SUMMARY_RESPONSE_IMMUTABLE_MARKER
+    )
+
+    assert compares
+
+@pytest.mark.usefixtures("dserver", "dtool_config")
+def test_default_get_manifest():
+    """Will send a direct mongo query request to the server."""
+    from dtool_lookup_api.synchronous import get_manifest
+
+    logger = logging.getLogger(__name__)
+
+    response = get_manifest(EXPECTED_DEFAULT_MANIFEST_URI)
+    assert response is not None
+
+    logger.debug("Response:")
+    _log_nested_dict(logger.debug, response)
+      
+    compares = _compare(
+        response,
+        EXPECTED_DEFAULT_MANIFEST_RESPONSE,
+        EXPECTED_DEFAULT_MANIFEST_RESPONSE_IMMUTABLE_MARKER
+    )
+
+    assert compares
+
+@pytest.mark.usefixtures("dserver", "dtool_config")
+def test_default_get_users():
+    """Will send a direct mongo query request to the server."""
+    from dtool_lookup_api.synchronous import get_users
+
+    logger = logging.getLogger(__name__)
+
+    response = get_users()
+    assert response is not None
+
+    logger.debug("Response:")
+    _log_nested_dict(logger.debug, response)
+      
+    compares = _compare(
+        response,
+        EXPECTED_DEFAULT_USER_RESPONSE,
+        EXPECTED_DEFAULT_USER_RESPONSE_IMMUTABLE_MARKER
+    )
+
+    assert compares
+    
 
 
 @pytest.mark.usefixtures("dserver", "dtool_config")
