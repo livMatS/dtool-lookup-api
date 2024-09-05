@@ -135,6 +135,32 @@ EXPECTED_DEFAULT_DATASET_RESPONSE = {
     }
 EXPECTED_DEFAULT_DATASET_RESPONSE_IMMUTABLE_MARKER=EXPECTED_DEFAULT_LOOKUP_RESPONSE_IMMUTABLE_MARKER[0]
 
+# datasets
+DEFAULT_DATASETS_LOOKUP_UUID = "1a1f9fad-8589-413e-9602-5bbd66bfe675"
+
+EXPECTED_DEFAULT_DATASETS_RESPONSE = [
+    {
+        'base_uri': 's3://test-bucket',
+        'created_at': 1604860720.736,
+        'creator_username': 'jotelha',
+        'frozen_at': 1604864525.691,
+        'name': 'simple_test_dataset',
+        'uri': 's3://test-bucket/1a1f9fad-8589-413e-9602-5bbd66bfe675',
+        'uuid': '1a1f9fad-8589-413e-9602-5bbd66bfe675'
+    },
+    {
+        'base_uri': 'smb://test-share',
+        'created_at': 1604860720.736,
+        'creator_username': 'jotelha',
+        'frozen_at': 1604864525.691,
+        'name': 'simple_test_dataset',
+        'uri': 'smb://test-share/1a1f9fad-8589-413e-9602-5bbd66bfe675',
+        'uuid': '1a1f9fad-8589-413e-9602-5bbd66bfe675'
+    }
+]
+
+EXPECTED_DEFAULT_DATASETS_RESPONSE_IMMUTABLE_MARKER=_make_marker(EXPECTED_DEFAULT_DATASETS_RESPONSE)
+
 # base_uri
 
 DEFAULT_BASE_URI = EXPECTED_DEFAULT_ALL_RESPONSE[1]['base_uri']
@@ -261,6 +287,28 @@ def test_default_get_dataset():
 
 
 @pytest.mark.usefixtures("dserver", "dtool_config")
+def test_default_get_datasets():
+    """Will send a direct mongo query request to the server."""
+    from dtool_lookup_api.synchronous import get_datasets
+
+    logger = logging.getLogger(__name__)
+
+    response = get_datasets(DEFAULT_DATASETS_LOOKUP_UUID)
+    assert response is not None
+
+    logger.debug("Response:")
+    _log_nested_dict(logger.debug, response)
+
+    compares = _compare(
+        response,
+        EXPECTED_DEFAULT_DATASETS_RESPONSE,
+        EXPECTED_DEFAULT_DATASETS_RESPONSE_IMMUTABLE_MARKER
+    )
+
+    assert compares
+
+
+@pytest.mark.usefixtures("dserver", "dtool_config")
 def test_default_get_base_uri():
     """Will send a direct mongo query request to the server."""
     from dtool_lookup_api.synchronous import get_base_uri
@@ -303,6 +351,76 @@ def test_default_get_base_uris():
     assert compares
 
 @pytest.mark.usefixtures("dserver", "dtool_config")
+def test_default_register_base_uri():
+    """Test the registration of base URIs."""
+    from dtool_lookup_api.synchronous import get_base_uri, register_base_uri, delete_base_uri
+
+    logger = logging.getLogger(__name__)
+
+    base_uris = [
+        {
+            "base_uri": 's3://test_uri_1',
+            "users_with_search_permissions": ["testuser"],
+            "users_with_register_permissions": []
+        },
+        {
+            "base_uri": "smb://test_uri_2",
+            "users_with_search_permissions": ["testuser"],
+            "users_with_register_permissions": []
+        }
+    ]
+
+    expected_responses = [
+        {
+            "base_uri": "s3://test_uri_1",
+            "users_with_search_permissions": ["testuser"],
+            "users_with_register_permissions": []
+        },
+        {
+            "base_uri": "smb://test_uri_2",
+            "users_with_search_permissions": ["testuser"],
+            "users_with_register_permissions": []
+        }
+    ]
+
+    # Ensure base URIs do not yet exist
+    for base_uri in base_uris:
+        response = get_base_uri(base_uri["base_uri"])
+        assert "code" in response and response["code"] == 404
+
+    # Register base URIs
+    for base_uri in base_uris:
+        response = register_base_uri(**base_uri)
+        assert response == True
+
+    # Ensure base URIs exist
+    for base_uri, expected_response in zip(base_uris, expected_responses):
+        response = get_base_uri(base_uri["base_uri"])
+        assert response == expected_response
+
+    # Ensure idempotent behavior
+    for base_uri in base_uris:
+        response = register_base_uri(**base_uri)
+        assert response == True
+
+    # Ensure base URIs still exist after re-registration
+    for base_uri, expected_response in zip(base_uris, expected_responses):
+        response = get_base_uri(base_uri["base_uri"])
+        assert response == expected_response
+
+    # Delete base URIs
+    for base_uri in base_uris:
+        response = delete_base_uri(base_uri["base_uri"])
+        assert response == True
+
+    # Ensure base URIs don't exist anymore
+    for base_uri in base_uris:
+        response = get_base_uri(base_uri["base_uri"])
+        assert "code" in response and response["code"] == 404
+
+    # TODO: Check for the existence of registered base URIs on the server
+
+@pytest.mark.usefixtures("dserver", "dtool_config")
 def test_default_get_summary():
     """Will send a direct mongo query request to the server."""
     from dtool_lookup_api.synchronous import get_summary
@@ -319,27 +437,6 @@ def test_default_get_summary():
         response,
         EXPECTED_DEFAULT_SUMMARY_RESPONSE,
         EXPECTED_DEFAULT_SUMMARY_RESPONSE_IMMUTABLE_MARKER
-    )
-
-    assert compares
-
-@pytest.mark.usefixtures("dserver", "dtool_config")
-def test_default_get_manifest():
-    """Will send a direct mongo query request to the server."""
-    from dtool_lookup_api.synchronous import get_manifest
-
-    logger = logging.getLogger(__name__)
-
-    response = get_manifest(EXPECTED_DEFAULT_MANIFEST_URI)
-    assert response is not None
-
-    logger.debug("Response:")
-    _log_nested_dict(logger.debug, response)
-      
-    compares = _compare(
-        response,
-        EXPECTED_DEFAULT_MANIFEST_RESPONSE,
-        EXPECTED_DEFAULT_MANIFEST_RESPONSE_IMMUTABLE_MARKER
     )
 
     assert compares
