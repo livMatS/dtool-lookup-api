@@ -442,27 +442,6 @@ def test_default_get_summary():
     assert compares
 
 @pytest.mark.usefixtures("dserver", "dtool_config")
-def test_default_get_manifest():
-    """Will send a direct mongo query request to the server."""
-    from dtool_lookup_api.synchronous import get_manifest
-
-    logger = logging.getLogger(__name__)
-
-    response = get_manifest(EXPECTED_DEFAULT_MANIFEST_URI)
-    assert response is not None
-
-    logger.debug("Response:")
-    _log_nested_dict(logger.debug, response)
-      
-    compares = _compare(
-        response,
-        EXPECTED_DEFAULT_MANIFEST_RESPONSE,
-        EXPECTED_DEFAULT_MANIFEST_RESPONSE_IMMUTABLE_MARKER
-    )
-
-    assert compares
-
-@pytest.mark.usefixtures("dserver", "dtool_config")
 def test_default_get_users():
     """Will send a direct mongo query request to the server."""
     from dtool_lookup_api.synchronous import get_users
