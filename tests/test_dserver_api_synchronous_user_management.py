@@ -15,6 +15,8 @@ EXPECTED_DEFAULT_USER_INFO_RESPONSE = {
     'username': 'testuser'
 }
 EXPECTED_DEFAULT_USER_INFO_RESPONSE_IMMUTABLE_MARKER = _make_marker(EXPECTED_DEFAULT_USER_INFO_RESPONSE)
+# ordering not guaranteed
+EXPECTED_DEFAULT_USER_INFO_RESPONSE_IMMUTABLE_MARKER["search_permissions_on_base_uris"] = [False, False]
 
 # list users
 
