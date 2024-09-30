@@ -300,6 +300,9 @@ EXPECTED_DEFAULT_ME_RESPONSE = {
 EXPECTED_DEFAULT_ME_RESPONSE_IMMUTABLE_MARKER = _make_marker(
     EXPECTED_DEFAULT_ME_RESPONSE
 )
+# ordering not guaranteed
+EXPECTED_DEFAULT_ME_RESPONSE_IMMUTABLE_MARKER["search_permissions_on_base_uris"] = [False, False]
+
 
 # get my summary
 
