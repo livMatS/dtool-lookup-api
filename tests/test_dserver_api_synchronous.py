@@ -406,8 +406,8 @@ def test_default_get_datasets():
 
     assert compares3
 
-    response4 = get_datasets(tags=["first-half", "second-third"])
-
+    response4 = get_datasets(tags=["first-half","second-third"])
+    print("response4",response4)
     assert len(response4) == 10
 
     logger.debug("Response 4:")
@@ -724,6 +724,7 @@ def test_default_get_my_summary():
     )
 
     assert compares
+
 
 
 
