@@ -15,8 +15,6 @@ EXPECTED_DEFAULT_PERMISSION_INFO_RESPONSE = {
 EXPECTED_DEFAULT_PERMISSION_INFO_RESPONSE_IMMUTABLE_MARKER = _make_marker(EXPECTED_DEFAULT_PERMISSION_INFO_RESPONSE)
 
 
-# mark to run early in order to not have any other users registered in database by other tests
-@pytest.mark.first
 @pytest.mark.usefixtures("dserver", "dtool_config")
 def test_get_base_uri():
     """Will send a permission info request to the server."""
