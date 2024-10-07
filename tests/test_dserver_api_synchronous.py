@@ -305,7 +305,35 @@ EXPECTED_DEFAULT_ME_RESPONSE_IMMUTABLE_MARKER = _make_marker(
 
 EXPECTED_DEFAULT_MY_SUMMARY_RESPONSE = EXPECTED_DEFAULT_SUMMARY_RESPONSE
 
-EXPECTED_DEFAULT_MY_SUMMARY_IMMUTABLE_MARKER = _make_marker(EXPECTED_DEFAULT_MY_SUMMARY_RESPONSE)
+EXPECTED_DEFAULT_MY_SUMMARY_IMMUTABLE_MARKER = _make_marker(
+    EXPECTED_DEFAULT_MY_SUMMARY_RESPONSE
+)
+
+# register dataset
+
+EXPECTED_DEFAULT_README_RESPONSE = str(
+    {
+        "creation_date": "2020-11-08",
+        "description": "testing description",
+        "expiration_date": "2022-11-08",
+        "funders": [
+            {
+                "code": "testing_code",
+                "organization": "testing_organization",
+                "program": "testing_program",
+            }
+        ],
+        "owners": [
+            {
+                "email": "testing@test.edu",
+                "name": "Testing User",
+                "orcid": "testing_orcid",
+                "username": "testing_user",
+            }
+        ],
+        "project": "testing project",
+    }
+)
 
 # dataset entry retrieval
 
@@ -406,8 +434,7 @@ def test_default_get_datasets():
 
     assert compares3
 
-    response4 = get_datasets(tags=["first-half","second-third"])
-    print("response4",response4)
+    response4 = get_datasets(tags=["first-half", "second-third"])
     assert len(response4) == 10
 
     logger.debug("Response 4:")
@@ -482,12 +509,12 @@ def test_default_register_base_uri():
         {
             "base_uri": "s3://test_uri_1",
             "users_with_search_permissions": ["testuser"],
-            "users_with_register_permissions": [],
+            "users_with_register_permissions": ["testuser"],
         },
         {
             "base_uri": "smb://test_uri_2",
             "users_with_search_permissions": ["testuser"],
-            "users_with_register_permissions": [],
+            "users_with_register_permissions": ["testuser"],
         },
     ]
 
@@ -495,12 +522,12 @@ def test_default_register_base_uri():
         {
             "base_uri": "s3://test_uri_1",
             "users_with_search_permissions": ["testuser"],
-            "users_with_register_permissions": [],
+            "users_with_register_permissions": ["testuser"],
         },
         {
             "base_uri": "smb://test_uri_2",
             "users_with_search_permissions": ["testuser"],
-            "users_with_register_permissions": [],
+            "users_with_register_permissions": ["testuser"],
         },
     ]
 
@@ -726,5 +753,79 @@ def test_default_get_my_summary():
     assert compares
 
 
+@pytest.mark.usefixtures("dserver", "dtool_config")
+def test_default_register_dataset():
+    """Test the registration of base URIs."""
+    from dtool_lookup_api.synchronous import (
+        register_base_uri,
+        register_dataset,
+        delete_base_uri,
+        delete_dataset,
+        get_datasets,
+    )
 
+    base_uris = [
+        {
+            "base_uri": "s3://test-1",
+            "users_with_search_permissions": ["testuser"],
+            "users_with_register_permissions": ["testuser"],
+        }
+    ]
 
+    # Ensure dataset do not yet exist
+    response_0 = get_datasets(base_uris=["s3://test-1"])
+    assert len(response_0) == 0
+
+    # Register a new base_uri
+    for base_uri in base_uris:
+        response = register_base_uri(**base_uri)
+        assert response == True
+
+    # Register dataset
+    response = register_dataset(
+        name="testuser",
+        uuid="1a1f9fad-8589-413e-9602-5bbd66bfe677",
+        base_uri="s3://test-1",
+        type="dataset",
+        uri="s3://test-1/1a1f9fad-8589-413e-9602-5bbd66bfe677",
+        manifest=EXPECTED_DEFAULT_MANIFEST_RESPONSE,
+        readme=EXPECTED_DEFAULT_README_RESPONSE,
+        creator_username="testuser",
+        frozen_at="1604864525.691",
+        created_at="1604860720.736269",
+        annotations={},
+        tags=[""],
+        number_of_items=0,
+        size_in_bytes=0,
+    )
+    assert response == True
+
+    # # Ensure base URIs exist
+    # for uri, expected_response in zip(uris, expected_responses):
+    #     response = register_dataset(uri["uri"])
+    #     assert response == expected_response
+
+    # # Ensure idempotent behavior
+    # for uri in uris:
+    #     response = register_dataset(**uri)
+    #     assert response == True
+
+    # Ensure base URIs still exist after re-registration
+    # for uri, expected_response in zip(uris, expected_responses):
+    #     response = get_base_uri(uri["uri"])
+    #     assert response == expected_response
+
+    # Delete dataset
+    response_2 = delete_dataset("s3://test-1/1a1f9fad-8589-413e-9602-5bbd66bfe677")
+    assert response_2 == True
+
+    # Delete base_uri
+    for base_uri in base_uris:
+        response = delete_base_uri(base_uri["base_uri"])
+        assert response == True
+
+    # Ensure dataset does not exist anymore
+    response_3 = get_datasets(base_uris=["s3://test-1"])
+    assert len(response_3) == 0
+
+    # TODO: Check for the existence of registered base URIs on the server

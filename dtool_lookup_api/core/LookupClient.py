@@ -314,23 +314,37 @@ class TokenBasedLookupClient:
         response = await self._get(f'/uris/{encoded_uri}')
         return response
     
+    # delete dataset
+    
     async def delete_dataset(self, uri):
         """Delete a datatset using URI. (Needs admin privileges.)"""
         encoded_uri = urllib.parse.quote_plus(uri)
         response = await self._delete(f'/uris/{encoded_uri}')
         return response == 200
     
-    # async def register_dataset(self,uri,
-    #                             users_with_search_permissions=[],
-    #                             users_with_register_permissions=[]):
-    #     """Register or update a dataset using URI. (Needs admin privileges.)"""
-    #     encoded_uri = urllib.parse.quote_plus(uri)
-    #     response = await self._put(
-    #         f'/uris/{encoded_uri}',
-    #         dict(users_with_search_permissions=users_with_search_permissions,
-    #              users_with_register_permissions=users_with_register_permissions)
-    #              )
-    #     return response in set([200, 201])
+    # register dataset
+
+    async def register_dataset(self,uri,base_uri,readme,manifest,uuid,name,type,creator_username,frozen_at,created_at,annotations,tags,number_of_items,size_in_bytes):
+        """Register or update a dataset using URI."""
+        encoded_uri = urllib.parse.quote_plus(uri)
+        response = await self._put(
+            f'/uris/{encoded_uri}',
+            dict(uuid=uuid,
+            uri=uri,
+            base_uri=base_uri,
+            name=name,type=type,
+            readme=readme,
+            manifest=manifest,
+            creator_username=creator_username,
+            frozen_at=frozen_at,
+            created_at=created_at,
+            annotations=annotations,
+            tags=tags,
+            number_of_items=number_of_items,
+            size_in_bytes=size_in_bytes)
+                 )
+        return response in set([200, 201])
+
 
     # uuids routes
 
