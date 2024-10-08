@@ -240,7 +240,8 @@ class TokenBasedLookupClient:
 
     async def get_datasets(self, free_text=None, creator_usernames=None,
                            base_uris=None, uuids=None, tags=None,
-                           page_number=1, page_size=10, pagination={}):
+                           page_number=1, page_size=10,
+                           pagination={}, sorting={},sort="uri"):
         """
         Get dataset entries on lookup server, filtered if desired.
 
@@ -263,6 +264,9 @@ class TokenBasedLookupClient:
         pagination : dict
             dictionary filled with data from the X-Pagination response header, e.g.
             '{"total": 124, "total_pages": 13, "first_page": 1, "last_page": 13, "page": 1, "next_page": 2}'
+        sorting : dict
+            dictionary filled with data from the X-Sort response header, e.g.
+            '{"sort": {"uuid": 1}}' for ascending sorting by uuid
 
         Returns
         -------
@@ -283,7 +287,7 @@ class TokenBasedLookupClient:
             post_body.update({'tags': tags})
 
         dataset_list = await self._post(
-            f'/uris?page={page_number}&page_size={page_size}',
+            f'/uris?page={page_number}&page_size={page_size}&sort={sort}',
             post_body, headers=headers)
 
         if 'X-Pagination' in headers:
@@ -292,6 +296,14 @@ class TokenBasedLookupClient:
         else:
             logger = logging.getLogger(__name__)
             logger.warning("Server returned no pagination information. Server version outdated.")
+
+        if 'X-Sort' in headers:
+            p = json.loads(headers['X-Sort'])
+            sorting.update(**p)
+        else:
+            logger = logging.getLogger(__name__)
+            logger.warning("Server returned no sorting information. Server version outdated.")
+
         return dataset_list
 
     async def get_dataset(self, uri):
