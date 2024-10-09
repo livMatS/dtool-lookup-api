@@ -21,8 +21,7 @@ dependencies = [
 [project.optional-dependencies]
 test = [
     "pytest",
-    "pytest-cov",
-    "pytest-ordering"
+    "pytest-cov"
 ]
 docs = [
     "sphinx",

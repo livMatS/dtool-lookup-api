@@ -240,7 +240,8 @@ class TokenBasedLookupClient:
 
     async def get_datasets(self, free_text=None, creator_usernames=None,
                            base_uris=None, uuids=None, tags=None,
-                           page_number=1, page_size=10, pagination={}):
+                           page_number=1, page_size=10,
+                           pagination={}, sorting={},sort="uri"):
         """
         Get dataset entries on lookup server, filtered if desired.
 
@@ -263,6 +264,9 @@ class TokenBasedLookupClient:
         pagination : dict
             dictionary filled with data from the X-Pagination response header, e.g.
             '{"total": 124, "total_pages": 13, "first_page": 1, "last_page": 13, "page": 1, "next_page": 2}'
+        sorting : dict
+            dictionary filled with data from the X-Sort response header, e.g.
+            '{"sort": {"uuid": 1}}' for ascending sorting by uuid
 
         Returns
         -------
@@ -283,7 +287,7 @@ class TokenBasedLookupClient:
             post_body.update({'tags': tags})
 
         dataset_list = await self._post(
-            f'/uris?page={page_number}&page_size={page_size}',
+            f'/uris?page={page_number}&page_size={page_size}&sort={sort}',
             post_body, headers=headers)
 
         if 'X-Pagination' in headers:
@@ -292,6 +296,14 @@ class TokenBasedLookupClient:
         else:
             logger = logging.getLogger(__name__)
             logger.warning("Server returned no pagination information. Server version outdated.")
+
+        if 'X-Sort' in headers:
+            p = json.loads(headers['X-Sort'])
+            sorting.update(**p)
+        else:
+            logger = logging.getLogger(__name__)
+            logger.warning("Server returned no sorting information. Server version outdated.")
+
         return dataset_list
 
     async def get_dataset(self, uri):
@@ -313,6 +325,38 @@ class TokenBasedLookupClient:
         encoded_uri = urllib.parse.quote_plus(uri)
         response = await self._get(f'/uris/{encoded_uri}')
         return response
+    
+    # delete dataset
+    
+    async def delete_dataset(self, uri):
+        """Delete a datatset using URI. (Needs admin privileges.)"""
+        encoded_uri = urllib.parse.quote_plus(uri)
+        response = await self._delete(f'/uris/{encoded_uri}')
+        return response == 200
+    
+    # register dataset
+
+    async def register_dataset(self,uri,base_uri,readme,manifest,uuid,name,type,creator_username,frozen_at,created_at,annotations,tags,number_of_items,size_in_bytes):
+        """Register or update a dataset using URI."""
+        encoded_uri = urllib.parse.quote_plus(uri)
+        response = await self._put(
+            f'/uris/{encoded_uri}',
+            dict(uuid=uuid,
+            uri=uri,
+            base_uri=base_uri,
+            name=name,type=type,
+            readme=readme,
+            manifest=manifest,
+            creator_username=creator_username,
+            frozen_at=frozen_at,
+            created_at=created_at,
+            annotations=annotations,
+            tags=tags,
+            number_of_items=number_of_items,
+            size_in_bytes=size_in_bytes)
+                 )
+        return response in set([200, 201])
+
 
     # uuids routes
 
@@ -411,6 +455,11 @@ class TokenBasedLookupClient:
             logger.warning("Server returned no pagination information. Server version outdated.")
 
         return users
+    
+    async def get_me(self):
+        """Request the current user info."""
+        response = await self._get(f'/me')
+        return response
 
     async def get_user(self, username=None):
         """Request user info.
@@ -446,6 +495,11 @@ class TokenBasedLookupClient:
         else:
             encoded_username = urllib.parse.quote_plus(username)
             response = await self._get(f'/users/{encoded_username}/summary')
+        return response
+    
+    async def get_my_summary(self):
+        """Overall summary of datasets accessible to the current user."""
+        response = await self._get(f'/me/summary')
         return response
 
     # base URIs & permissions management routes

@@ -15,8 +15,6 @@ EXPECTED_DEFAULT_PERMISSION_INFO_RESPONSE = {
 EXPECTED_DEFAULT_PERMISSION_INFO_RESPONSE_IMMUTABLE_MARKER = _make_marker(EXPECTED_DEFAULT_PERMISSION_INFO_RESPONSE)
 
 
-# mark to run early in order to not have any other users registered in database by other tests
-@pytest.mark.first
 @pytest.mark.usefixtures("dserver", "dtool_config")
 def test_get_base_uri():
     """Will send a permission info request to the server."""
@@ -38,27 +36,3 @@ def test_get_base_uri():
         EXPECTED_DEFAULT_PERMISSION_INFO_RESPONSE_IMMUTABLE_MARKER
     )
     assert compares
-
-
-# TODO: test for update_permissions
-# @pytest.mark.usefixtures("dserver", "dtool_config")
-# def test_default_update_permissions():
-#     """Will send a permission info request to the server."""
-#     from dtool_lookup_api.synchronous import update_permissions
-#
-#     logger = logging.getLogger(__name__)
-#
-#     response = update_permissions()
-#     assert response is not None
-#
-#     logger.debug("Response:")
-#     _log_nested_dict(logger.debug, response)
-#
-#     assert len(response) == 1
-#
-#     compares = _compare(
-#         response,
-#         EXPECTED_DEFAULT_UPDATE_PERMISSIONS_RESPONSE,
-#         EXPECTED_DEFAULT_UPDATE_PERMISSIONS_RESPONSE_IMMUTABLE_MARKER
-#     )
-#     assert compares

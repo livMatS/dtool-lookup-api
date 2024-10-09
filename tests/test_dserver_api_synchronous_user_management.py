@@ -15,6 +15,8 @@ EXPECTED_DEFAULT_USER_INFO_RESPONSE = {
     'username': 'testuser'
 }
 EXPECTED_DEFAULT_USER_INFO_RESPONSE_IMMUTABLE_MARKER = _make_marker(EXPECTED_DEFAULT_USER_INFO_RESPONSE)
+# ordering not guaranteed
+EXPECTED_DEFAULT_USER_INFO_RESPONSE_IMMUTABLE_MARKER["search_permissions_on_base_uris"] = [False, False]
 
 # list users
 
@@ -26,7 +28,6 @@ EXPECTED_DEFAULT_LIST_USERS_RESPONSE_IMMUTABLE_MARKER = _make_marker(EXPECTED_DE
 
 
 # mark to run early in order to not have any other users registered in database by other tests
-@pytest.mark.first
 @pytest.mark.usefixtures("dserver", "dtool_config")
 def test_user_info():
     """Will send a user info request to the server."""
@@ -49,7 +50,6 @@ def test_user_info():
 
 
 # mark to run early in order to not have any other users registered in database by other tests
-@pytest.mark.first
 @pytest.mark.usefixtures("dserver", "dtool_config")
 def test_default_get_users():
     """Will send a list users request to the server."""
@@ -73,8 +73,6 @@ def test_default_get_users():
     assert compares
 
 
-# TODO: clean up, i.e. delete users after use
-@pytest.mark.skip(reason="User management currently broken.")
 @pytest.mark.usefixtures("dserver", "dtool_config")
 def test_default_register_user():
     """Will send a register user request to the server."""
@@ -137,6 +135,3 @@ def test_default_register_user():
     for user in users:
         response = get_user(user["username"])
         assert "code" in response and response["code"] == 404
-
-    # TODO: check for existence of registered users on server
-
