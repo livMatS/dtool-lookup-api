@@ -476,7 +476,7 @@ class TokenBasedLookupClient:
 
     # user management routes
 
-    async def get_users(self, page_number=1, page_size=10, pagination={},sorting={},sort="username"):
+    async def get_users(self, page_number=1, page_size=10,sort_fields=["username"],sort_order=[ASCENDING], pagination={},sorting={}):
         """
            Request a list of users. (Needs admin privileges.)
 
@@ -489,6 +489,13 @@ class TokenBasedLookupClient:
            pagination: dict, optional
                Dictionary filled with data from the X-Pagination response header, e.g.
                    '{"total": 124, "total_pages": 13, "first_page": 1, "last_page": 13, "page": 1, "next_page": 2}'
+            sort_fields: str or list of str, optional
+            default is "uri"
+            sort_order: int or list of int of ASCENDING (1) or DESCENDING (-1)
+            default is ASCENDING (1)
+            sorting : dict
+            dictionary filled with data from the X-Sort response header, e.g.
+            '{"sort": {"uuid": 1}}' for ascending sorting by uuid
 
            Returns
            -------
@@ -497,6 +504,23 @@ class TokenBasedLookupClient:
            """
 
         headers = {}
+
+        if isinstance(sort_fields, str):
+            sort_fields = [sort_fields]
+        
+        if isinstance(sort_order, int):
+            sort_order = [sort_order]
+        
+        # assert that sort fields and sort order have same length
+        prefixed_fields = []
+        for field, order in zip(sort_fields, sort_order):
+            if order == DESCENDING:
+                prefixed_field = '-' + field
+            else:
+                prefixed_field = field
+            prefixed_fields.append(prefixed_field)
+            
+        sort = ','.join(prefixed_fields)
 
         users = await self._get(
             f'/users?page={page_number}&page_size={page_size}&sort={sort}', headers=headers)

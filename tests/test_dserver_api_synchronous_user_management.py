@@ -5,26 +5,42 @@ import pytest
 
 from utils import _log_nested_dict, _compare, _make_marker
 
+ASCENDING = 1
+DESCENDING = -1
+
 # user info
 
-DEFAULT_USER_INFO_USER_NAME = 'testuser'
+DEFAULT_USER_INFO_USER_NAME = "testuser"
 EXPECTED_DEFAULT_USER_INFO_RESPONSE = {
-    'is_admin': True,
-    'register_permissions_on_base_uris': [],
-    'search_permissions_on_base_uris': ['smb://test-share', 's3://test-bucket'],
-    'username': 'testuser'
+    "is_admin": True,
+    "register_permissions_on_base_uris": [],
+    "search_permissions_on_base_uris": ["smb://test-share", "s3://test-bucket"],
+    "username": "testuser",
 }
-EXPECTED_DEFAULT_USER_INFO_RESPONSE_IMMUTABLE_MARKER = _make_marker(EXPECTED_DEFAULT_USER_INFO_RESPONSE)
+EXPECTED_DEFAULT_USER_INFO_RESPONSE_IMMUTABLE_MARKER = _make_marker(
+    EXPECTED_DEFAULT_USER_INFO_RESPONSE
+)
 # ordering not guaranteed
-EXPECTED_DEFAULT_USER_INFO_RESPONSE_IMMUTABLE_MARKER["search_permissions_on_base_uris"] = [False, False]
+EXPECTED_DEFAULT_USER_INFO_RESPONSE_IMMUTABLE_MARKER[
+    "search_permissions_on_base_uris"
+] = [False, False]
 
 # list users
 
-EXPECTED_DEFAULT_LIST_USERS_RESPONSE = [{
-    'is_admin': True,
-    'username': 'testuser'
-}]
-EXPECTED_DEFAULT_LIST_USERS_RESPONSE_IMMUTABLE_MARKER = _make_marker(EXPECTED_DEFAULT_LIST_USERS_RESPONSE)
+EXPECTED_DEFAULT_LIST_USERS_RESPONSE = [{"is_admin": True, "username": "testuser"}]
+EXPECTED_DEFAULT_LIST_USERS_RESPONSE_IMMUTABLE_MARKER = _make_marker(
+    EXPECTED_DEFAULT_LIST_USERS_RESPONSE
+)
+
+# sorted by username
+
+EXPECTED_DEFAULT_DESCENDING_USER_RESPONSE = [
+    {"is_admin": True, "username": "testuser"},
+    {"is_admin": True, "username": "evil-witch"},
+    {"is_admin": False, "username": "dopey"},
+]
+
+EXPECTED_DEFAULT_ASCENDING_USER_RESPONSE = [{'is_admin': False, 'username': 'dopey'}, {'is_admin': True, 'username': 'evil-witch'}, {'is_admin': True, 'username': 'testuser'}]
 
 
 # mark to run early in order to not have any other users registered in database by other tests
@@ -44,7 +60,7 @@ def test_user_info():
     compares = _compare(
         response,
         EXPECTED_DEFAULT_USER_INFO_RESPONSE,
-        EXPECTED_DEFAULT_USER_INFO_RESPONSE_IMMUTABLE_MARKER
+        EXPECTED_DEFAULT_USER_INFO_RESPONSE_IMMUTABLE_MARKER,
     )
     assert compares
 
@@ -68,7 +84,7 @@ def test_default_get_users():
     compares = _compare(
         response,
         EXPECTED_DEFAULT_LIST_USERS_RESPONSE,
-        EXPECTED_DEFAULT_LIST_USERS_RESPONSE_IMMUTABLE_MARKER
+        EXPECTED_DEFAULT_LIST_USERS_RESPONSE_IMMUTABLE_MARKER,
     )
     assert compares
 
@@ -76,29 +92,31 @@ def test_default_get_users():
 @pytest.mark.usefixtures("dserver", "dtool_config")
 def test_default_register_user():
     """Will send a register user request to the server."""
-    from dtool_lookup_api.synchronous import get_user, register_user, delete_user
+    from dtool_lookup_api.synchronous import (
+        get_user,
+        register_user,
+        delete_user,
+        get_users,
+    )
 
     logger = logging.getLogger(__name__)
 
     # mimic https://github.com/jic-dtool/dserver/blob/12baba73eebc668b4998ae2c2ea43946dc3bf856/tests/test_admin_user_routes.py#L14
-    users = [
-        {"username": "evil-witch", "is_admin": True},
-        {"username": "dopey"}
-    ]
+    users = [{"username": "evil-witch", "is_admin": True}, {"username": "dopey"}]
 
     expected_responses = [
         {
-            'username': 'evil-witch',
-            'is_admin': True,
-            'register_permissions_on_base_uris': [],
-            'search_permissions_on_base_uris': [],
-         },
-         {
-            'username': 'dopey',
-            'is_admin': False,
-            'register_permissions_on_base_uris': [],
-            'search_permissions_on_base_uris': [],
-         }
+            "username": "evil-witch",
+            "is_admin": True,
+            "register_permissions_on_base_uris": [],
+            "search_permissions_on_base_uris": [],
+        },
+        {
+            "username": "dopey",
+            "is_admin": False,
+            "register_permissions_on_base_uris": [],
+            "search_permissions_on_base_uris": [],
+        },
     ]
 
     # assure users do not yet exist
@@ -115,6 +133,17 @@ def test_default_register_user():
     for user, expected_response in zip(users, expected_responses):
         response = get_user(user["username"])
         assert response == expected_response
+
+    # idea: Check for sorted user listing
+
+    response_descending = get_users(sort_fields=["username"], sort_order=[DESCENDING])
+
+    assert response_descending == EXPECTED_DEFAULT_DESCENDING_USER_RESPONSE
+
+
+    response_ascending = get_users(sort_fields=["username"], sort_order=[ASCENDING])
+
+    assert response_ascending == EXPECTED_DEFAULT_ASCENDING_USER_RESPONSE
 
     # ensure idempotent
     for user in users:
