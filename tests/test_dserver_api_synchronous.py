@@ -8,6 +8,9 @@ from utils import _log_nested_dict, _compare, NoDatesSafeLoader, _make_marker
 
 # all
 
+ASCENDING = 1
+DESCENDING = -1
+
 ALL_METADATA = sorted(
     [
         {
@@ -134,6 +137,48 @@ for dataset in EXPECTED_DEFAULT_LOOKUP_RESPONSE_IMMUTABLE_MARKER:
         }
     )
 
+EXPECTED_DEFAULT_LOOKUP_RESPONSE_DESCENDING_BASE_URI = [
+    {
+        "base_uri": "smb://test-share",
+        "created_at": 1604860720.736269,
+        "creator_username": "jotelha",
+        "frozen_at": 1604864525.691079,
+        "name": "simple_test_dataset",
+        "uri": "smb://test-share/1a1f9fad-8589-413e-9602-5bbd66bfe675",
+        "uuid": "1a1f9fad-8589-413e-9602-5bbd66bfe675",
+    },
+    {
+        "base_uri": "s3://test-bucket",
+        "created_at": 1604860720.736269,
+        "creator_username": "jotelha",
+        "frozen_at": 1604864525.691079,
+        "name": "simple_test_dataset",
+        "uri": "s3://test-bucket/1a1f9fad-8589-413e-9602-5bbd66bfe675",
+        "uuid": "1a1f9fad-8589-413e-9602-5bbd66bfe675",
+    },
+]
+
+EXPECTED_DEFAULT_LOOKUP_RESPONSE_ASCENDING_BASE_URI = [
+    {
+        "base_uri": "s3://test-bucket",
+        "created_at": 1604860720.736269,
+        "creator_username": "jotelha",
+        "frozen_at": 1604864525.691079,
+        "name": "simple_test_dataset",
+        "uri": "s3://test-bucket/1a1f9fad-8589-413e-9602-5bbd66bfe675",
+        "uuid": "1a1f9fad-8589-413e-9602-5bbd66bfe675",
+    },
+    {
+        "base_uri": "smb://test-share",
+        "created_at": 1604860720.736269,
+        "creator_username": "jotelha",
+        "frozen_at": 1604864525.691079,
+        "name": "simple_test_dataset",
+        "uri": "smb://test-share/1a1f9fad-8589-413e-9602-5bbd66bfe675",
+        "uuid": "1a1f9fad-8589-413e-9602-5bbd66bfe675",
+    },
+]
+
 # dataset
 DEFAULT_DATASET = "s3://test-bucket/1a1f9fad-8589-413e-9602-5bbd66bfe675"
 EXPECTED_DEFAULT_DATASET_RESPONSE = {
@@ -193,6 +238,48 @@ EXPECTED_DEFAULT_BASE_URI_lOOKUP_RESPONSE_IMMUTABLE_MARKER = _make_marker(
     EXPECTED_DEFAULT_BASE_URI_lOOKUP_RESPONSE
 )
 
+EXPECTED_DEFAULT_DESCENDING_NAME_SORTING_RESPONSE = [
+    {
+        "base_uri": "s3://testsorting1",
+        "created_at": 1604860720.736,
+        "creator_username": "testuser",
+        "frozen_at": 1604864525.691,
+        "name": "b",
+        "uri": "s3://testsorting1/1a1f9fad-8589-413e-9602-5bbd66bfe679",
+        "uuid": "1a1f9fad-8589-413e-9602-5bbd66bfe679",
+    },
+    {
+        "base_uri": "s3://testsorting1",
+        "created_at": 1604860720.736,
+        "creator_username": "testuser",
+        "frozen_at": 1604864525.691,
+        "name": "a",
+        "uri": "s3://testsorting1/1a1f9fad-8589-413e-9602-5bbd66bfe678",
+        "uuid": "1a1f9fad-8589-413e-9602-5bbd66bfe678",
+    },
+]
+
+EXPECTED_DEFAULT_ASCENDING_NAME_SORTING_RESPONSE = [
+    {
+        "base_uri": "s3://testsorting1",
+        "created_at": 1604860720.736,
+        "creator_username": "testuser",
+        "frozen_at": 1604864525.691,
+        "name": "a",
+        "uri": "s3://testsorting1/1a1f9fad-8589-413e-9602-5bbd66bfe678",
+        "uuid": "1a1f9fad-8589-413e-9602-5bbd66bfe678",
+    },
+    {
+        "base_uri": "s3://testsorting1",
+        "created_at": 1604860720.736,
+        "creator_username": "testuser",
+        "frozen_at": 1604864525.691,
+        "name": "b",
+        "uri": "s3://testsorting1/1a1f9fad-8589-413e-9602-5bbd66bfe679",
+        "uuid": "1a1f9fad-8589-413e-9602-5bbd66bfe679",
+    },
+]
+
 # base_uri
 
 DEFAULT_BASE_URI = EXPECTED_DEFAULT_ALL_RESPONSE[1]["base_uri"]
@@ -212,6 +299,11 @@ EXPECTED_DEFAULT_BASE_URI_RESPONSE_IMMUTABLE_MARKER = _make_marker(
 EXPECTED_DEFAULT_BASE_URIS_RESPONSE = [
     {"base_uri": "s3://test-bucket"},
     {"base_uri": "smb://test-share"},
+]
+
+EXPECTED_DEFAULT_BASE_URIS_DESCENDING_RESPONSE = [
+    {"base_uri": "smb://test-share"},
+    {"base_uri": "s3://test-bucket"},
 ]
 
 EXPECTED_DEFAULT_BASE_URIS_RESPONSE_IMMUTABLE_MARKER = _make_marker(
@@ -377,6 +469,12 @@ def test_default_get_datasets_by_uuid():
     response = get_datasets_by_uuid(DEFAULT_LOOKUP_UUID)
     assert response is not None
 
+    response_2 = get_datasets_by_uuid(DEFAULT_LOOKUP_UUID, sort_fields=["base_uri"],sort_order=[DESCENDING])
+    assert response_2 == EXPECTED_DEFAULT_LOOKUP_RESPONSE_DESCENDING_BASE_URI
+
+    response_3 = get_datasets_by_uuid(DEFAULT_LOOKUP_UUID, sort_fields=["base_uri"],sort_order=[ASCENDING])
+    assert response_3 == EXPECTED_DEFAULT_LOOKUP_RESPONSE_ASCENDING_BASE_URI
+
     logger.debug("Response:")
     _log_nested_dict(logger.debug, response)
 
@@ -415,6 +513,10 @@ def test_default_get_datasets():
     """Will send a direct mongo query request to the server."""
     from dtool_lookup_api.synchronous import (
         get_datasets,
+        register_dataset,
+        register_base_uri,
+        delete_dataset,
+        delete_base_uri,
     )
 
     logger = logging.getLogger(__name__)
@@ -443,6 +545,83 @@ def test_default_get_datasets():
 
     response4 = get_datasets(tags=["first-half", "second-third"])
     assert len(response4) == 10
+
+    base_uris = [
+        {
+            "base_uri": "s3://testsorting1",
+            "users_with_search_permissions": ["testuser"],
+            "users_with_register_permissions": ["testuser"],
+        }
+    ]
+
+    # Register a new base_uri
+    for base_uri in base_uris:
+        response = register_base_uri(**base_uri)
+        assert response == True
+
+    # Register dataset
+    response = register_dataset(
+        name="a",
+        uuid="1a1f9fad-8589-413e-9602-5bbd66bfe678",
+        base_uri="s3://testsorting1",
+        type="dataset",
+        uri="s3://testsorting1/1a1f9fad-8589-413e-9602-5bbd66bfe678",
+        manifest=EXPECTED_DEFAULT_MANIFEST_RESPONSE,
+        readme=EXPECTED_DEFAULT_README_RESPONSE,
+        creator_username="testuser",
+        frozen_at="1604864525.691",
+        created_at="1604860720.736269",
+        annotations={},
+        tags=[""],
+        number_of_items=0,
+        size_in_bytes=0,
+    )
+    assert response == True
+
+    response_11 = register_dataset(
+        name="b",
+        uuid="1a1f9fad-8589-413e-9602-5bbd66bfe679",
+        base_uri="s3://testsorting1",
+        type="dataset",
+        uri="s3://testsorting1/1a1f9fad-8589-413e-9602-5bbd66bfe679",
+        manifest=EXPECTED_DEFAULT_MANIFEST_RESPONSE,
+        readme=EXPECTED_DEFAULT_README_RESPONSE,
+        creator_username="testuser",
+        frozen_at="1604864525.691",
+        created_at="1604860720.736269",
+        annotations={},
+        tags=[""],
+        number_of_items=0,
+        size_in_bytes=0,
+    )
+    assert response_11 == True
+
+    # Checking for sorting order descending name
+    response_5 = get_datasets(base_uris=["s3://testsorting1"],sort_fields=["name"],sort_order=[DESCENDING])
+    assert response_5 == EXPECTED_DEFAULT_DESCENDING_NAME_SORTING_RESPONSE
+    
+
+
+    # Checking for sorting order ascending name
+    response_6 = get_datasets(base_uris=["s3://testsorting1"], sort_fields=["name"],sort_order=[ASCENDING])
+    assert response_6 == EXPECTED_DEFAULT_ASCENDING_NAME_SORTING_RESPONSE
+
+
+    # Delete dataset
+    response_2 = delete_dataset(
+        "s3://testsorting1/1a1f9fad-8589-413e-9602-5bbd66bfe678"
+    )
+    assert response_2 == True
+
+    response_3 = delete_dataset(
+        "s3://testsorting1/1a1f9fad-8589-413e-9602-5bbd66bfe679"
+    )
+    assert response_3 == True
+
+    # Delete base_uri
+    for base_uri in base_uris:
+        response = delete_base_uri(base_uri["base_uri"])
+        assert response == True
 
     logger.debug("Response 4:")
     _log_nested_dict(logger.debug, response4)
@@ -487,6 +666,15 @@ def test_default_get_base_uris():
     logger = logging.getLogger(__name__)
     response = get_base_uris()
     assert response is not None
+
+    # Checking for descending order response
+
+    response_2 = get_base_uris(sort_fields=["base_uri"],sort_order=[DESCENDING])
+    assert response_2 == EXPECTED_DEFAULT_BASE_URIS_DESCENDING_RESPONSE
+
+    # Checking for ascending  order response
+    response_3 = get_base_uris(sort_fields=["base_uri"],sort_order=[ASCENDING])
+    assert response_3 == EXPECTED_DEFAULT_BASE_URIS_RESPONSE
 
     logger.debug("Response:")
     _log_nested_dict(logger.debug, response)
@@ -844,7 +1032,7 @@ def test_default_register_dataset():
     assert response_4 == EXPECTED_DEFAULT_README_RESPONSE
 
     response_9 = get_tags("s3://test-1/1a1f9fad-8589-413e-9602-5bbd66bfe677")
-    assert response_9==['test-tag1']
+    assert response_9 == ["test-tag1"]
 
     #  Ensure idempotent behavior
     response_5 = register_dataset(
