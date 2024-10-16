@@ -134,7 +134,7 @@ def test_default_register_user():
         response = get_user(user["username"])
         assert response == expected_response
 
-    # idea: Check for sorted user listing
+    # Check for sorted user listing
 
     response_descending = get_users(sort_fields=["username"], sort_order=[DESCENDING])
 
