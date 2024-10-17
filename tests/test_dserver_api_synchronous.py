@@ -409,7 +409,7 @@ EXPECTED_DEFAULT_MY_SUMMARY_IMMUTABLE_MARKER = _make_marker(
 
 # register dataset
 
-EXPECTED_DEFAULT_README_RESPONSE = str(
+EXPECTED_DEFAULT_README_RESPONSE = yaml.dump(
     {
         "creation_date": "2020-11-08",
         "description": "testing description",
@@ -430,7 +430,8 @@ EXPECTED_DEFAULT_README_RESPONSE = str(
             }
         ],
         "project": "testing project",
-    }
+    },
+    indent=4, default_flow_style=False, sort_keys=False
 )
 
 # dataset entry retrieval
@@ -946,7 +947,16 @@ def test_default_get_my_summary():
 
     assert compares
 
-
+# TODO: use _compare function with comparison markers as with other tests to
+# validate each nested response, i.e.
+#     logger.debug("Response:")
+#     _log_nested_dict(logger.debug, response)
+#
+#     compares = _compare(
+#         response,
+#         EXPECTED_DEFAULT_MY_SUMMARY_RESPONSE,
+#         EXPECTED_DEFAULT_MY_SUMMARY_IMMUTABLE_MARKER,
+#     )
 @pytest.mark.usefixtures("dserver", "dtool_config")
 def test_default_register_dataset():
     """Test the registration of base URIs."""
@@ -955,10 +965,12 @@ def test_default_register_dataset():
         register_dataset,
         delete_base_uri,
         delete_dataset,
+        get_dataset,
         get_datasets,
         get_manifest,
         get_readme,
         get_tags,
+        get_annotations
     )
 
     base_uris = [
@@ -978,24 +990,36 @@ def test_default_register_dataset():
             "name": "testuser",
             "uri": "s3://test-1/1a1f9fad-8589-413e-9602-5bbd66bfe677",
             "uuid": "1a1f9fad-8589-413e-9602-5bbd66bfe677",
+            "number_of_items": 0,
+            "size_in_bytes": 0,
         }
     ]
 
     expected_updated_result = [
         {
             "base_uri": "s3://test-1",
-            "created_at": 1604860720.736,
-            "creator_username": "testuser",
-            "frozen_at": 1604864525.691,
+            "created_at": 2604860720.736,
+            "creator_username": "another-testuser",
+            "frozen_at": 2604864525.691,
             "name": "updated_test_dataset",
             "uri": "s3://test-1/1a1f9fad-8589-413e-9602-5bbd66bfe677",
             "uuid": "1a1f9fad-8589-413e-9602-5bbd66bfe677",
+            "number_of_items": 2,
+            "size_in_bytes": 3,
         }
     ]
 
+    # Delete dataset (in case it exists already)
+    delete_dataset("s3://test-1/1a1f9fad-8589-413e-9602-5bbd66bfe677")
+    delete_base_uri("s3://test-1")
+
     # Ensure dataset do not yet exist
-    response_0 = get_datasets(base_uris=["s3://test-1"])
-    assert len(response_0) == 0
+    # get datasets returns empty list even if base URI does not exist
+    response_get_datasets= get_datasets(base_uris=["s3://test-1"])
+    assert len(response_get_datasets) == 0
+
+    response_get_dataset = get_dataset("s3://test-1/1a1f9fad-8589-413e-9602-5bbd66bfe677")
+    assert 'code' in response_get_dataset and response_get_dataset['code'] == 403  # forbidden
 
     # Register a new base_uri
     for base_uri in base_uris:
@@ -1003,7 +1027,7 @@ def test_default_register_dataset():
         assert response == True
 
     # Register dataset
-    response_1 = register_dataset(
+    response_register_dataset = register_dataset(
         name="testuser",
         uuid="1a1f9fad-8589-413e-9602-5bbd66bfe677",
         base_uri="s3://test-1",
@@ -1013,53 +1037,107 @@ def test_default_register_dataset():
         readme=EXPECTED_DEFAULT_README_RESPONSE,
         creator_username="testuser",
         frozen_at="1604864525.691",
-        created_at="1604860720.736269",
-        annotations={},
+        created_at="1604860720.736",
+        annotations={"test-annotation": "test-value"},
         tags=["test-tag1"],
         number_of_items=0,
         size_in_bytes=0,
     )
-    assert response_1 == True
+    assert response_register_dataset == True
 
     #  Ensure dataset exist
-    response_2 = get_datasets(base_uris=["s3://test-1"])
-    assert response_2 == expected_result
+    response_get_datasets = get_datasets(base_uris=["s3://test-1"])
+    assert response_get_datasets == expected_result
 
-    response_3 = get_manifest("s3://test-1/1a1f9fad-8589-413e-9602-5bbd66bfe677")
-    assert response_3 == EXPECTED_DEFAULT_MANIFEST_RESPONSE
+    response_get_dataset = get_dataset("s3://test-1/1a1f9fad-8589-413e-9602-5bbd66bfe677")
+    assert response_get_dataset == expected_result[0]
 
-    response_4 = get_readme("s3://test-1/1a1f9fad-8589-413e-9602-5bbd66bfe677")
-    assert response_4 == EXPECTED_DEFAULT_README_RESPONSE
+    response_get_manifest = get_manifest("s3://test-1/1a1f9fad-8589-413e-9602-5bbd66bfe677")
+    assert response_get_manifest == EXPECTED_DEFAULT_MANIFEST_RESPONSE
 
-    response_9 = get_tags("s3://test-1/1a1f9fad-8589-413e-9602-5bbd66bfe677")
-    assert response_9 == ["test-tag1"]
+    response_get_readme = get_readme("s3://test-1/1a1f9fad-8589-413e-9602-5bbd66bfe677")
+    assert response_get_readme == EXPECTED_DEFAULT_README_RESPONSE
+
+    response_get_tags = get_tags("s3://test-1/1a1f9fad-8589-413e-9602-5bbd66bfe677")
+    assert response_get_tags == ['test-tag1']
+
+    response_get_annotations = get_annotations("s3://test-1/1a1f9fad-8589-413e-9602-5bbd66bfe677")
+    assert response_get_annotations == {"test-annotation": "test-value"}
 
     #  Ensure idempotent behavior
-    response_5 = register_dataset(
+    response_register_dataset = register_dataset(
         name="updated_test_dataset",
         uuid="1a1f9fad-8589-413e-9602-5bbd66bfe677",
         base_uri="s3://test-1",
         type="dataset",
         uri="s3://test-1/1a1f9fad-8589-413e-9602-5bbd66bfe677",
-        manifest=EXPECTED_DEFAULT_MANIFEST_RESPONSE,
-        readme=EXPECTED_DEFAULT_README_RESPONSE,
-        creator_username="testuser",
-        frozen_at="1604864525.691",
-        created_at="1604860720.736269",
-        annotations={},
+        manifest=EXPECTED_DEFAULT_MANIFEST_RESPONSE,  # TODO: modify manifest
+        readme=EXPECTED_DEFAULT_README_RESPONSE,  # TODO: modify readme content
+        creator_username="another-testuser",
+        frozen_at="2604864525.691",
+        created_at="2604860720.736",
+        annotations={"test-annotation": "test-value", "another-test-annotation": "another-test-value"},
         tags=["Updated_tag_1", "Updated_tag_2"],
-        number_of_items=0,
-        size_in_bytes=0,
+        number_of_items=2,
+        size_in_bytes=3,
     )
-    assert response_5 == True
+    assert response_register_dataset == True
 
     # Ensure dataset has been updated
-    response_6 = get_datasets(base_uris=["s3://test-1"])
-    assert response_6 == expected_updated_result
+    response_get_datasets = get_datasets(base_uris=["s3://test-1"])
+    assert response_get_datasets == expected_updated_result
+    # ATTENTION: get_datasets returns
+    # [{'base_uri': 's3://test-1',
+    #   'created_at': 1604860720.736,
+    #   'creator_username': 'testuser',
+    #   'frozen_at': 1604864525.691,
+    #   'name': 'updated_test_dataset',
+    #   'number_of_items': 2,
+    #   'size_in_bytes': 3,
+    #   'uri': 's3://test-1/1a1f9fad-8589-413e-9602-5bbd66bfe677',
+    #   'uuid': '1a1f9fad-8589-413e-9602-5bbd66bfe677'}]
+    # with timestamps of .3 precision ...
+
+    response_get_dataset = get_dataset("s3://test-1/1a1f9fad-8589-413e-9602-5bbd66bfe677")
+    assert response_get_dataset == expected_updated_result[0]
+    # ... while get_dataset return
+    # {'base_uri': 's3://test-1',
+    #  'created_at': 1604860720.736269,
+    #  'creator_username': 'testuser',
+    #  'frozen_at': 1604864525.691,
+    #  'name': 'updated_test_dataset',
+    #  'number_of_items': 2,
+    #  'size_in_bytes': 3,
+    #  'uri': 's3://test-1/1a1f9fad-8589-413e-9602-5bbd66bfe677',
+    #  'uuid': '1a1f9fad-8589-413e-9602-5bbd66bfe677'}
+    # with timestamps of .6 precision.
+    # The tests hence only work with .3 precision in the first place
+
+    # also test modified metadata
+    response_get_manifest = get_manifest("s3://test-1/1a1f9fad-8589-413e-9602-5bbd66bfe677")
+    assert response_get_manifest == EXPECTED_DEFAULT_MANIFEST_RESPONSE  # TODO: test against modified content
+
+    response_get_readme = get_readme("s3://test-1/1a1f9fad-8589-413e-9602-5bbd66bfe677")
+    assert response_get_readme == EXPECTED_DEFAULT_README_RESPONSE  # TODO: test against modified content
+
+    response_get_tags = get_tags("s3://test-1/1a1f9fad-8589-413e-9602-5bbd66bfe677")
+    assert response_get_tags == ["Updated_tag_1", "Updated_tag_2"]  # TODO: test order-independent
+
+    response_get_annotations = get_annotations("s3://test-1/1a1f9fad-8589-413e-9602-5bbd66bfe677")
+    assert response_get_annotations == {"test-annotation": "test-value", "another-test-annotation": "another-test-value"}
 
     # Delete dataset
-    response_7 = delete_dataset("s3://test-1/1a1f9fad-8589-413e-9602-5bbd66bfe677")
-    assert response_7 == True
+    response_delete_dataset = delete_dataset("s3://test-1/1a1f9fad-8589-413e-9602-5bbd66bfe677")
+    assert response_delete_dataset == True
+
+    # Ensure dataset does not exist anymore in base URI
+    # response_get_datasets = get_datasets(base_uris=["s3://test-1"])
+    # assert len(response_get_datasets) == 0
+    # TODO: this does not work yet, deletion not propagated to search database on server side
+
+    # Dataset does not exist anymore, but user is still allowed to search base URI
+    response_get_dataset = get_dataset("s3://test-1/1a1f9fad-8589-413e-9602-5bbd66bfe677")
+    assert 'code' in response_get_dataset and response_get_dataset['code'] == 404  # not found
 
     # Delete base_uri
     for base_uri in base_uris:
@@ -1067,7 +1145,11 @@ def test_default_register_dataset():
         assert response == True
 
     # Ensure dataset does not exist anymore
-    response_8 = get_datasets(base_uris=["s3://test-1"])
-    assert len(response_8) == 0
+    response_get_datasets = get_datasets(base_uris=["s3://test-1"])
+    assert len(response_get_datasets) == 0
+
+    # Dataset does not exist anymore, and base URI neither
+    response_get_dataset = get_dataset("s3://test-1/1a1f9fad-8589-413e-9602-5bbd66bfe677")
+    assert 'code' in response_get_dataset and response_get_dataset['code'] == 403  # forbidden
 
     # TODO: Check for the existence of registered base URIs on the server
