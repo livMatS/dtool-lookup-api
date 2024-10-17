@@ -42,6 +42,47 @@ EXPECTED_DEFAULT_DESCENDING_USER_RESPONSE = [
 
 EXPECTED_DEFAULT_ASCENDING_USER_RESPONSE = [{'is_admin': False, 'username': 'dopey'}, {'is_admin': True, 'username': 'evil-witch'}, {'is_admin': True, 'username': 'testuser'}]
 
+# summary
+
+EXPECTED_DEFAULT_SUMMARY_RESPONSE = {
+    "base_uris": ["s3://test-bucket", "smb://test-share"],
+    "creator_usernames": ["jotelha"],
+    "datasets_per_base_uri": {"s3://test-bucket": 1, "smb://test-share": 283},
+    "datasets_per_creator": {"jotelha": 284},
+    "datasets_per_tag": {"first-half": 140, "second-third": 94},
+    "number_of_datasets": 284,
+    "tags": ["first-half", "second-third"],
+}
+
+EXPECTED_DEFAULT_SUMMARY_RESPONSE_IMMUTABLE_MARKER = _make_marker(
+    EXPECTED_DEFAULT_SUMMARY_RESPONSE
+)
+
+# me
+
+EXPECTED_DEFAULT_ME_RESPONSE = {
+    "is_admin": True,
+    "register_permissions_on_base_uris": [],
+    "search_permissions_on_base_uris": ["smb://test-share", "s3://test-bucket"],
+    "username": "testuser",
+}
+
+EXPECTED_DEFAULT_ME_RESPONSE_IMMUTABLE_MARKER = _make_marker(
+    EXPECTED_DEFAULT_ME_RESPONSE
+)
+# ordering not guaranteed
+EXPECTED_DEFAULT_ME_RESPONSE_IMMUTABLE_MARKER["search_permissions_on_base_uris"] = [
+    False,
+    False,
+]
+
+# get my summary
+
+EXPECTED_DEFAULT_MY_SUMMARY_RESPONSE = EXPECTED_DEFAULT_SUMMARY_RESPONSE
+
+EXPECTED_DEFAULT_MY_SUMMARY_IMMUTABLE_MARKER = _make_marker(
+    EXPECTED_DEFAULT_MY_SUMMARY_RESPONSE
+)
 
 # mark to run early in order to not have any other users registered in database by other tests
 @pytest.mark.usefixtures("dserver", "dtool_config")
@@ -164,3 +205,70 @@ def test_default_register_user():
     for user in users:
         response = get_user(user["username"])
         assert "code" in response and response["code"] == 404
+
+
+@pytest.mark.usefixtures("dserver", "dtool_config")
+def test_default_get_summary():
+    """Will send a direct mongo query request to the server."""
+    from dtool_lookup_api.synchronous import get_summary
+
+    logger = logging.getLogger(__name__)
+
+    response = get_summary(username="testuser")
+    assert response is not None
+
+    logger.debug("Response:")
+    _log_nested_dict(logger.debug, response)
+
+    compares = _compare(
+        response,
+        EXPECTED_DEFAULT_SUMMARY_RESPONSE,
+        EXPECTED_DEFAULT_SUMMARY_RESPONSE_IMMUTABLE_MARKER,
+    )
+
+    assert compares
+
+
+@pytest.mark.usefixtures("dserver", "dtool_config")
+def test_default_get_me():
+    """Will send a direct mongo query request to the server."""
+    from dtool_lookup_api.synchronous import get_me
+
+    logger = logging.getLogger(__name__)
+
+    response = get_me()
+    assert response is not None
+
+    logger.debug("Response:")
+
+    _log_nested_dict(logger.debug, response)
+
+    compares = _compare(
+        response,
+        EXPECTED_DEFAULT_ME_RESPONSE,
+        EXPECTED_DEFAULT_ME_RESPONSE_IMMUTABLE_MARKER,
+    )
+
+    assert compares
+
+
+@pytest.mark.usefixtures("dserver", "dtool_config")
+def test_default_get_my_summary():
+    """Will send a direct mongo query request to the server."""
+    from dtool_lookup_api.synchronous import get_my_summary
+
+    logger = logging.getLogger(__name__)
+
+    response = get_my_summary()
+    assert response is not None
+
+    logger.debug("Response:")
+    _log_nested_dict(logger.debug, response)
+
+    compares = _compare(
+        response,
+        EXPECTED_DEFAULT_MY_SUMMARY_RESPONSE,
+        EXPECTED_DEFAULT_MY_SUMMARY_IMMUTABLE_MARKER,
+    )
+
+    assert compares

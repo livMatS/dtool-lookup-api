@@ -42,6 +42,37 @@ def dserver(request):
     pass  # stub
 
 
+@pytest.fixture(scope="session", autouse=True)
+def session_cleanup():
+    """Restore dserver to initial state by deleting all modifications possibly applied by failed tests."""
+    from dtool_lookup_api.synchronous import (
+        delete_base_uri,
+        delete_dataset,
+        delete_user
+    )
+    yield
+
+    datasets = [
+        "s3://test-1/1a1f9fad-8589-413e-9602-5bbd66bfe677",
+        "s3://testsorting1/1a1f9fad-8589-413e-9602-5bbd66bfe678",
+        "s3://testsorting1/1a1f9fad-8589-413e-9602-5bbd66bfe679"
+    ]
+
+    for dataset in datasets:
+        delete_dataset(dataset)
+
+    base_uris = [
+        "s3://test-1",
+        "s3://test_uri_1",
+        "s3://test_uri_2",
+        "s3://testsorting1"
+    ]
+
+    for base_uri in base_uris:
+        delete_base_uri(base_uri)
+
+
+
 @pytest.fixture
 def dtool_config(monkeypatch, dserver_config_cli_argument):
     """Provide default dtool config."""

@@ -5,9 +5,6 @@ import pytest
 import yaml
 from utils import _log_nested_dict, _compare, NoDatesSafeLoader, _make_marker
 
-
-# all
-
 ASCENDING = 1
 DESCENDING = -1
 
@@ -146,6 +143,8 @@ EXPECTED_DEFAULT_LOOKUP_RESPONSE_DESCENDING_BASE_URI = [
         "name": "simple_test_dataset",
         "uri": "smb://test-share/1a1f9fad-8589-413e-9602-5bbd66bfe675",
         "uuid": "1a1f9fad-8589-413e-9602-5bbd66bfe675",
+        "number_of_items": 1,
+        "size_in_bytes": 17,
     },
     {
         "base_uri": "s3://test-bucket",
@@ -155,6 +154,8 @@ EXPECTED_DEFAULT_LOOKUP_RESPONSE_DESCENDING_BASE_URI = [
         "name": "simple_test_dataset",
         "uri": "s3://test-bucket/1a1f9fad-8589-413e-9602-5bbd66bfe675",
         "uuid": "1a1f9fad-8589-413e-9602-5bbd66bfe675",
+        "number_of_items": 1,
+        "size_in_bytes": 17,
     },
 ]
 
@@ -167,6 +168,8 @@ EXPECTED_DEFAULT_LOOKUP_RESPONSE_ASCENDING_BASE_URI = [
         "name": "simple_test_dataset",
         "uri": "s3://test-bucket/1a1f9fad-8589-413e-9602-5bbd66bfe675",
         "uuid": "1a1f9fad-8589-413e-9602-5bbd66bfe675",
+        "number_of_items": 1,
+        "size_in_bytes": 17,
     },
     {
         "base_uri": "smb://test-share",
@@ -176,6 +179,8 @@ EXPECTED_DEFAULT_LOOKUP_RESPONSE_ASCENDING_BASE_URI = [
         "name": "simple_test_dataset",
         "uri": "smb://test-share/1a1f9fad-8589-413e-9602-5bbd66bfe675",
         "uuid": "1a1f9fad-8589-413e-9602-5bbd66bfe675",
+        "number_of_items": 1,
+        "size_in_bytes": 17,
     },
 ]
 
@@ -223,7 +228,7 @@ EXPECTED_DEFAULT_DATASETS_RESPONSE_IMMUTABLE_MARKER = _make_marker(
     EXPECTED_DEFAULT_DATASETS_RESPONSE
 )
 
-EXPECTED_DEFAULT_BASE_URI_lOOKUP_RESPONSE = [
+EXPECTED_DEFAULT_BASE_URI_LOOKUP_RESPONSE = [
     {
         "base_uri": "s3://test-bucket",
         "created_at": 1604860720.736,
@@ -234,8 +239,8 @@ EXPECTED_DEFAULT_BASE_URI_lOOKUP_RESPONSE = [
         "uuid": "1a1f9fad-8589-413e-9602-5bbd66bfe675",
     }
 ]
-EXPECTED_DEFAULT_BASE_URI_lOOKUP_RESPONSE_IMMUTABLE_MARKER = _make_marker(
-    EXPECTED_DEFAULT_BASE_URI_lOOKUP_RESPONSE
+EXPECTED_DEFAULT_BASE_URI_LOOKUP_RESPONSE_IMMUTABLE_MARKER = _make_marker(
+    EXPECTED_DEFAULT_BASE_URI_LOOKUP_RESPONSE
 )
 
 EXPECTED_DEFAULT_DESCENDING_NAME_SORTING_RESPONSE = [
@@ -247,6 +252,8 @@ EXPECTED_DEFAULT_DESCENDING_NAME_SORTING_RESPONSE = [
         "name": "b",
         "uri": "s3://testsorting1/1a1f9fad-8589-413e-9602-5bbd66bfe679",
         "uuid": "1a1f9fad-8589-413e-9602-5bbd66bfe679",
+        "number_of_items": 0,
+        "size_in_bytes": 0,
     },
     {
         "base_uri": "s3://testsorting1",
@@ -256,6 +263,8 @@ EXPECTED_DEFAULT_DESCENDING_NAME_SORTING_RESPONSE = [
         "name": "a",
         "uri": "s3://testsorting1/1a1f9fad-8589-413e-9602-5bbd66bfe678",
         "uuid": "1a1f9fad-8589-413e-9602-5bbd66bfe678",
+        "number_of_items": 0,
+        "size_in_bytes": 0,
     },
 ]
 
@@ -268,6 +277,8 @@ EXPECTED_DEFAULT_ASCENDING_NAME_SORTING_RESPONSE = [
         "name": "a",
         "uri": "s3://testsorting1/1a1f9fad-8589-413e-9602-5bbd66bfe678",
         "uuid": "1a1f9fad-8589-413e-9602-5bbd66bfe678",
+        "number_of_items": 0,
+        "size_in_bytes": 0,
     },
     {
         "base_uri": "s3://testsorting1",
@@ -277,54 +288,10 @@ EXPECTED_DEFAULT_ASCENDING_NAME_SORTING_RESPONSE = [
         "name": "b",
         "uri": "s3://testsorting1/1a1f9fad-8589-413e-9602-5bbd66bfe679",
         "uuid": "1a1f9fad-8589-413e-9602-5bbd66bfe679",
+        "number_of_items": 0,
+        "size_in_bytes": 0,
     },
 ]
-
-# base_uri
-
-DEFAULT_BASE_URI = EXPECTED_DEFAULT_ALL_RESPONSE[1]["base_uri"]
-
-EXPECTED_DEFAULT_BASE_URI_RESPONSE = {
-    "base_uri": "s3://test-bucket",
-    "users_with_register_permissions": [],
-    "users_with_search_permissions": ["testuser"],
-}
-
-EXPECTED_DEFAULT_BASE_URI_RESPONSE_IMMUTABLE_MARKER = _make_marker(
-    EXPECTED_DEFAULT_BASE_URI_RESPONSE
-)
-
-# base_uris
-
-EXPECTED_DEFAULT_BASE_URIS_RESPONSE = [
-    {"base_uri": "s3://test-bucket"},
-    {"base_uri": "smb://test-share"},
-]
-
-EXPECTED_DEFAULT_BASE_URIS_DESCENDING_RESPONSE = [
-    {"base_uri": "smb://test-share"},
-    {"base_uri": "s3://test-bucket"},
-]
-
-EXPECTED_DEFAULT_BASE_URIS_RESPONSE_IMMUTABLE_MARKER = _make_marker(
-    EXPECTED_DEFAULT_BASE_URIS_RESPONSE
-)
-
-# summary
-
-EXPECTED_DEFAULT_SUMMARY_RESPONSE = {
-    "base_uris": ["s3://test-bucket", "smb://test-share"],
-    "creator_usernames": ["jotelha"],
-    "datasets_per_base_uri": {"s3://test-bucket": 1, "smb://test-share": 283},
-    "datasets_per_creator": {"jotelha": 284},
-    "datasets_per_tag": {"first-half": 140, "second-third": 94},
-    "number_of_datasets": 284,
-    "tags": ["first-half", "second-third"],
-}
-
-EXPECTED_DEFAULT_SUMMARY_RESPONSE_IMMUTABLE_MARKER = _make_marker(
-    EXPECTED_DEFAULT_SUMMARY_RESPONSE
-)
 
 # manifest
 
@@ -379,33 +346,6 @@ PAGINATION_PARAMETERS = {
     "page_size": 10,
     "pagination": {},
 }
-
-# me
-
-EXPECTED_DEFAULT_ME_RESPONSE = {
-    "is_admin": True,
-    "register_permissions_on_base_uris": [],
-    "search_permissions_on_base_uris": ["smb://test-share", "s3://test-bucket"],
-    "username": "testuser",
-}
-
-EXPECTED_DEFAULT_ME_RESPONSE_IMMUTABLE_MARKER = _make_marker(
-    EXPECTED_DEFAULT_ME_RESPONSE
-)
-# ordering not guaranteed
-EXPECTED_DEFAULT_ME_RESPONSE_IMMUTABLE_MARKER["search_permissions_on_base_uris"] = [
-    False,
-    False,
-]
-
-
-# get my summary
-
-EXPECTED_DEFAULT_MY_SUMMARY_RESPONSE = EXPECTED_DEFAULT_SUMMARY_RESPONSE
-
-EXPECTED_DEFAULT_MY_SUMMARY_IMMUTABLE_MARKER = _make_marker(
-    EXPECTED_DEFAULT_MY_SUMMARY_RESPONSE
-)
 
 # register dataset
 
@@ -538,8 +478,8 @@ def test_default_get_datasets():
     response3 = get_datasets(base_uris=["s3://test-bucket"])
     compares3 = _compare(
         response3,
-        EXPECTED_DEFAULT_BASE_URI_lOOKUP_RESPONSE,
-        EXPECTED_DEFAULT_BASE_URI_lOOKUP_RESPONSE_IMMUTABLE_MARKER,
+        EXPECTED_DEFAULT_BASE_URI_LOOKUP_RESPONSE,
+        EXPECTED_DEFAULT_BASE_URI_LOOKUP_RESPONSE_IMMUTABLE_MARKER,
     )
 
     assert compares3
@@ -638,177 +578,6 @@ def test_default_get_datasets():
 
 
 @pytest.mark.usefixtures("dserver", "dtool_config")
-def test_default_get_base_uri():
-    """Will send a direct mongo query request to the server."""
-    from dtool_lookup_api.synchronous import get_base_uri
-
-    logger = logging.getLogger(__name__)
-
-    response = get_base_uri(DEFAULT_BASE_URI)
-    assert response is not None
-
-    logger.debug("Response:")
-    _log_nested_dict(logger.debug, response)
-
-    compares = _compare(
-        response,
-        EXPECTED_DEFAULT_BASE_URI_RESPONSE,
-        EXPECTED_DEFAULT_BASE_URI_RESPONSE_IMMUTABLE_MARKER,
-    )
-
-    assert compares
-
-
-@pytest.mark.usefixtures("dserver", "dtool_config")
-def test_default_get_base_uris():
-    """Will send a direct mongo query request to the server."""
-    from dtool_lookup_api.synchronous import get_base_uris
-
-    logger = logging.getLogger(__name__)
-    response = get_base_uris()
-    assert response is not None
-
-    # Checking for descending order response
-
-    response_2 = get_base_uris(sort_fields=["base_uri"],sort_order=[DESCENDING])
-    assert response_2 == EXPECTED_DEFAULT_BASE_URIS_DESCENDING_RESPONSE
-
-    # Checking for ascending  order response
-    response_3 = get_base_uris(sort_fields=["base_uri"],sort_order=[ASCENDING])
-    assert response_3 == EXPECTED_DEFAULT_BASE_URIS_RESPONSE
-
-    logger.debug("Response:")
-    _log_nested_dict(logger.debug, response)
-
-    compares = _compare(
-        response,
-        EXPECTED_DEFAULT_BASE_URIS_RESPONSE,
-        EXPECTED_DEFAULT_BASE_URIS_RESPONSE_IMMUTABLE_MARKER,
-    )
-
-    assert compares
-
-
-@pytest.mark.usefixtures("dserver", "dtool_config")
-def test_default_register_base_uri():
-    """Test the registration of base URIs."""
-    from dtool_lookup_api.synchronous import (
-        get_base_uri,
-        register_base_uri,
-        delete_base_uri,
-    )
-
-    logger = logging.getLogger(__name__)
-
-    base_uris = [
-        {
-            "base_uri": "s3://test_uri_1",
-            "users_with_search_permissions": ["testuser"],
-            "users_with_register_permissions": ["testuser"],
-        },
-        {
-            "base_uri": "smb://test_uri_2",
-            "users_with_search_permissions": ["testuser"],
-            "users_with_register_permissions": ["testuser"],
-        },
-    ]
-
-    expected_responses = [
-        {
-            "base_uri": "s3://test_uri_1",
-            "users_with_search_permissions": ["testuser"],
-            "users_with_register_permissions": ["testuser"],
-        },
-        {
-            "base_uri": "smb://test_uri_2",
-            "users_with_search_permissions": ["testuser"],
-            "users_with_register_permissions": ["testuser"],
-        },
-    ]
-
-    # Ensure base URIs do not yet exist
-    for base_uri in base_uris:
-        response = get_base_uri(base_uri["base_uri"])
-        assert "code" in response and response["code"] == 404
-
-    # Register base URIs
-    for base_uri in base_uris:
-        response = register_base_uri(**base_uri)
-        assert response == True
-
-    # Ensure base URIs exist
-    for base_uri, expected_response in zip(base_uris, expected_responses):
-        response = get_base_uri(base_uri["base_uri"])
-        assert response == expected_response
-
-    # Ensure idempotent behavior
-    for base_uri in base_uris:
-        response = register_base_uri(**base_uri)
-        assert response == True
-
-    # Ensure base URIs still exist after re-registration
-    for base_uri, expected_response in zip(base_uris, expected_responses):
-        response = get_base_uri(base_uri["base_uri"])
-        assert response == expected_response
-
-    # Delete base URIs
-    for base_uri in base_uris:
-        response = delete_base_uri(base_uri["base_uri"])
-        assert response == True
-
-    # Ensure base URIs don't exist anymore
-    for base_uri in base_uris:
-        response = get_base_uri(base_uri["base_uri"])
-        assert "code" in response and response["code"] == 404
-
-    # TODO: Check for the existence of registered base URIs on the server
-
-
-@pytest.mark.usefixtures("dserver", "dtool_config")
-def test_default_get_summary():
-    """Will send a direct mongo query request to the server."""
-    from dtool_lookup_api.synchronous import get_summary
-
-    logger = logging.getLogger(__name__)
-
-    response = get_summary(username="testuser")
-    assert response is not None
-
-    logger.debug("Response:")
-    _log_nested_dict(logger.debug, response)
-
-    compares = _compare(
-        response,
-        EXPECTED_DEFAULT_SUMMARY_RESPONSE,
-        EXPECTED_DEFAULT_SUMMARY_RESPONSE_IMMUTABLE_MARKER,
-    )
-
-    assert compares
-
-
-@pytest.mark.usefixtures("dserver", "dtool_config")
-def test_default_get_users():
-    """Will send a direct mongo query request to the server."""
-    from dtool_lookup_api.synchronous import get_users
-
-    logger = logging.getLogger(__name__)
-
-    response = get_users()
-    assert response is not None
-
-    logger.debug("Response:")
-    _log_nested_dict(logger.debug, response)
-
-    compares = _compare(
-        response,
-        EXPECTED_DEFAULT_USER_RESPONSE,
-        EXPECTED_DEFAULT_USER_RESPONSE_IMMUTABLE_MARKER,
-    )
-
-    assert compares
-
-
-@pytest.mark.usefixtures("dserver", "dtool_config")
 def test_default_query():
     """Will send a direct mongo query request to the server."""
     from dtool_lookup_api.synchronous import query
@@ -902,50 +671,6 @@ def test_pagination():
     for key in missing_keys:
         print(f"Optional key {key} is not present in pagination")
 
-
-@pytest.mark.usefixtures("dserver", "dtool_config")
-def test_default_get_me():
-    """Will send a direct mongo query request to the server."""
-    from dtool_lookup_api.synchronous import get_me
-
-    logger = logging.getLogger(__name__)
-
-    response = get_me()
-    assert response is not None
-
-    logger.debug("Response:")
-
-    _log_nested_dict(logger.debug, response)
-
-    compares = _compare(
-        response,
-        EXPECTED_DEFAULT_ME_RESPONSE,
-        EXPECTED_DEFAULT_ME_RESPONSE_IMMUTABLE_MARKER,
-    )
-
-    assert compares
-
-
-@pytest.mark.usefixtures("dserver", "dtool_config")
-def test_default_get_my_summary():
-    """Will send a direct mongo query request to the server."""
-    from dtool_lookup_api.synchronous import get_my_summary
-
-    logger = logging.getLogger(__name__)
-
-    response = get_my_summary()
-    assert response is not None
-
-    logger.debug("Response:")
-    _log_nested_dict(logger.debug, response)
-
-    compares = _compare(
-        response,
-        EXPECTED_DEFAULT_MY_SUMMARY_RESPONSE,
-        EXPECTED_DEFAULT_MY_SUMMARY_IMMUTABLE_MARKER,
-    )
-
-    assert compares
 
 # TODO: use _compare function with comparison markers as with other tests to
 # validate each nested response, i.e.
