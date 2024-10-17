@@ -34,8 +34,8 @@ from .synchronous import (
     # uris
     get_datasets,
     get_dataset,
-    # register_dataset, to be implemented
-    # delete_dataset, to be implemented
+    register_dataset,
+    delete_dataset,
     # uuids
     get_datasets_by_uuid,
     # metadata retrieval
