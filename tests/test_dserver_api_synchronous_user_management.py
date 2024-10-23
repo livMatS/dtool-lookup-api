@@ -40,7 +40,10 @@ EXPECTED_DEFAULT_DESCENDING_USER_RESPONSE = [
     {"is_admin": False, "username": "dopey"},
 ]
 
+EXPECTED_DEFAULT_DESCENDING_USER_RESPONSE_IMMUTABLE_MARKER = _make_marker(EXPECTED_DEFAULT_DESCENDING_USER_RESPONSE)
+
 EXPECTED_DEFAULT_ASCENDING_USER_RESPONSE = [{'is_admin': False, 'username': 'dopey'}, {'is_admin': True, 'username': 'evil-witch'}, {'is_admin': True, 'username': 'testuser'}]
+EXPECTED_DEFAULT_ASCENDING_USER_RESPONSE_IMMUTABLE_MARKER = _make_marker(EXPECTED_DEFAULT_ASCENDING_USER_RESPONSE)
 
 # summary
 
@@ -179,12 +182,30 @@ def test_default_register_user():
 
     response_descending = get_users(sort_fields=["username"], sort_order=[DESCENDING])
 
-    assert response_descending == EXPECTED_DEFAULT_DESCENDING_USER_RESPONSE
+    logger.debug("Response Descending:")
+    _log_nested_dict(logger.debug, response_descending)
 
+    compares_response_descending = _compare(
+        response_descending,
+        EXPECTED_DEFAULT_DESCENDING_USER_RESPONSE,
+        EXPECTED_DEFAULT_DESCENDING_USER_RESPONSE_IMMUTABLE_MARKER
+    )
+
+    assert compares_response_descending
 
     response_ascending = get_users(sort_fields=["username"], sort_order=[ASCENDING])
 
-    assert response_ascending == EXPECTED_DEFAULT_ASCENDING_USER_RESPONSE
+
+    logger.debug("Response Ascending:")
+    _log_nested_dict(logger.debug, response_ascending)
+
+    compares_response_ascending = _compare(
+        response_ascending,
+        EXPECTED_DEFAULT_ASCENDING_USER_RESPONSE,
+        EXPECTED_DEFAULT_ASCENDING_USER_RESPONSE_IMMUTABLE_MARKER
+    )
+
+    assert compares_response_ascending
 
     # ensure idempotent
     for user in users:
@@ -205,6 +226,8 @@ def test_default_register_user():
     for user in users:
         response = get_user(user["username"])
         assert "code" in response and response["code"] == 404
+
+
 
 
 @pytest.mark.usefixtures("dserver", "dtool_config")
@@ -272,3 +295,4 @@ def test_default_get_my_summary():
     )
 
     assert compares
+
