@@ -344,8 +344,6 @@ class TokenBasedLookupClient:
         dict
             Basic metadata info for dataset at URI.
         """
-        headers = {}
-
         encoded_uri = urllib.parse.quote_plus(uri)
         response = await self._get(f'/uris/{encoded_uri}')
         return response
@@ -353,14 +351,17 @@ class TokenBasedLookupClient:
     # delete dataset
 
     async def delete_dataset(self, uri):
-        """Delete a datatset using URI. (Needs admin privileges.)"""
+        """Delete a dataset using URI. (Needs admin privileges.)"""
         encoded_uri = urllib.parse.quote_plus(uri)
         response = await self._delete(f'/uris/{encoded_uri}')
         return response == 200
 
     # register dataset
 
-    async def register_dataset(self, uri, base_uri, readme, manifest, uuid, name, type, creator_username, frozen_at, created_at, annotations, tags, number_of_items, size_in_bytes):
+    async def register_dataset(self, uri, base_uri, readme, manifest, uuid,
+                               name, type, creator_username, frozen_at,
+                               created_at, annotations, tags, number_of_items,
+                               size_in_bytes):
         """Register or update a dataset using URI."""
         encoded_uri = urllib.parse.quote_plus(uri)
         response = await self._put(
@@ -383,7 +384,9 @@ class TokenBasedLookupClient:
 
     # uuids routes
 
-    async def get_datasets_by_uuid(self, uuid, page_number=1, page_size=10, sort_fields=["uri"], sort_order=[ASCENDING], pagination={}, sorting={}):
+    async def get_datasets_by_uuid(self, uuid, page_number=1, page_size=10,
+                                   sort_fields=["uri"], sort_order=[ASCENDING],
+                                   pagination={}, sorting={}):
         """
         Search for entries by a specific UUID.
 
@@ -402,8 +405,8 @@ class TokenBasedLookupClient:
             default is "uri"
         sort_order: int or list of int of ASCENDING (1) or DESCENDING (-1)
             default is ASCENDING (1)
-         sorting : dict
-            dictionary filled with data from the X-Sort response header, e.g.
+        sorting : dict
+            Dictionary filled with data from the X-Sort response header, e.g.
             '{"sort": {"uuid": 1}}' for ascending sorting by uuid
 
         Returns
@@ -475,32 +478,34 @@ class TokenBasedLookupClient:
 
     # user management routes
 
-    async def get_users(self, page_number=1, page_size=10, sort_fields=["username"], sort_order=[ASCENDING], pagination={}, sorting={}):
+    async def get_users(self, page_number=1, page_size=10,
+                        sort_fields=["username"], sort_order=[ASCENDING],
+                        pagination={}, sorting={}):
         """
-           Request a list of users. (Needs admin privileges.)
+        Request a list of users. (Needs admin privileges.)
 
-           Parameters
-           ----------
-           page_number : int, optional
-               The page number of the results, default is 1.
-           page_size : int, optional
-               The number of results per page, default is 10.
-           pagination: dict, optional
-               Dictionary filled with data from the X-Pagination response header, e.g.
-                   '{"total": 124, "total_pages": 13, "first_page": 1, "last_page": 13, "page": 1, "next_page": 2}'
-            sort_fields: str or list of str, optional
+        Parameters
+        ----------
+        page_number : int, optional
+           The page number of the results, default is 1.
+        page_size : int, optional
+           The number of results per page, default is 10.
+        pagination: dict, optional
+           Dictionary filled with data from the X-Pagination response header, e.g.
+               '{"total": 124, "total_pages": 13, "first_page": 1, "last_page": 13, "page": 1, "next_page": 2}'
+        sort_fields: str or list of str, optional
             default is "uri"
-            sort_order: int or list of int of ASCENDING (1) or DESCENDING (-1)
+        sort_order: int or list of int of ASCENDING (1) or DESCENDING (-1)
             default is ASCENDING (1)
-            sorting : dict
-            dictionary filled with data from the X-Sort response header, e.g.
+        sorting : dict
+            Dictionary filled with data from the X-Sort response header, e.g.
             '{"sort": {"uuid": 1}}' for ascending sorting by uuid
 
-           Returns
-           -------
-           list of dict
-               User information including username, email, roles, etc.
-           """
+        Returns
+        -------
+        list of dict
+           User information including username, email, roles, etc.
+        """
 
         headers = {}
 
@@ -542,7 +547,7 @@ class TokenBasedLookupClient:
 
     async def get_me(self):
         """Request the current user info."""
-        response = await self._get(f'/me')
+        response = await self._get('/me')
         return response
 
     async def get_user(self, username=None):
@@ -550,7 +555,7 @@ class TokenBasedLookupClient:
 
         If no username specified, query currently authenticated user."""
         if username is None:
-            response = await self._get(f'/me')
+            response = await self._get('/me')
         else:
             encoded_username = urllib.parse.quote_plus(username)
             response = await self._get(f'/users/{encoded_username}')
@@ -575,7 +580,7 @@ class TokenBasedLookupClient:
 
         If no username specified, query currently authenticated user."""
         if username is None:
-            response = await self._get(f'/me/summary')
+            response = await self._get('/me/summary')
         else:
             encoded_username = urllib.parse.quote_plus(username)
             response = await self._get(f'/users/{encoded_username}/summary')
@@ -583,37 +588,39 @@ class TokenBasedLookupClient:
 
     async def get_my_summary(self):
         """Overall summary of datasets accessible to the current user."""
-        response = await self._get(f'/me/summary')
+        response = await self._get('/me/summary')
         return response
 
     # base URIs & permissions management routes
 
-    async def get_base_uris(self, page_number=1, page_size=10, sort_fields=["base_uri"], sort_order=[ASCENDING], pagination={}, sorting={}):
+    async def get_base_uris(self, page_number=1, page_size=10,
+                            sort_fields=["base_uri"], sort_order=[ASCENDING],
+                            pagination={}, sorting={}):
         """
-           List all registered base URIs. (Needs admin privileges.)
+        List all registered base URIs. (Needs admin privileges.)
 
-           Parameters
-           ----------
-           page_number : int, optional
-               The page number of the results, default is 1.
-           page_size : int, optional
-               The number of results per page, default is 10.
-           pagination: dict, optional
-               Dictionary filled with data from the X-Pagination response header, e.g.
-                   '{"total": 124, "total_pages": 13, "first_page": 1, "last_page": 13, "page": 1, "next_page": 2}'
-            sort_fields: str or list of str, optional
-                default is "uri"
-            sort_order: int or list of int of ASCENDING (1) or DESCENDING (-1)
-                default is ASCENDING (1)
-            sorting : dict
-            dictionary filled with data from the X-Sort response header, e.g.
-            '{"sort": {"uuid": 1}}' for ascending sorting by uuid
+        Parameters
+        ----------
+        page_number : int, optional
+            The page number of the results, default is 1.
+        page_size : int, optional
+            The number of results per page, default is 10.
+        pagination: dict, optional
+            Dictionary filled with data from the X-Pagination response header, e.g.
+               '{"total": 124, "total_pages": 13, "first_page": 1, "last_page": 13, "page": 1, "next_page": 2}'
+        sort_fields: str or list of str, optional
+            default is "uri"
+        sort_order: int or list of int of ASCENDING (1) or DESCENDING (-1)
+            default is ASCENDING (1)
+        sorting : dict
+            Dictionary filled with data from the X-Sort response header, e.g.
+                '{"sort": {"uuid": 1}}' for ascending sorting by uuid
 
-           Returns
-           -------
-           list of dict
-               Registered base URIs information including name, URI, and description.
-           """
+        Returns
+        -------
+        list of dict
+           Registered base URIs information including name, URI, and description.
+        """
         headers = {}
 
         if isinstance(sort_fields, str):
@@ -724,19 +731,19 @@ class TokenBasedLookupClient:
         query : str or dict
             The MongoDB query to be executed.
         creator_usernames: list of str, optional
-            select datasets created by any of these specific users
+            Select datasets created by any of these specific users
         base_uris: list of str, optional
-            select datasets living on any of these base URIs
+            Select datasets living on any of these base URIs
         uuids: list of str, optional
-            select datasets matching any of these UUIDs
+            Select datasets matching any of these UUIDs
         tags: list of str, optional
-            select datasets matching all provided tags
+            Select datasets matching all provided tags
         page_number : int, optional
             The page number of the results, default is 1.
         page_size : int, optional
             The number of results per page, default is 10.
         pagination : dict
-            dictionary filled with data from the X-Pagination response header, e.g.
+            Dictionary filled with data from the X-Pagination response header, e.g.
             '{"total": 124, "total_pages": 13, "first_page": 1, "last_page": 13, "page": 1, "next_page": 2}'
 
         Returns
@@ -780,7 +787,8 @@ class TokenBasedLookupClient:
         uuid : str
             The unique identifier of the dataset for which the dependency graph is requested.
         dependency_keys : list of str, optional
-            A list of dependency keys to filter the dependency graph. If not provided, the entire dependency graph will be returned.
+            A list of dependency keys to filter the dependency graph.
+            If not provided, the entire dependency graph will be returned.
         page_number : int, optional
             The page number of the results, default is 1.
         page_size : int, optional
