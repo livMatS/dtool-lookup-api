@@ -159,6 +159,10 @@ EXPECTED_DEFAULT_LOOKUP_RESPONSE_DESCENDING_BASE_URI = [
     },
 ]
 
+EXPECTED_DEFAULT_LOOKUP_RESPONSE_DESCENDING_BASE_URI_IMMUTABLE_MARKER = _make_marker(
+    EXPECTED_DEFAULT_LOOKUP_RESPONSE_DESCENDING_BASE_URI
+)
+
 EXPECTED_DEFAULT_LOOKUP_RESPONSE_ASCENDING_BASE_URI = [
     {
         "base_uri": "s3://test-bucket",
@@ -183,6 +187,10 @@ EXPECTED_DEFAULT_LOOKUP_RESPONSE_ASCENDING_BASE_URI = [
         "size_in_bytes": 17,
     },
 ]
+
+EXPECTED_DEFAULT_LOOKUP_RESPONSE_ASCENDING_BASE_URI_IMMUTABLE_MARKER = _make_marker(
+    EXPECTED_DEFAULT_LOOKUP_RESPONSE_ASCENDING_BASE_URI
+)
 
 # dataset
 DEFAULT_DATASET = "s3://test-bucket/1a1f9fad-8589-413e-9602-5bbd66bfe675"
@@ -268,6 +276,8 @@ EXPECTED_DEFAULT_DESCENDING_NAME_SORTING_RESPONSE = [
     },
 ]
 
+EXPECTED_DEFAULT_DESCENDING_NAME_SORTING_RESPONSE_IMMUTABLE_MARKER = _make_marker(EXPECTED_DEFAULT_DESCENDING_NAME_SORTING_RESPONSE)
+
 EXPECTED_DEFAULT_ASCENDING_NAME_SORTING_RESPONSE = [
     {
         "base_uri": "s3://testsorting1",
@@ -293,6 +303,8 @@ EXPECTED_DEFAULT_ASCENDING_NAME_SORTING_RESPONSE = [
     },
 ]
 
+EXPECTED_DEFAULT_ASCENDING_NAME_SORTING_RESPONSE_IMMUTABLE_MARKER = _make_marker(EXPECTED_DEFAULT_ASCENDING_NAME_SORTING_RESPONSE)
+
 # manifest
 
 EXPECTED_DEFAULT_MANIFEST_URI = EXPECTED_DEFAULT_ALL_RESPONSE[1]["uri"]
@@ -312,6 +324,22 @@ EXPECTED_DEFAULT_MANIFEST_RESPONSE = {
 
 EXPECTED_DEFAULT_MANIFEST_RESPONSE_IMMUTABLE_MARKER = _make_marker(
     EXPECTED_DEFAULT_MANIFEST_RESPONSE
+)
+
+EXPECTED_DEFAULT_UPDATED_MANIFEST_RESPONSE = {
+    "dtoolcore_version": "3.18.3",
+    "hash_function": "md5sum_hexdigest",
+    "items": {
+        "eb58eb70ebcddf630feeea28834f5256c207edfd": {
+            "hash": "2f7d9c3e0cfd47e8fcab0c12447b2bf0",
+            "relpath": "simple_text_file.txt",
+            "size_in_bytes": 17,
+            "utc_timestamp": 1729081495.0,
+        }
+    },
+}
+EXPECTED_DEFAULT_UPDATED_MANIFEST_RESPONSE_IMMUTABLE_MARKER = _make_marker(
+    EXPECTED_DEFAULT_UPDATED_MANIFEST_RESPONSE
 )
 
 # user
@@ -371,8 +399,42 @@ EXPECTED_DEFAULT_README_RESPONSE = yaml.dump(
         ],
         "project": "testing project",
     },
-    indent=4, default_flow_style=False, sort_keys=False
+    indent=4,
+    default_flow_style=False,
+    sort_keys=False,
 )
+
+EXPECTED_DEFAULT_README_RESPONSE_IMMUTABLE_MARKER = _make_marker(
+    EXPECTED_DEFAULT_README_RESPONSE
+)
+
+EXPECTED_DEFAULT_UPDATED_README_RESPONSE =  yaml.dump(
+    {
+        "creation_date": "2020-11-08",
+        "description": "updated_readme",
+        "expiration_date": "2022-11-08",
+        "funders": [
+            {
+                "code": "testing_code",
+                "organization": "testing_organization",
+                "program": "testing_program",
+            }
+        ],
+        "owners": [
+            {
+                "email": "testing@test.edu",
+                "name": "Testing User",
+                "orcid": "testing_orcid",
+                "username": "testing_user",
+            }
+        ],
+        "project": "testing project",
+    },
+    indent=4,
+    default_flow_style=False,
+    sort_keys=False,
+)
+EXPECTED_DEFAULT_UPDATED_README_RESPONSE_IMMUTABLE_MARKER  = _make_marker(EXPECTED_DEFAULT_UPDATED_README_RESPONSE)
 
 # dataset entry retrieval
 
@@ -410,14 +472,34 @@ def test_default_get_datasets_by_uuid():
     response = get_datasets_by_uuid(DEFAULT_LOOKUP_UUID)
     assert response is not None
 
-    response_2 = get_datasets_by_uuid(DEFAULT_LOOKUP_UUID, sort_fields=["base_uri"],sort_order=[DESCENDING])
-    assert response_2 == EXPECTED_DEFAULT_LOOKUP_RESPONSE_DESCENDING_BASE_URI
+    response_2 = get_datasets_by_uuid(
+        DEFAULT_LOOKUP_UUID, sort_fields=["base_uri"], sort_order=[DESCENDING]
+    )
 
-    response_3 = get_datasets_by_uuid(DEFAULT_LOOKUP_UUID, sort_fields=["base_uri"],sort_order=[ASCENDING])
-    assert response_3 == EXPECTED_DEFAULT_LOOKUP_RESPONSE_ASCENDING_BASE_URI
+    compares_2 = _compare(
+        response_2,
+        EXPECTED_DEFAULT_LOOKUP_RESPONSE_DESCENDING_BASE_URI,
+        EXPECTED_DEFAULT_LOOKUP_RESPONSE_DESCENDING_BASE_URI_IMMUTABLE_MARKER,
+    )
+
+    response_3 = get_datasets_by_uuid(
+        DEFAULT_LOOKUP_UUID, sort_fields=["base_uri"], sort_order=[ASCENDING]
+    )
+
+    compares_3 = _compare(
+        response_3,
+        EXPECTED_DEFAULT_LOOKUP_RESPONSE_ASCENDING_BASE_URI,
+        EXPECTED_DEFAULT_LOOKUP_RESPONSE_ASCENDING_BASE_URI_IMMUTABLE_MARKER,
+    )
 
     logger.debug("Response:")
     _log_nested_dict(logger.debug, response)
+
+    logger.debug("Response 2:")
+    _log_nested_dict(logger.debug, response_2)
+
+    logger.debug("Response 3:")
+    _log_nested_dict(logger.debug, response_3)
 
     compares = _compare(
         response,
@@ -425,6 +507,8 @@ def test_default_get_datasets_by_uuid():
         EXPECTED_DEFAULT_LOOKUP_RESPONSE_IMMUTABLE_MARKER,
     )
     assert compares
+    assert compares_2
+    assert compares_3
 
 
 @pytest.mark.usefixtures("dserver", "dtool_config")
@@ -465,6 +549,9 @@ def test_default_get_datasets():
     response = get_datasets(DEFAULT_DATASETS_LOOKUP_UUID)
     assert response is not None
 
+    logger.debug("Response:")
+    _log_nested_dict(logger.debug, response)
+
     compares = _compare(
         response,
         EXPECTED_DEFAULT_DATASETS_RESPONSE,
@@ -473,9 +560,17 @@ def test_default_get_datasets():
     assert compares
 
     response2 = get_datasets(creator_usernames=["jotelha"])
+
+    logger.debug("Response 2:")
+    _log_nested_dict(logger.debug, response2)
+
     assert len(response2) == 10
 
     response3 = get_datasets(base_uris=["s3://test-bucket"])
+
+    logger.debug("Response 3:")
+    _log_nested_dict(logger.debug, response3)
+
     compares3 = _compare(
         response3,
         EXPECTED_DEFAULT_BASE_URI_LOOKUP_RESPONSE,
@@ -485,6 +580,10 @@ def test_default_get_datasets():
     assert compares3
 
     response4 = get_datasets(tags=["first-half", "second-third"])
+
+    logger.debug("Response 4:")
+    _log_nested_dict(logger.debug, response4)
+
     assert len(response4) == 10
 
     base_uris = [
@@ -538,15 +637,35 @@ def test_default_get_datasets():
     assert response_11 == True
 
     # Checking for sorting order descending name
-    response_5 = get_datasets(base_uris=["s3://testsorting1"],sort_fields=["name"],sort_order=[DESCENDING])
-    assert response_5 == EXPECTED_DEFAULT_DESCENDING_NAME_SORTING_RESPONSE
-    
+    response_5 = get_datasets(
+        base_uris=["s3://testsorting1"], sort_fields=["name"], sort_order=[DESCENDING]
+    )
 
+    logger.debug("Response 5:")
+    _log_nested_dict(logger.debug, response_5)
+
+    compares_response_5 = _compare(
+    response_5,
+    EXPECTED_DEFAULT_DESCENDING_NAME_SORTING_RESPONSE,
+    EXPECTED_DEFAULT_DESCENDING_NAME_SORTING_RESPONSE_IMMUTABLE_MARKER
+    )
+
+    assert compares_response_5
 
     # Checking for sorting order ascending name
-    response_6 = get_datasets(base_uris=["s3://testsorting1"], sort_fields=["name"],sort_order=[ASCENDING])
-    assert response_6 == EXPECTED_DEFAULT_ASCENDING_NAME_SORTING_RESPONSE
+    response_6 = get_datasets(
+        base_uris=["s3://testsorting1"], sort_fields=["name"], sort_order=[ASCENDING]
+    )
 
+    logger.debug("Response 6:")
+    _log_nested_dict(logger.debug, response_6)
+
+    compares_response_6 = _compare(
+    response_6,
+    EXPECTED_DEFAULT_ASCENDING_NAME_SORTING_RESPONSE,
+    EXPECTED_DEFAULT_ASCENDING_NAME_SORTING_RESPONSE_IMMUTABLE_MARKER
+    )
+    assert compares_response_6 
 
     # Delete dataset
     response_2 = delete_dataset(
@@ -563,18 +682,6 @@ def test_default_get_datasets():
     for base_uri in base_uris:
         response = delete_base_uri(base_uri["base_uri"])
         assert response == True
-
-    logger.debug("Response 4:")
-    _log_nested_dict(logger.debug, response4)
-
-    logger.debug("Response 3:")
-    _log_nested_dict(logger.debug, response3)
-
-    logger.debug("Response 2:")
-    _log_nested_dict(logger.debug, response2)
-
-    logger.debug("Response:")
-    _log_nested_dict(logger.debug, response)
 
 
 @pytest.mark.usefixtures("dserver", "dtool_config")
@@ -695,8 +802,10 @@ def test_default_register_dataset():
         get_manifest,
         get_readme,
         get_tags,
-        get_annotations
+        get_annotations,
     )
+
+    logger = logging.getLogger(__name__)
 
     base_uris = [
         {
@@ -720,6 +829,8 @@ def test_default_register_dataset():
         }
     ]
 
+    expected_result_immutable_marker = _make_marker(expected_result)
+
     expected_updated_result = [
         {
             "base_uri": "s3://test-1",
@@ -734,17 +845,26 @@ def test_default_register_dataset():
         }
     ]
 
+    expected_updated_result_make_marker = _make_marker(expected_updated_result)
+    expected_updated_result_get_dataset_immutable_marker = _make_marker(
+        expected_updated_result[0]
+    )
+
     # Delete dataset (in case it exists already)
     delete_dataset("s3://test-1/1a1f9fad-8589-413e-9602-5bbd66bfe677")
     delete_base_uri("s3://test-1")
 
     # Ensure dataset do not yet exist
     # get datasets returns empty list even if base URI does not exist
-    response_get_datasets= get_datasets(base_uris=["s3://test-1"])
+    response_get_datasets = get_datasets(base_uris=["s3://test-1"])
     assert len(response_get_datasets) == 0
 
-    response_get_dataset = get_dataset("s3://test-1/1a1f9fad-8589-413e-9602-5bbd66bfe677")
-    assert 'code' in response_get_dataset and response_get_dataset['code'] == 403  # forbidden
+    response_get_dataset = get_dataset(
+        "s3://test-1/1a1f9fad-8589-413e-9602-5bbd66bfe677"
+    )
+    assert (
+        "code" in response_get_dataset and response_get_dataset["code"] == 403
+    )  # forbidden
 
     # Register a new base_uri
     for base_uri in base_uris:
@@ -772,21 +892,65 @@ def test_default_register_dataset():
 
     #  Ensure dataset exist
     response_get_datasets = get_datasets(base_uris=["s3://test-1"])
-    assert response_get_datasets == expected_result
+    logger.debug("Response get datasets:")
+    _log_nested_dict(logger.debug, response_get_datasets)
 
-    response_get_dataset = get_dataset("s3://test-1/1a1f9fad-8589-413e-9602-5bbd66bfe677")
-    assert response_get_dataset == expected_result[0]
+    compares_response_get_datasets = _compare(
+        response_get_datasets,
+        expected_result,
+        expected_result_immutable_marker
+    )
 
-    response_get_manifest = get_manifest("s3://test-1/1a1f9fad-8589-413e-9602-5bbd66bfe677")
-    assert response_get_manifest == EXPECTED_DEFAULT_MANIFEST_RESPONSE
+    assert compares_response_get_datasets
+
+    response_get_dataset = get_dataset(
+        "s3://test-1/1a1f9fad-8589-413e-9602-5bbd66bfe677"
+    )
+    logger.debug("Response get dataset:")
+    _log_nested_dict(logger.debug, response_get_dataset)
+
+    compares_response_get_dataset = _compare(
+        response_get_dataset,
+        expected_result[0],
+        expected_updated_result_get_dataset_immutable_marker
+    )
+
+    assert compares_response_get_dataset
+
+    response_get_manifest = get_manifest(
+        "s3://test-1/1a1f9fad-8589-413e-9602-5bbd66bfe677"
+    )
+
+    logger.debug("Response get manifest:")
+    _log_nested_dict(logger.debug, response_get_manifest)
+
+    compares_response_get_manifest = _compare(
+        response_get_manifest,
+        EXPECTED_DEFAULT_MANIFEST_RESPONSE,
+        EXPECTED_DEFAULT_MANIFEST_RESPONSE_IMMUTABLE_MARKER
+    )
+
+    assert compares_response_get_manifest
 
     response_get_readme = get_readme("s3://test-1/1a1f9fad-8589-413e-9602-5bbd66bfe677")
-    assert response_get_readme == EXPECTED_DEFAULT_README_RESPONSE
+
+    logger.debug("Response get Readme:")
+    _log_nested_dict(logger.debug, response_get_readme)
+
+    compares_response_get_read_me = _compare(
+        response_get_readme,
+        EXPECTED_DEFAULT_README_RESPONSE,
+        EXPECTED_DEFAULT_README_RESPONSE_IMMUTABLE_MARKER
+    )
+
+    assert compares_response_get_read_me
 
     response_get_tags = get_tags("s3://test-1/1a1f9fad-8589-413e-9602-5bbd66bfe677")
-    assert response_get_tags == ['test-tag1']
+    assert response_get_tags == ["test-tag1"]
 
-    response_get_annotations = get_annotations("s3://test-1/1a1f9fad-8589-413e-9602-5bbd66bfe677")
+    response_get_annotations = get_annotations(
+        "s3://test-1/1a1f9fad-8589-413e-9602-5bbd66bfe677"
+    )
     assert response_get_annotations == {"test-annotation": "test-value"}
 
     #  Ensure idempotent behavior
@@ -796,12 +960,15 @@ def test_default_register_dataset():
         base_uri="s3://test-1",
         type="dataset",
         uri="s3://test-1/1a1f9fad-8589-413e-9602-5bbd66bfe677",
-        manifest=EXPECTED_DEFAULT_MANIFEST_RESPONSE,  # TODO: modify manifest
-        readme=EXPECTED_DEFAULT_README_RESPONSE,  # TODO: modify readme content
+        manifest=EXPECTED_DEFAULT_MANIFEST_RESPONSE,
+        readme=EXPECTED_DEFAULT_README_RESPONSE, 
         creator_username="another-testuser",
         frozen_at="2604864525.691",
         created_at="2604860720.736",
-        annotations={"test-annotation": "test-value", "another-test-annotation": "another-test-value"},
+        annotations={
+            "test-annotation": "test-value",
+            "another-test-annotation": "another-test-value",
+        },
         tags=["Updated_tag_1", "Updated_tag_2"],
         number_of_items=2,
         size_in_bytes=3,
@@ -810,7 +977,12 @@ def test_default_register_dataset():
 
     # Ensure dataset has been updated
     response_get_datasets = get_datasets(base_uris=["s3://test-1"])
-    assert response_get_datasets == expected_updated_result
+    compares_get_datasets = _compare(
+        response_get_datasets,
+        expected_updated_result,
+        expected_updated_result_make_marker,
+    )
+    assert compares_get_datasets
     # ATTENTION: get_datasets returns
     # [{'base_uri': 's3://test-1',
     #   'created_at': 1604860720.736,
@@ -823,8 +995,19 @@ def test_default_register_dataset():
     #   'uuid': '1a1f9fad-8589-413e-9602-5bbd66bfe677'}]
     # with timestamps of .3 precision ...
 
-    response_get_dataset = get_dataset("s3://test-1/1a1f9fad-8589-413e-9602-5bbd66bfe677")
-    assert response_get_dataset == expected_updated_result[0]
+    response_get_dataset = get_dataset(
+        "s3://test-1/1a1f9fad-8589-413e-9602-5bbd66bfe677"
+    )
+    logger.debug("Response get dataset:")
+    _log_nested_dict(logger.debug, response_get_dataset)
+
+    compares_get_dataset = _compare(
+        response_get_dataset,
+        expected_updated_result[0],
+        expected_updated_result_get_dataset_immutable_marker,
+    )
+    assert compares_get_dataset
+
     # ... while get_dataset return
     # {'base_uri': 's3://test-1',
     #  'created_at': 1604860720.736269,
@@ -839,20 +1022,109 @@ def test_default_register_dataset():
     # The tests hence only work with .3 precision in the first place
 
     # also test modified metadata
-    response_get_manifest = get_manifest("s3://test-1/1a1f9fad-8589-413e-9602-5bbd66bfe677")
-    assert response_get_manifest == EXPECTED_DEFAULT_MANIFEST_RESPONSE  # TODO: test against modified content
+    response_get_manifest = get_manifest(
+        "s3://test-1/1a1f9fad-8589-413e-9602-5bbd66bfe677"
+    )
+
+    logger.debug("Response get manifest:")
+    _log_nested_dict(logger.debug, response_get_manifest)
+
+    compares_get_manifest = _compare(
+        response_get_manifest,
+        EXPECTED_DEFAULT_MANIFEST_RESPONSE,
+        EXPECTED_DEFAULT_MANIFEST_RESPONSE_IMMUTABLE_MARKER,
+    )
+
+    assert compares_get_manifest
+
 
     response_get_readme = get_readme("s3://test-1/1a1f9fad-8589-413e-9602-5bbd66bfe677")
-    assert response_get_readme == EXPECTED_DEFAULT_README_RESPONSE  # TODO: test against modified content
+
+    logger.debug("Response get readme:")
+    _log_nested_dict(logger.debug, response_get_readme)
+
+    compares_get_readme = _compare(
+        response_get_readme,
+        EXPECTED_DEFAULT_README_RESPONSE,
+        EXPECTED_DEFAULT_README_RESPONSE_IMMUTABLE_MARKER,
+    )
+    assert compares_get_readme
+
+
+    # Test against modified manifest and readme
+
+    updated_manifest = get_manifest(
+        "s3://test-bucket/1a1f9fad-8589-413e-9602-5bbd66bfe675"
+    )
+    
+    updated_readme = EXPECTED_DEFAULT_UPDATED_README_RESPONSE
+
+    response_modified_mainfest_readme = register_dataset(
+    name="updated_test_dataset",
+    uuid="1a1f9fad-8589-413e-9602-5bbd66bfe677",
+    base_uri="s3://test-1",
+    type="dataset",
+    uri="s3://test-1/1a1f9fad-8589-413e-9602-5bbd66bfe677",
+    manifest=updated_manifest,  #  modified manifest
+    readme=updated_readme,  #  modified readme content
+    creator_username="another-testuser",
+    frozen_at="2604864525.691",
+    created_at="2604860720.736",
+    annotations={"test-annotation": "test-value", "another-test-annotation": "another-test-value"},
+    tags=["Updated_tag_1", "Updated_tag_2"],
+    number_of_items=2,
+    size_in_bytes=3,
+    )
+    assert response_modified_mainfest_readme == True
+
+    response_get_manifest_updated = get_manifest(
+        "s3://test-1/1a1f9fad-8589-413e-9602-5bbd66bfe677"
+    )
+
+    logger.debug("Response get updated manifest:")
+    _log_nested_dict(logger.debug, response_get_manifest_updated)
+
+    compares_get_manifest_updated = _compare(
+        response_get_manifest_updated,
+        EXPECTED_DEFAULT_UPDATED_MANIFEST_RESPONSE,
+        EXPECTED_DEFAULT_UPDATED_MANIFEST_RESPONSE_IMMUTABLE_MARKER,
+    )
+
+    assert compares_get_manifest_updated
+
+    response_get_readme_updated = get_readme("s3://test-1/1a1f9fad-8589-413e-9602-5bbd66bfe677")
+
+    logger.debug("Response get updated readme:")
+    _log_nested_dict(logger.debug, response_get_readme_updated)
+
+    compares_get_readme_updated = _compare(
+        response_get_readme_updated,
+        EXPECTED_DEFAULT_UPDATED_README_RESPONSE,
+        EXPECTED_DEFAULT_UPDATED_README_RESPONSE_IMMUTABLE_MARKER,
+    )
+
+    assert compares_get_readme_updated
 
     response_get_tags = get_tags("s3://test-1/1a1f9fad-8589-413e-9602-5bbd66bfe677")
-    assert response_get_tags == ["Updated_tag_1", "Updated_tag_2"]  # TODO: test order-independent
 
-    response_get_annotations = get_annotations("s3://test-1/1a1f9fad-8589-413e-9602-5bbd66bfe677")
-    assert response_get_annotations == {"test-annotation": "test-value", "another-test-annotation": "another-test-value"}
+    logger.debug("Response get tags:")
+    _log_nested_dict(logger.debug, response_get_tags)
+
+    assert set(response_get_tags) == set(["Updated_tag_1", "Updated_tag_2"])
+
+    response_get_annotations = get_annotations(
+        "s3://test-1/1a1f9fad-8589-413e-9602-5bbd66bfe677"
+    )
+
+    assert response_get_annotations == {
+        "test-annotation": "test-value",
+        "another-test-annotation": "another-test-value",
+    }
 
     # Delete dataset
-    response_delete_dataset = delete_dataset("s3://test-1/1a1f9fad-8589-413e-9602-5bbd66bfe677")
+    response_delete_dataset = delete_dataset(
+        "s3://test-1/1a1f9fad-8589-413e-9602-5bbd66bfe677"
+    )
     assert response_delete_dataset == True
 
     # Ensure dataset does not exist anymore in base URI
@@ -861,8 +1133,12 @@ def test_default_register_dataset():
     # TODO: this does not work yet, deletion not propagated to search database on server side
 
     # Dataset does not exist anymore, but user is still allowed to search base URI
-    response_get_dataset = get_dataset("s3://test-1/1a1f9fad-8589-413e-9602-5bbd66bfe677")
-    assert 'code' in response_get_dataset and response_get_dataset['code'] == 404  # not found
+    response_get_dataset = get_dataset(
+        "s3://test-1/1a1f9fad-8589-413e-9602-5bbd66bfe677"
+    )
+    assert (
+        "code" in response_get_dataset and response_get_dataset["code"] == 404
+    )  # not found
 
     # Delete base_uri
     for base_uri in base_uris:
@@ -874,7 +1150,11 @@ def test_default_register_dataset():
     assert len(response_get_datasets) == 0
 
     # Dataset does not exist anymore, and base URI neither
-    response_get_dataset = get_dataset("s3://test-1/1a1f9fad-8589-413e-9602-5bbd66bfe677")
-    assert 'code' in response_get_dataset and response_get_dataset['code'] == 403  # forbidden
+    response_get_dataset = get_dataset(
+        "s3://test-1/1a1f9fad-8589-413e-9602-5bbd66bfe677"
+    )
+    assert (
+        "code" in response_get_dataset and response_get_dataset["code"] == 403
+    )  # forbidden
 
     # TODO: Check for the existence of registered base URIs on the server
