@@ -70,4 +70,4 @@ from .synchronous import (
     readme,
     summary,
     user_info
-    )
+)

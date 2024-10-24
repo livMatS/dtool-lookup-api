@@ -276,7 +276,8 @@ EXPECTED_DEFAULT_DESCENDING_NAME_SORTING_RESPONSE = [
     },
 ]
 
-EXPECTED_DEFAULT_DESCENDING_NAME_SORTING_RESPONSE_IMMUTABLE_MARKER = _make_marker(EXPECTED_DEFAULT_DESCENDING_NAME_SORTING_RESPONSE)
+EXPECTED_DEFAULT_DESCENDING_NAME_SORTING_RESPONSE_IMMUTABLE_MARKER = _make_marker(
+    EXPECTED_DEFAULT_DESCENDING_NAME_SORTING_RESPONSE)
 
 EXPECTED_DEFAULT_ASCENDING_NAME_SORTING_RESPONSE = [
     {
@@ -303,7 +304,8 @@ EXPECTED_DEFAULT_ASCENDING_NAME_SORTING_RESPONSE = [
     },
 ]
 
-EXPECTED_DEFAULT_ASCENDING_NAME_SORTING_RESPONSE_IMMUTABLE_MARKER = _make_marker(EXPECTED_DEFAULT_ASCENDING_NAME_SORTING_RESPONSE)
+EXPECTED_DEFAULT_ASCENDING_NAME_SORTING_RESPONSE_IMMUTABLE_MARKER = _make_marker(
+    EXPECTED_DEFAULT_ASCENDING_NAME_SORTING_RESPONSE)
 
 # manifest
 
@@ -408,7 +410,7 @@ EXPECTED_DEFAULT_README_RESPONSE_IMMUTABLE_MARKER = _make_marker(
     EXPECTED_DEFAULT_README_RESPONSE
 )
 
-EXPECTED_DEFAULT_UPDATED_README_RESPONSE =  yaml.dump(
+EXPECTED_DEFAULT_UPDATED_README_RESPONSE = yaml.dump(
     {
         "creation_date": "2020-11-08",
         "description": "updated_readme",
@@ -434,7 +436,7 @@ EXPECTED_DEFAULT_UPDATED_README_RESPONSE =  yaml.dump(
     default_flow_style=False,
     sort_keys=False,
 )
-EXPECTED_DEFAULT_UPDATED_README_RESPONSE_IMMUTABLE_MARKER  = _make_marker(EXPECTED_DEFAULT_UPDATED_README_RESPONSE)
+EXPECTED_DEFAULT_UPDATED_README_RESPONSE_IMMUTABLE_MARKER = _make_marker(EXPECTED_DEFAULT_UPDATED_README_RESPONSE)
 
 # dataset entry retrieval
 
@@ -645,9 +647,9 @@ def test_default_get_datasets():
     _log_nested_dict(logger.debug, response_5)
 
     compares_response_5 = _compare(
-    response_5,
-    EXPECTED_DEFAULT_DESCENDING_NAME_SORTING_RESPONSE,
-    EXPECTED_DEFAULT_DESCENDING_NAME_SORTING_RESPONSE_IMMUTABLE_MARKER
+        response_5,
+        EXPECTED_DEFAULT_DESCENDING_NAME_SORTING_RESPONSE,
+        EXPECTED_DEFAULT_DESCENDING_NAME_SORTING_RESPONSE_IMMUTABLE_MARKER
     )
 
     assert compares_response_5
@@ -661,11 +663,11 @@ def test_default_get_datasets():
     _log_nested_dict(logger.debug, response_6)
 
     compares_response_6 = _compare(
-    response_6,
-    EXPECTED_DEFAULT_ASCENDING_NAME_SORTING_RESPONSE,
-    EXPECTED_DEFAULT_ASCENDING_NAME_SORTING_RESPONSE_IMMUTABLE_MARKER
+        response_6,
+        EXPECTED_DEFAULT_ASCENDING_NAME_SORTING_RESPONSE,
+        EXPECTED_DEFAULT_ASCENDING_NAME_SORTING_RESPONSE_IMMUTABLE_MARKER
     )
-    assert compares_response_6 
+    assert compares_response_6
 
     # Delete dataset
     response_2 = delete_dataset(
@@ -961,7 +963,7 @@ def test_default_register_dataset():
         type="dataset",
         uri="s3://test-1/1a1f9fad-8589-413e-9602-5bbd66bfe677",
         manifest=EXPECTED_DEFAULT_MANIFEST_RESPONSE,
-        readme=EXPECTED_DEFAULT_README_RESPONSE, 
+        readme=EXPECTED_DEFAULT_README_RESPONSE,
         creator_username="another-testuser",
         frozen_at="2604864525.691",
         created_at="2604860720.736",
@@ -1037,7 +1039,6 @@ def test_default_register_dataset():
 
     assert compares_get_manifest
 
-
     response_get_readme = get_readme("s3://test-1/1a1f9fad-8589-413e-9602-5bbd66bfe677")
 
     logger.debug("Response get readme:")
@@ -1050,30 +1051,29 @@ def test_default_register_dataset():
     )
     assert compares_get_readme
 
-
     # Test against modified manifest and readme
 
     updated_manifest = get_manifest(
         "s3://test-bucket/1a1f9fad-8589-413e-9602-5bbd66bfe675"
     )
-    
+
     updated_readme = EXPECTED_DEFAULT_UPDATED_README_RESPONSE
 
     response_modified_mainfest_readme = register_dataset(
-    name="updated_test_dataset",
-    uuid="1a1f9fad-8589-413e-9602-5bbd66bfe677",
-    base_uri="s3://test-1",
-    type="dataset",
-    uri="s3://test-1/1a1f9fad-8589-413e-9602-5bbd66bfe677",
-    manifest=updated_manifest,  #  modified manifest
-    readme=updated_readme,  #  modified readme content
-    creator_username="another-testuser",
-    frozen_at="2604864525.691",
-    created_at="2604860720.736",
-    annotations={"test-annotation": "test-value", "another-test-annotation": "another-test-value"},
-    tags=["Updated_tag_1", "Updated_tag_2"],
-    number_of_items=2,
-    size_in_bytes=3,
+        name="updated_test_dataset",
+        uuid="1a1f9fad-8589-413e-9602-5bbd66bfe677",
+        base_uri="s3://test-1",
+        type="dataset",
+        uri="s3://test-1/1a1f9fad-8589-413e-9602-5bbd66bfe677",
+        manifest=updated_manifest,  # modified manifest
+        readme=updated_readme,  # modified readme content
+        creator_username="another-testuser",
+        frozen_at="2604864525.691",
+        created_at="2604860720.736",
+        annotations={"test-annotation": "test-value", "another-test-annotation": "another-test-value"},
+        tags=["Updated_tag_1", "Updated_tag_2"],
+        number_of_items=2,
+        size_in_bytes=3,
     )
     assert response_modified_mainfest_readme == True
 

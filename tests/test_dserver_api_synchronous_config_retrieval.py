@@ -36,7 +36,7 @@ EXPECTED_CONFIG_RESPONSE_IMMUTABLE_MARKER["jwt_public_key"] = False
 # EXPECTED_CONFIG_RESPONSE_IMMUTABLE_MARKER["dserver_direct_mongo_plugin"]["allow_direct_aggregation"] = False
 
 
-#version info
+# version info
 
 EXPECTED_DEFAULT_VERSIONS_RESPONSE = {
     "dservercore": "0.17.2",

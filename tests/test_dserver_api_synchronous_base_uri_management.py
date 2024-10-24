@@ -70,11 +70,11 @@ def test_default_get_base_uris():
 
     # Checking for descending order response
 
-    response_2 = get_base_uris(sort_fields=["base_uri"],sort_order=[DESCENDING])
+    response_2 = get_base_uris(sort_fields=["base_uri"], sort_order=[DESCENDING])
     assert response_2 == EXPECTED_DEFAULT_BASE_URIS_DESCENDING_RESPONSE
 
     # Checking for ascending  order response
-    response_3 = get_base_uris(sort_fields=["base_uri"],sort_order=[ASCENDING])
+    response_3 = get_base_uris(sort_fields=["base_uri"], sort_order=[ASCENDING])
     assert response_3 == EXPECTED_DEFAULT_BASE_URIS_RESPONSE
 
     logger.debug("Response:")
@@ -162,4 +162,3 @@ def test_default_register_base_uri():
         assert "code" in response and response["code"] == 404
 
     # TODO: Check for the existence of registered base URIs on the server
-

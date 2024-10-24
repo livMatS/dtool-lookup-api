@@ -99,4 +99,5 @@ class NoDatesSafeLoader(yaml.SafeLoader):
                                                          for tag, regexp in mappings
                                                          if tag != tag_to_remove]
 
+
 NoDatesSafeLoader.remove_implicit_resolver('tag:yaml.org,2002:timestamp')

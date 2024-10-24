@@ -243,7 +243,7 @@ class TokenBasedLookupClient:
     async def get_datasets(self, free_text=None, creator_usernames=None,
                            base_uris=None, uuids=None, tags=None,
                            page_number=1, page_size=10,
-                           sort_fields=["uri"], sort_order=[ASCENDING] ,
+                           sort_fields=["uri"], sort_order=[ASCENDING],
                            pagination={}, sorting={}):
         """
         Get dataset entries on lookup server, filtered if desired.
@@ -295,10 +295,10 @@ class TokenBasedLookupClient:
 
         if isinstance(sort_fields, str):
             sort_fields = [sort_fields]
-        
+
         if isinstance(sort_order, int):
             sort_order = [sort_order]
-        
+
         # assert that sort fields and sort order have same length
         prefixed_fields = []
         for field, order in zip(sort_fields, sort_order):
@@ -307,7 +307,7 @@ class TokenBasedLookupClient:
             else:
                 prefixed_field = field
             prefixed_fields.append(prefixed_field)
-            
+
         sort = ','.join(prefixed_fields)
 
         dataset_list = await self._post(
@@ -327,7 +327,7 @@ class TokenBasedLookupClient:
         else:
             logger = logging.getLogger(__name__)
             logger.warning("Server returned no sorting information. Server version outdated.")
-        
+
         return dataset_list
 
     async def get_dataset(self, uri):
@@ -349,42 +349,41 @@ class TokenBasedLookupClient:
         encoded_uri = urllib.parse.quote_plus(uri)
         response = await self._get(f'/uris/{encoded_uri}')
         return response
-    
+
     # delete dataset
-    
+
     async def delete_dataset(self, uri):
         """Delete a datatset using URI. (Needs admin privileges.)"""
         encoded_uri = urllib.parse.quote_plus(uri)
         response = await self._delete(f'/uris/{encoded_uri}')
         return response == 200
-    
+
     # register dataset
 
-    async def register_dataset(self,uri,base_uri,readme,manifest,uuid,name,type,creator_username,frozen_at,created_at,annotations,tags,number_of_items,size_in_bytes):
+    async def register_dataset(self, uri, base_uri, readme, manifest, uuid, name, type, creator_username, frozen_at, created_at, annotations, tags, number_of_items, size_in_bytes):
         """Register or update a dataset using URI."""
         encoded_uri = urllib.parse.quote_plus(uri)
         response = await self._put(
             f'/uris/{encoded_uri}',
             dict(uuid=uuid,
-            uri=uri,
-            base_uri=base_uri,
-            name=name,type=type,
-            readme=readme,
-            manifest=manifest,
-            creator_username=creator_username,
-            frozen_at=frozen_at,
-            created_at=created_at,
-            annotations=annotations,
-            tags=tags,
-            number_of_items=number_of_items,
-            size_in_bytes=size_in_bytes)
-                 )
+                 uri=uri,
+                 base_uri=base_uri,
+                 name=name, type=type,
+                 readme=readme,
+                 manifest=manifest,
+                 creator_username=creator_username,
+                 frozen_at=frozen_at,
+                 created_at=created_at,
+                 annotations=annotations,
+                 tags=tags,
+                 number_of_items=number_of_items,
+                 size_in_bytes=size_in_bytes)
+        )
         return response in set([200, 201])
-
 
     # uuids routes
 
-    async def get_datasets_by_uuid(self, uuid, page_number=1, page_size=10, sort_fields=["uri"], sort_order=[ASCENDING],pagination={},sorting={}):
+    async def get_datasets_by_uuid(self, uuid, page_number=1, page_size=10, sort_fields=["uri"], sort_order=[ASCENDING], pagination={}, sorting={}):
         """
         Search for entries by a specific UUID.
 
@@ -416,7 +415,7 @@ class TokenBasedLookupClient:
 
         if isinstance(sort_fields, str):
             sort_fields = [sort_fields]
-        
+
         if isinstance(sort_order, int):
             sort_order = [sort_order]
 
@@ -427,7 +426,7 @@ class TokenBasedLookupClient:
             else:
                 prefixed_field = field
             prefixed_fields.append(prefixed_field)
-            
+
         sort = ','.join(prefixed_fields)
 
         lookup_list = await self._get(
@@ -476,7 +475,7 @@ class TokenBasedLookupClient:
 
     # user management routes
 
-    async def get_users(self, page_number=1, page_size=10,sort_fields=["username"],sort_order=[ASCENDING], pagination={},sorting={}):
+    async def get_users(self, page_number=1, page_size=10, sort_fields=["username"], sort_order=[ASCENDING], pagination={}, sorting={}):
         """
            Request a list of users. (Needs admin privileges.)
 
@@ -507,10 +506,10 @@ class TokenBasedLookupClient:
 
         if isinstance(sort_fields, str):
             sort_fields = [sort_fields]
-        
+
         if isinstance(sort_order, int):
             sort_order = [sort_order]
-        
+
         # assert that sort fields and sort order have same length
         prefixed_fields = []
         for field, order in zip(sort_fields, sort_order):
@@ -519,7 +518,7 @@ class TokenBasedLookupClient:
             else:
                 prefixed_field = field
             prefixed_fields.append(prefixed_field)
-            
+
         sort = ','.join(prefixed_fields)
 
         users = await self._get(
@@ -531,7 +530,7 @@ class TokenBasedLookupClient:
         else:
             logger = logging.getLogger(__name__)
             logger.warning("Server returned no pagination information. Server version outdated.")
-        
+
         if 'X-Sort' in headers:
             p = json.loads(headers['X-Sort'])
             sorting.update(**p)
@@ -540,7 +539,7 @@ class TokenBasedLookupClient:
             logger.warning("Server returned no sorting information. Server version outdated.")
 
         return users
-    
+
     async def get_me(self):
         """Request the current user info."""
         response = await self._get(f'/me')
@@ -581,7 +580,7 @@ class TokenBasedLookupClient:
             encoded_username = urllib.parse.quote_plus(username)
             response = await self._get(f'/users/{encoded_username}/summary')
         return response
-    
+
     async def get_my_summary(self):
         """Overall summary of datasets accessible to the current user."""
         response = await self._get(f'/me/summary')
@@ -589,7 +588,7 @@ class TokenBasedLookupClient:
 
     # base URIs & permissions management routes
 
-    async def get_base_uris(self, page_number=1, page_size=10,sort_fields=["base_uri"],sort_order=[ASCENDING] , pagination={},sorting={}):
+    async def get_base_uris(self, page_number=1, page_size=10, sort_fields=["base_uri"], sort_order=[ASCENDING], pagination={}, sorting={}):
         """
            List all registered base URIs. (Needs admin privileges.)
 
@@ -619,10 +618,10 @@ class TokenBasedLookupClient:
 
         if isinstance(sort_fields, str):
             sort_fields = [sort_fields]
-        
+
         if isinstance(sort_order, int):
             sort_order = [sort_order]
-        
+
         prefixed_fields = []
         for field, order in zip(sort_fields, sort_order):
             if order == DESCENDING:
@@ -630,7 +629,7 @@ class TokenBasedLookupClient:
             else:
                 prefixed_field = field
             prefixed_fields.append(prefixed_field)
-            
+
         sort = ','.join(prefixed_fields)
 
         base_uris_list = await self._get(
