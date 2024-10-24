@@ -371,7 +371,7 @@ EXPECTED_DEFAULT_SEARCH_RESPONSE_IMMUTABLE_MARKER = (
 )
 
 PAGINATION_PARAMETERS = {
-    "keyword": "test",
+    "free_text": "test",
     "page_number": 1,
     "page_size": 10,
     "pagination": {},
