@@ -1092,7 +1092,6 @@ def test_default_register_dataset():
 
     assert compares_get_manifest_updated
 
-
     response_get_readme_updated = get_readme("s3://test-1/1a1f9fad-8589-413e-9602-5bbd66bfe677")
 
     logger.debug("Response get updated readme:")
@@ -1111,14 +1110,7 @@ def test_default_register_dataset():
     logger.debug("Response get tags:")
     _log_nested_dict(logger.debug, response_get_tags)
 
-    compares_get_tags = _compare(
-        response_get_tags,
-        ["Updated_tag_1", "Updated_tag_2"],
-        ["Updated_tag_1", "Updated_tag_2"]
-    )
-    assert compares_get_tags
-
-    # TODO: test order-independent
+    assert set(response_get_tags) == set(["Updated_tag_1", "Updated_tag_2"])
 
     response_get_annotations = get_annotations(
         "s3://test-1/1a1f9fad-8589-413e-9602-5bbd66bfe677"
