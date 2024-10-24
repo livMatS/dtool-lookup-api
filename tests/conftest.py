@@ -3,7 +3,6 @@
 # TODO: Tests for different authentication mechanisms
 
 import pytest
-import os
 
 from environ import TemporaryOSEnviron
 
@@ -55,8 +54,7 @@ def dtool_config(monkeypatch, dserver_config_cli_argument):
 
         from dtool_lookup_api.synchronous import (
             delete_base_uri,
-            delete_dataset,
-            delete_user
+            delete_dataset
         )
 
         datasets = [

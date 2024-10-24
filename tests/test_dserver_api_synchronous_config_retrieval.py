@@ -1,6 +1,5 @@
 import logging
 import pytest
-import yaml
 
 from utils import _log_nested_dict, _compare, _make_marker
 

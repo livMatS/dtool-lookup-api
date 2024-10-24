@@ -98,8 +98,6 @@ def test_default_register_base_uri():
         delete_base_uri,
     )
 
-    logger = logging.getLogger(__name__)
-
     base_uris = [
         {
             "base_uri": "s3://test_uri_1",

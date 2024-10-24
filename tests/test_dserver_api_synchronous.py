@@ -3,7 +3,7 @@
 import logging
 import pytest
 import yaml
-from utils import _log_nested_dict, _compare, NoDatesSafeLoader, _make_marker
+from utils import _log_nested_dict, _compare, _make_marker
 
 ASCENDING = 1
 DESCENDING = -1
@@ -735,10 +735,10 @@ def test_default_search():
 @pytest.mark.usefixtures("dserver", "dtool_config")
 def test_pagination():
 
-    from dtool_lookup_api.synchronous import search
+    from dtool_lookup_api.synchronous import get_datasets
 
     # Using ** to unpack dictionary values as function arguments
-    dataset_list = search(**PAGINATION_PARAMETERS)
+    _ = get_datasets(**PAGINATION_PARAMETERS)
 
     # Validate that pagination dict was populated
     pagination = PAGINATION_PARAMETERS["pagination"]

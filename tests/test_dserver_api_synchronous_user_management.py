@@ -146,7 +146,6 @@ def test_default_register_user():
 
     logger = logging.getLogger(__name__)
 
-    # mimic https://github.com/jic-dtool/dserver/blob/12baba73eebc668b4998ae2c2ea43946dc3bf856/tests/test_admin_user_routes.py#L14
     users = [{"username": "evil-witch", "is_admin": True}, {"username": "dopey"}]
 
     expected_responses = [
