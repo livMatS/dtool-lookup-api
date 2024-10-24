@@ -1,6 +1,13 @@
 CHANGELOG
 =========
 
+0.9.0 (24Oct24)
+---------------
+
+- introduced sort arguments where applicable
+- added ``delete_dataset`` and ``register_dataset`` methods
+- added extensive unit tests for all methods
+
 0.8.0 (4Jul24)
 --------------
 
