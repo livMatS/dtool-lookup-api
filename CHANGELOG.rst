@@ -1,6 +1,13 @@
 CHANGELOG
 =========
 
+0.9.1 (4Nov24)
+--------------
+
+- standardized dependency graph interface to ``get_graph_by_uuid``
+- standardized direct mongo interfaces to ``get_datasets_by_mongo_query`` and ``get_datasets_by_mongo_aggregation``
+- added dependency graph retrieval test
+
 0.9.0 (24Oct24)
 ---------------
 
