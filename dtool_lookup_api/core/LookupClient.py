@@ -824,11 +824,12 @@ class TokenBasedLookupClient:
 
         if dependency_keys is None:
             dependency_graph = await self._get(
-                f'/graph/uuids/{uuid}?page={page_number}?page={page_number}&page_size={page_size}&sort={sort}',
+                f'/graph/uuids/{uuid}?page={page_number}&page_size={page_size}&sort={sort}',
                 headers=headers)
         else:  # TODO: validity check on dependency key list
-            dependency_graph = await self._post(f'/graph/uuids/{uuid}?page={page_number}&page_size={page_size}&sort={sort}',
-                                                {"dependency_keys": dependency_keys})
+            dependency_graph = await self._post(
+                f'/graph/uuids/{uuid}?page={page_number}&page_size={page_size}&sort={sort}',
+                {"dependency_keys": dependency_keys}, headers=headers)
 
         if 'X-Pagination' in headers:
             p = json.loads(headers['X-Pagination'])
