@@ -55,9 +55,9 @@ from .synchronous import (
     register_base_uri,
     delete_base_uri,
     # server-side plugin-dependent functionality
-    aggregate,
-    query,
-    graph,
+    get_get_datasets_by_mongo_aggregation,
+    get_datasets_by_mongo_query,
+    get_graph_by_uuid,
     # deprecated
     all,
     search,
@@ -69,5 +69,8 @@ from .synchronous import (
     manifest,
     readme,
     summary,
-    user_info
+    user_info,
+    aggregate,
+    query,
+    graph
 )

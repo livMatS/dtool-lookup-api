@@ -62,6 +62,28 @@ def deprecated(replacement=None):
     return decorator
 
 
+def _parse_sort_fields(sort_fields, sort_order):
+    """Translates sort fields to single string as expected by dserver. Internal."""
+
+    if isinstance(sort_fields, str):
+        sort_fields = [sort_fields]
+
+    if isinstance(sort_order, int):
+        sort_order = [sort_order]
+
+    # assert that sort fields and sort order have same length
+    prefixed_fields = []
+    for field, order in zip(sort_fields, sort_order):
+        if order == DESCENDING:
+            prefixed_field = '-' + field
+        else:
+            prefixed_field = field
+        prefixed_fields.append(prefixed_field)
+
+    sort = ','.join(prefixed_fields)
+    return sort
+
+
 class LookupServerError(Exception):
     pass
 
@@ -293,22 +315,7 @@ class TokenBasedLookupClient:
         if tags is not None:
             post_body.update({'tags': tags})
 
-        if isinstance(sort_fields, str):
-            sort_fields = [sort_fields]
-
-        if isinstance(sort_order, int):
-            sort_order = [sort_order]
-
-        # assert that sort fields and sort order have same length
-        prefixed_fields = []
-        for field, order in zip(sort_fields, sort_order):
-            if order == DESCENDING:
-                prefixed_field = '-' + field
-            else:
-                prefixed_field = field
-            prefixed_fields.append(prefixed_field)
-
-        sort = ','.join(prefixed_fields)
+        sort = _parse_sort_fields(sort_fields, sort_order)
 
         dataset_list = await self._post(
             f'/uris?page={page_number}&page_size={page_size}&sort={sort}',
@@ -416,28 +423,14 @@ class TokenBasedLookupClient:
         """
         headers = {}
 
-        if isinstance(sort_fields, str):
-            sort_fields = [sort_fields]
-
-        if isinstance(sort_order, int):
-            sort_order = [sort_order]
-
-        prefixed_fields = []
-        for field, order in zip(sort_fields, sort_order):
-            if order == DESCENDING:
-                prefixed_field = '-' + field
-            else:
-                prefixed_field = field
-            prefixed_fields.append(prefixed_field)
-
-        sort = ','.join(prefixed_fields)
+        sort = _parse_sort_fields(sort_fields, sort_order)
 
         lookup_list = await self._get(
             f'/uuids/{uuid}?page={page_number}&page_size={page_size}&sort={sort}', headers=headers)
 
         if 'X-Pagination' in headers:
             p = json.loads(headers['X-Pagination'])
-            pagination.update(p)
+            pagination.update(**p)
         else:
             logger = logging.getLogger(__name__)
             logger.warning("Server returned no pagination information. Server version outdated.")
@@ -509,29 +502,14 @@ class TokenBasedLookupClient:
 
         headers = {}
 
-        if isinstance(sort_fields, str):
-            sort_fields = [sort_fields]
-
-        if isinstance(sort_order, int):
-            sort_order = [sort_order]
-
-        # assert that sort fields and sort order have same length
-        prefixed_fields = []
-        for field, order in zip(sort_fields, sort_order):
-            if order == DESCENDING:
-                prefixed_field = '-' + field
-            else:
-                prefixed_field = field
-            prefixed_fields.append(prefixed_field)
-
-        sort = ','.join(prefixed_fields)
+        sort = _parse_sort_fields(sort_fields, sort_order)
 
         users = await self._get(
             f'/users?page={page_number}&page_size={page_size}&sort={sort}', headers=headers)
 
         if 'X-Pagination' in headers:
             p = json.loads(headers['X-Pagination'])
-            pagination.update(p)
+            pagination.update(**p)
         else:
             logger = logging.getLogger(__name__)
             logger.warning("Server returned no pagination information. Server version outdated.")
@@ -623,28 +601,14 @@ class TokenBasedLookupClient:
         """
         headers = {}
 
-        if isinstance(sort_fields, str):
-            sort_fields = [sort_fields]
-
-        if isinstance(sort_order, int):
-            sort_order = [sort_order]
-
-        prefixed_fields = []
-        for field, order in zip(sort_fields, sort_order):
-            if order == DESCENDING:
-                prefixed_field = '-' + field
-            else:
-                prefixed_field = field
-            prefixed_fields.append(prefixed_field)
-
-        sort = ','.join(prefixed_fields)
+        sort = _parse_sort_fields(sort_fields, sort_order)
 
         base_uris_list = await self._get(
             f'/base-uris?page={page_number}&page_size={page_size}&sort={sort}', headers=headers)
 
         if 'X-Pagination' in headers:
             p = json.loads(headers['X-Pagination'])
-            pagination.update(p)
+            pagination.update(**p)
         else:
             logger = logging.getLogger(__name__)
             logger.warning("Server returned no pagination information. Server version outdated.")
@@ -683,7 +647,10 @@ class TokenBasedLookupClient:
 
     # server-side plugin-dependent routes
 
-    async def aggregate(self, aggregation, page_number=1, page_size=20, pagination={}):
+    async def get_datasets_by_mongo_aggregation(self, aggregation,
+                        page_number=1, page_size=10,
+                        sort_fields=["uri"], sort_order=[ASCENDING],
+                        pagination={}, sorting={}):
         """
         Execute a direct MongoDB aggregation.
 
@@ -694,10 +661,17 @@ class TokenBasedLookupClient:
         page_number : int, optional
             The page number of the results, default is 1.
         page_size : int, optional
-            The number of results per page, default is 20.
-        pagination: dict, optional
+            The number of results per page, default is 10.
+        pagination : dict
             Dictionary filled with data from the X-Pagination response header, e.g.
-                '{"total": 124, "total_pages": 13, "first_page": 1, "last_page": 13, "page": 1, "next_page": 2}'
+            '{"total": 124, "total_pages": 13, "first_page": 1, "last_page": 13, "page": 1, "next_page": 2}'
+        sort_fields: str or list of str, optional
+            default is "uri"
+        sort_order: int or list of int of ASCENDING (1) or DESCENDING (-1)
+            default is ASCENDING (1)
+        sorting : dict
+            Dictionary filled with data from the X-Sort response header, e.g.
+            '{"sort": {"uuid": 1}}' for ascending sorting by uuid
 
         Returns
         -------
@@ -709,20 +683,34 @@ class TokenBasedLookupClient:
             aggregation = json.loads(aggregation)
 
         headers = {}
-        aggregation_result = await self._post(f'/mongo/aggregate?page={page_number}&page_size={page_size}',
-                                              dict(aggregation=aggregation), headers=headers)
+
+        sort = _parse_sort_fields(sort_fields, sort_order)
+
+        aggregation_result = await self._post(
+            f'/mongo/aggregate?page={page_number}&page_size={page_size}&sort={sort}',
+            dict(aggregation=aggregation), headers=headers)
 
         if 'X-Pagination' in headers:
             p = json.loads(headers['X-Pagination'])
             pagination.update(**p)
         else:
             logger = logging.getLogger(__name__)
-            logger.warning("Server returned no pagination information. Server version outdated.")
+            logger.debug("Server returned no pagination information. Server version outdated.")
+
+        if 'X-Sort' in headers:
+            p = json.loads(headers['X-Sort'])
+            sorting.update(**p)
+        else:
+            logger = logging.getLogger(__name__)
+            logger.debug("Server returned no sorting information. Server version outdated.")
+
         return aggregation_result
 
-    async def query(self, query, creator_usernames=None,
+    async def get_datasets_by_mongo_query(self, query, creator_usernames=None,
                     base_uris=None, uuids=None, tags=None,
-                    page_number=1, page_size=10, pagination={}):
+                    page_number=1, page_size=10,
+                    sort_fields=["uri"], sort_order=[ASCENDING],
+                    pagination={}, sorting={}):
         """
         Direct mongo query, requires server-side direct mongo plugin.
 
@@ -745,6 +733,13 @@ class TokenBasedLookupClient:
         pagination : dict
             Dictionary filled with data from the X-Pagination response header, e.g.
             '{"total": 124, "total_pages": 13, "first_page": 1, "last_page": 13, "page": 1, "next_page": 2}'
+        sort_fields: str or list of str, optional
+            default is "uri"
+        sort_order: int or list of int of ASCENDING (1) or DESCENDING (-1)
+            default is ASCENDING (1)
+        sorting : dict
+            Dictionary filled with data from the X-Sort response header, e.g.
+            '{"sort": {"uuid": 1}}' for ascending sorting by uuid
 
         Returns
         -------
@@ -756,6 +751,9 @@ class TokenBasedLookupClient:
             query = json.loads(query)
 
         headers = {}
+
+        sort = _parse_sort_fields(sort_fields, sort_order)
+
         post_body = {'query': query}
         if creator_usernames is not None:
             post_body.update({'creator_usernames': creator_usernames})
@@ -767,18 +765,28 @@ class TokenBasedLookupClient:
             post_body.update({'tags': tags})
 
         query_result = await self._post(
-            f'/mongo/query?page={page_number}&page_size={page_size}', post_body, headers=headers)
+            f'/mongo/query?page={page_number}&page_size={page_size}&sort={sort}', post_body, headers=headers)
 
         if 'X-Pagination' in headers:
             p = json.loads(headers['X-Pagination'])
-            pagination.update(p)
+            pagination.update(**p)
         else:
             logger = logging.getLogger(__name__)
-            logger.warning("Server returned no pagination information. Server version outdated.")
+            logger.debug("Server returned no pagination information. Server version outdated.")
+
+        if 'X-Sort' in headers:
+            p = json.loads(headers['X-Sort'])
+            sorting.update(**p)
+        else:
+            logger = logging.getLogger(__name__)
+            logger.debug("Server returned no sorting information. Server version outdated.")
 
         return query_result
 
-    async def graph(self, uuid, dependency_keys=None, page_number=1, page_size=10, pagination={}):
+    async def get_graph_by_uuid(self, uuid, dependency_keys=None,
+                                page_number=1, page_size=10,
+                                sort_fields=["uri"], sort_order=[ASCENDING],
+                                pagination={}, sorting={}):
         """
         Request dependency graph for a specific UUID.
 
@@ -796,6 +804,13 @@ class TokenBasedLookupClient:
         pagination: dict, optional
             Dictionary filled with data from the X-Pagination response header, e.g.
                 '{"total": 124, "total_pages": 13, "first_page": 1, "last_page": 13, "page": 1, "next_page": 2}'
+        sort_fields: str or list of str, optional
+            default is "uri"
+        sort_order: int or list of int of ASCENDING (1) or DESCENDING (-1)
+            default is ASCENDING (1)
+        sorting : dict
+            Dictionary filled with data from the X-Sort response header, e.g.
+            '{"sort": {"uuid": 1}}' for ascending sorting by uuid
 
         Returns
         -------
@@ -805,19 +820,29 @@ class TokenBasedLookupClient:
 
         headers = {}
 
+        sort = _parse_sort_fields(sort_fields, sort_order)
+
         if dependency_keys is None:
             dependency_graph = await self._get(
-                f'/graph/lookup/{uuid}?page={page_number}&page_size={page_size}',
+                f'/graph/uuids/{uuid}?page={page_number}?page={page_number}&page_size={page_size}&sort={sort}',
                 headers=headers)
-
-            if 'X-Pagination' in headers:
-                p = json.loads(headers['X-Pagination'])
-                pagination.update(p)
-            else:
-                logger = logging.getLogger(__name__)
-                logger.warning("Server returned no pagination information. Server version outdated.")
         else:  # TODO: validity check on dependency key list
-            dependency_graph = await self._post(f'/graph/lookup/{uuid}', {"dependency_keys": dependency_keys})
+            dependency_graph = await self._post(f'/graph/uuids/{uuid}?page={page_number}&page_size={page_size}&sort={sort}',
+                                                {"dependency_keys": dependency_keys})
+
+        if 'X-Pagination' in headers:
+            p = json.loads(headers['X-Pagination'])
+            pagination.update(**p)
+        else:
+            logger = logging.getLogger(__name__)
+            logger.debug("Server returned no pagination information. Server version outdated.")
+
+        if 'X-Sort' in headers:
+            p = json.loads(headers['X-Sort'])
+            sorting.update(**p)
+        else:
+            logger = logging.getLogger(__name__)
+            logger.debug("Server returned no sorting information. Server version outdated.")
 
         return dependency_graph
 
@@ -872,7 +897,7 @@ class TokenBasedLookupClient:
             pagination.update(**p)
         else:
             logger = logging.getLogger(__name__)
-            logger.warning("Server returned no pagination information. Server version outdated.")
+            logger.debug("Server returned no pagination information. Server version outdated.")
         return dataset_list
 
     @deprecated(replacement="get_datasets_by_uuid")
@@ -919,10 +944,44 @@ class TokenBasedLookupClient:
                                         page_size=page_size,
                                         pagination=pagination)
 
-    @deprecated(replacement="query")
-    async def by_query(self, query, page_number=1, page_size=10, pagination={}):
+    @deprecated(replacement="get_datasets_by_mongo_aggregation")
+    async def aggregate(self, aggregation,
+                        page_number=1, page_size=10,
+                        sort_fields=["uri"], sort_order=[ASCENDING],
+                        pagination={}, sorting={}):
+        return await self.get_datasets_by_mongo_aggregation(
+            aggregation=aggregation,
+            page_number=page_number, page_size=page_size, pagination=pagination,
+            sort_fields=sort_fields, sort_order=sort_order, sorting=sorting)
+
+    @deprecated(replacement="get_datasets_by_mongo_query")
+    async def by_query(self, query,
+                       creator_usernames=None,
+                       base_uris=None, uuids=None, tags=None,
+                       page_number=1, page_size=10,
+                       sort_fields=["uri"], sort_order=[ASCENDING],
+                       pagination={}, sorting={}):
         """Direct mongo query, requires server-side direct mongo plugin."""
-        return await self.query(query, page_number=page_number, page_size=page_size, pagination=pagination)
+        return await self.get_datasets_by_mongo_query(
+            query=query, creator_usernames=creator_usernames, base_uris=base_uris, uuids=uuids, tags=tags,
+            page_number=page_number, page_size=page_size, pagination=pagination,
+            sort_fields=sort_fields, sort_order=sort_order, sorting=sorting)
+
+    @deprecated(replacement="get_datasets_by_mongo_query")
+    async def query(self, query, creator_usernames=None,
+                    base_uris=None, uuids=None, tags=None,
+                    page_number=1, page_size=10,
+                    sort_fields=["uri"], sort_order=[ASCENDING],
+                    pagination={}, sorting={}):
+        return await self.get_datasets_by_mongo_query(
+            query=query, creator_usernames=creator_usernames, base_uris=base_uris, uuids=uuids, tags=tags,
+            page_number=page_number, page_size=page_size, pagination=pagination,
+            sort_fields=sort_fields, sort_order=sort_order, sorting=sorting)
+
+    @deprecated(replacement="get_graph_by_uuid")
+    async def graph(self, uuid, dependency_keys=None, page_number=1, page_size=10, pagination={}):
+        return await self.get_graph_by_uuid(self, uuid, dependency_keys=dependency_keys,
+                          page_number=page_number, page_size=page_size, pagination=pagination)
 
 
 class CredentialsBasedLookupClient(TokenBasedLookupClient):
