@@ -1,6 +1,12 @@
 CHANGELOG
 =========
 
+0.10.0 (5Nov24)
+---------------
+
+- moved ``authenticate```function into ``CredentialsBasedLookupClient`` as method
+- explicitly depend on and use ``certifi`` certificates
+
 0.9.1 (4Nov24)
 --------------
 
