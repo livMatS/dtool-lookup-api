@@ -15,6 +15,7 @@ dependencies = [
         "asgiref",
         "aiohttp",
         "dtoolcore>=3.9.0",
+        "certifi",
         "PyYAML",
     ]
 

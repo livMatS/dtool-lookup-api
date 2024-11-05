@@ -19,7 +19,7 @@ REMOTE_DSERVER_ADDRESS_AND_CREDENTIALS = {
     "DSERVER_TOKEN_GENERATOR_URL": "https://demo.dtool.dev/token",
     "DSERVER_USERNAME": "testuser",
     "DSERVER_PASSWORD": "test_password",
-    "DSERVER_VERIFY_SSL": False,
+    "DSERVER_VERIFY_SSL": True,
 }
 
 LOCAL_DSERVER_ADDRESS_AND_CREDENTIALS = {

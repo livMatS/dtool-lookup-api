@@ -30,6 +30,8 @@ import logging
 import urllib.parse
 
 import aiohttp
+import certifi
+import ssl
 
 from .config import Config
 
@@ -88,33 +90,23 @@ class LookupServerError(Exception):
     pass
 
 
-async def authenticate(auth_url, username, password, verify_ssl=True):
-    """Authenticate against token generator and return received token."""
-    # async with aiohttp.ClientSession() as session:
-    async with aiohttp.ClientSession() as session, session.post(
-            auth_url,
-            json={
-                'username': username,
-                'password': password
-            }, ssl=verify_ssl) as r:
-        if r.status == 200:
-            json = await r.json()
-            if 'token' not in json:
-                raise RuntimeError('Authentication failed')
-            else:
-                return json['token']
-        else:
-            raise RuntimeError(f'Error {r.status} retrieving data from '
-                               f'authentication server.')
-
-
 class TokenBasedLookupClient:
     """Core Python interface for communication with dserver."""
 
     def __init__(self, lookup_url, token=None, verify_ssl=True):
         logger = logging.getLogger(__name__)
 
-        self.session = aiohttp.ClientSession()
+        self.ssl_context = None
+        # self.ssl_context = aiohttp.ClientSSLContext()
+        if verify_ssl:
+            certifi_where = certifi.where()
+            logger.debug("Use certifi certficates at %s", certifi_where)
+            self.ssl_context = ssl.create_default_context(cafile=certifi_where)
+        else:
+            logger.debug("Do not verify ssl certificates.")
+
+        self.session = aiohttp.ClientSession(connector=aiohttp.TCPConnector(ssl=self.ssl_context))
+
         self.lookup_url = lookup_url
         self.verify_ssl = verify_ssl
         self.token = token
@@ -999,17 +991,31 @@ class CredentialsBasedLookupClient(TokenBasedLookupClient):
         logger.debug("%s initialized with lookup_url=%s, auth_url=%s, username=%s, ssl=%s",
                      type(self).__name__, self.lookup_url, self.auth_url, self.username, self.verify_ssl)
 
+    async def authenticate(self):
+        """Authenticate against token generator and return received token."""
+        async with self.session.post(
+                self.auth_url,
+                json={
+                    'username': self.username,
+                    'password': self.password
+                }, ssl=self.verify_ssl) as r:
+            if r.status == 200:
+                json = await r.json()
+                if 'token' not in json:
+                    raise RuntimeError('Authentication failed')
+                else:
+                    return json['token']
+            else:
+                raise RuntimeError(f'Error {r.status} retrieving data from '
+                                   f'authentication server.')
+
     async def connect(self):
         """Establish connection."""
         logger = logging.getLogger(__name__)
         logger.debug("Connect to lookup_url=%s, auth_url=%s, username=%s, ssl=%s",
                      self.lookup_url, self.auth_url, self.username, self.verify_ssl)
 
-        self.token = await authenticate(
-            auth_url=self.auth_url,
-            username=self.username,
-            password=self.password,
-            verify_ssl=self.verify_ssl)
+        self.token = await self.authenticate()
 
         await super().connect()
 
