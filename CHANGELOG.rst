@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+0.10.1 (8Nov24)
+---------------
+
+- Fix leaking unclosed session issue
+
 0.10.0 (5Nov24)
 ---------------
 

@@ -105,7 +105,8 @@ class TokenBasedLookupClient:
         else:
             logger.debug("Do not verify ssl certificates.")
 
-        self.session = aiohttp.ClientSession(connector=aiohttp.TCPConnector(ssl=self.ssl_context))
+        # self.session = aiohttp.ClientSession(connector=aiohttp.TCPConnector(ssl=self.ssl_context))
+        self.session = None
 
         self.lookup_url = lookup_url
         self.verify_ssl = verify_ssl
@@ -116,14 +117,20 @@ class TokenBasedLookupClient:
 
     async def __aenter__(self):
         logger = logging.getLogger(__name__)
+        # self.session = aiohttp.ClientSession(connector=aiohttp.TCPConnector(ssl=self.ssl_context))
+        await self.create_session()
         await self.connect()
         logger.debug("Connection to %s established.", self.lookup_url)
         return self
 
     async def __aexit__(self, exc_type, exc_value, traceback):
         logger = logging.getLogger(__name__)
-        await self.session.close()
+        await self.close()
         logger.debug("Connection to %s closed.", self.lookup_url)
+
+    async def create_session(self):
+        if self.session is None or self.session.closed:
+            self.session = aiohttp.ClientSession(connector=aiohttp.TCPConnector(ssl=self.ssl_context))
 
     async def connect(self):
         """Establish connection."""
@@ -135,6 +142,11 @@ class TokenBasedLookupClient:
 
         logger.debug("Connect to %s, ssl=%s", self.lookup_url, self.verify_ssl)
 
+    async def close(self):
+        """Close session if open."""
+        if self.session and not self.session.closed:
+            await self.session.close()
+
     @property
     def header(self):
         return {'Authorization': f'Bearer {self.token}'}
@@ -145,6 +157,7 @@ class TokenBasedLookupClient:
 
     async def _get(self, route, headers={}):
         """Return information from a specific route."""
+        await self.create_session()
         async with self.session.get(
                 f'{self.lookup_url}{route}',
                 headers=self.header, ssl=self.verify_ssl) as r:
@@ -170,6 +183,7 @@ class TokenBasedLookupClient:
         -------
         list or dict or str
             parsed json response if parsable, otherwise plain text"""
+        await self.create_session()
         async with self.session.post(
                 f'{self.lookup_url}{route}',
                 headers=self.header,
@@ -200,6 +214,7 @@ class TokenBasedLookupClient:
         -------
         list or dict or str
             parsed json response if parsable, otherwise plain text"""
+        await self.create_session()
         async with self.session.put(
                 f'{self.lookup_url}{route}',
                 headers=self.header,
@@ -228,7 +243,8 @@ class TokenBasedLookupClient:
         -------
         list or dict or str
             parsed json response if parsable, otherwise plain text"""
-        async with self.session.delete(
+        await self.create_session()
+        async with self.session as session, session.delete(
                 f'{self.lookup_url}{route}',
                 headers=self.header,
                 ssl=self.verify_ssl) as r:
@@ -993,7 +1009,8 @@ class CredentialsBasedLookupClient(TokenBasedLookupClient):
 
     async def authenticate(self):
         """Authenticate against token generator and return received token."""
-        async with self.session.post(
+        await self.create_session()
+        async with self.session as session, session.post(
                 self.auth_url,
                 json={
                     'username': self.username,
@@ -1090,7 +1107,8 @@ class ConfigurationBasedLookupClient(CredentialsBasedLookupClient):
             return False
         else:
             logger.debug("Testing token validity via /config/info route.")
-            async with self.session.get(
+            await self.create_session()
+            async with self.session as session, session.get(
                     f'{self.lookup_url}/config/info',
                     headers=self.header,
                     ssl=self.verify_ssl) as r:
