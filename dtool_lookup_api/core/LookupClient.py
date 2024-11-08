@@ -125,8 +125,11 @@ class TokenBasedLookupClient:
 
     async def __aexit__(self, exc_type, exc_value, traceback):
         logger = logging.getLogger(__name__)
+        if exc_type:
+            logger.debug("%s: %s", exc_type, exc_value)
         await self.close()
         logger.debug("Connection to %s closed.", self.lookup_url)
+        return False
 
     async def create_session(self):
         if self.session is None or self.session.closed:
@@ -244,7 +247,7 @@ class TokenBasedLookupClient:
         list or dict or str
             parsed json response if parsable, otherwise plain text"""
         await self.create_session()
-        async with self.session as session, session.delete(
+        async with self.session.delete(
                 f'{self.lookup_url}{route}',
                 headers=self.header,
                 ssl=self.verify_ssl) as r:
@@ -1010,7 +1013,7 @@ class CredentialsBasedLookupClient(TokenBasedLookupClient):
     async def authenticate(self):
         """Authenticate against token generator and return received token."""
         await self.create_session()
-        async with self.session as session, session.post(
+        async with self.session.post(
                 self.auth_url,
                 json={
                     'username': self.username,
@@ -1019,10 +1022,12 @@ class CredentialsBasedLookupClient(TokenBasedLookupClient):
             if r.status == 200:
                 json = await r.json()
                 if 'token' not in json:
+                    await self.close()
                     raise RuntimeError('Authentication failed')
                 else:
                     return json['token']
             else:
+                await self.close()
                 raise RuntimeError(f'Error {r.status} retrieving data from '
                                    f'authentication server.')
 
@@ -1108,7 +1113,7 @@ class ConfigurationBasedLookupClient(CredentialsBasedLookupClient):
         else:
             logger.debug("Testing token validity via /config/info route.")
             await self.create_session()
-            async with self.session as session, session.get(
+            async with self.session.get(
                     f'{self.lookup_url}/config/info',
                     headers=self.header,
                     ssl=self.verify_ssl) as r:
