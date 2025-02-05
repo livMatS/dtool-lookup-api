@@ -1,0 +1,19 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite it as below."
+authors:
+- family-names: Hörmann
+  given-names: Johannes Laurin
+  orcid: 0000-0001-5867-695X
+- familiy-names: Vazhappilly 
+  given-names: Ashwin
+  orcid: 0009-0009-6725-4367
+- family-names: Pastewka
+  given-names: Lars
+  orcid: 0000-0001-8351-7336
+- family-names: Bobby
+  given-names: Evin
+- family-names: Sanner
+  given-names: Antoine
+  orcid: 0000-0002-7019-2103 
+
+title: dtool-lookup-api
