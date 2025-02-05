@@ -1,6 +1,13 @@
 CHANGELOG
 =========
 
+0.10.2 (5Feb25)
+---------------
+
+- fixed register data unit test
+- activated archival on zenodo
+- added CITATION.cff file
+
 0.10.1 (8Nov24)
 ---------------
 
