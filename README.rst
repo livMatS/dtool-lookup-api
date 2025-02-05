@@ -18,10 +18,14 @@ README
     :target: https://github.com/livMatS/dtool-lookup-api/actions/workflows/test.yml
 
 .. |docs| image:: https://readthedocs.org/projects/dtool-lookup-api/badge/?version=latest
-   :target: https://readthedocs.org/projects/dtool-lookup-api?badge=latest
-   :alt: Documentation Status
+    :alt: Documentation Status
+    :target: https://readthedocs.org/projects/dtool-lookup-api?badge=latest
 
-|dtool| |pypi| |tag| |tests| |docs|
+.. |zenodo| image:: https://zenodo.org/badge/311799093.svg
+    :alt: Zenodo Archive
+    :target: https://doi.org/10.5281/zenodo.14811473
+
+|dtool| |pypi| |tag| |tests| |docs| |zenodo|
 
 Python API for interacting with dserver.
 
