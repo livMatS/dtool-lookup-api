@@ -979,10 +979,7 @@ def test_default_register_dataset():
 
     # Test against modified manifest and readme
 
-    updated_manifest = get_manifest(
-        "s3://test-bucket/1a1f9fad-8589-413e-9602-5bbd66bfe675"
-    )
-
+    updated_manifest = EXPECTED_DEFAULT_UPDATED_MANIFEST_RESPONSE
     updated_readme = EXPECTED_DEFAULT_UPDATED_README_RESPONSE
 
     response_modified_mainfest_readme = register_dataset(
