@@ -90,10 +90,10 @@ class LookupServerError(Exception):
     pass
 
 
-class TokenBasedLookupClient:
+class UnauthenticatedLookupClient:
     """Core Python interface for communication with dserver."""
 
-    def __init__(self, lookup_url, token=None, verify_ssl=True):
+    def __init__(self, lookup_url, verify_ssl=True):
         logger = logging.getLogger(__name__)
 
         self.ssl_context = None
@@ -105,12 +105,10 @@ class TokenBasedLookupClient:
         else:
             logger.debug("Do not verify ssl certificates.")
 
-        # self.session = aiohttp.ClientSession(connector=aiohttp.TCPConnector(ssl=self.ssl_context))
         self.session = None
 
         self.lookup_url = lookup_url
         self.verify_ssl = verify_ssl
-        self.token = token
 
         logger.debug("%s initialized with lookup_url=%s, ssl=%s",
                      type(self).__name__, self.lookup_url, self.verify_ssl)
@@ -138,11 +136,6 @@ class TokenBasedLookupClient:
     async def connect(self):
         """Establish connection."""
         logger = logging.getLogger(__name__)
-
-        if self.token is None or self.token == "":
-            raise ValueError(
-                "Provide JWT token.")
-
         logger.debug("Connect to %s, ssl=%s", self.lookup_url, self.verify_ssl)
 
     async def close(self):
@@ -152,7 +145,7 @@ class TokenBasedLookupClient:
 
     @property
     def header(self):
-        return {'Authorization': f'Bearer {self.token}'}
+        return {}
 
     def _check_json(self, json):
         if isinstance(json, dict) and 'msg' in json:
@@ -994,6 +987,35 @@ class TokenBasedLookupClient:
     async def graph(self, uuid, dependency_keys=None, page_number=1, page_size=10, pagination={}):
         return await self.get_graph_by_uuid(self, uuid, dependency_keys=dependency_keys,
                           page_number=page_number, page_size=page_size, pagination=pagination)
+
+
+class TokenBasedLookupClient(UnauthenticatedLookupClient):
+    """Uses token to authenticate against lookup server."""
+
+    def __init__(self, lookup_url, token=None, verify_ssl=True):
+        logger = logging.getLogger(__name__)
+
+        super().__init__(lookup_url=lookup_url, verify_ssl=verify_ssl)
+        self.token = token
+
+    async def connect(self):
+        """Establish connection."""
+        logger = logging.getLogger(__name__)
+
+        if self.token is None or self.token == "":
+            raise ValueError(
+                "Provide JWT token.")
+
+        logger.debug("Connect to %s, ssl=%s", self.lookup_url, self.verify_ssl)
+
+    async def close(self):
+        """Close session if open."""
+        if self.session and not self.session.closed:
+            await self.session.close()
+
+    @property
+    def header(self):
+        return {'Authorization': f'Bearer {self.token}'}
 
 
 class CredentialsBasedLookupClient(TokenBasedLookupClient):
