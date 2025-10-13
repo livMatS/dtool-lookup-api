@@ -1063,9 +1063,8 @@ class CredentialsBasedLookupClient(TokenBasedLookupClient):
 
         await super().connect()
 
-
-class ConfigurationBasedLookupClient(CredentialsBasedLookupClient):
-    """Use configured token if available and valid or reuest new token with credentials if provided."""
+class ConfigurationBasedAuthenticatedLookupClient(CredentialsBasedLookupClient):
+    """Use configured token if available and valid or request new token with credentials if provided."""
 
     # This class is intended on looking up any possibly configured token
     # and reuse that before requesting a new one (if any credentials are provided
@@ -1085,6 +1084,7 @@ class ConfigurationBasedLookupClient(CredentialsBasedLookupClient):
             auth_url = Config.auth_url
         if verify_ssl is None:
             verify_ssl = Config.verify_ssl
+
 
         logger.debug("Initializing %s with lookup_url=%s, auth_url=%s, username=%s, ssl=%s, cache_token=%s",
                      type(self).__name__, lookup_url, auth_url, username, verify_ssl, cache_token)
@@ -1143,6 +1143,49 @@ class ConfigurationBasedLookupClient(CredentialsBasedLookupClient):
                 text = await r.text()
             logger.debug("Server answered with %s: %s.", status_code, yaml.safe_load(text))
             return status_code == 200
+
+
+class ConfigurationBasedLookupClient():
+    """Factory that returns the appropriate LookupClient subclass based on configuration."""
+
+    def __new__(cls,
+                lookup_url=None,
+                auth_url=None,
+                username=None,
+                password=None,
+                verify_ssl=None,
+                disable_authentication=None,
+                cache_token=True):
+        """
+        Decide which LookupClient subclass to instantiate.
+
+        1. Configuration-based authenticated if disable_authentication flag False (default).
+        2. Unauthenticated otherwise.
+        """
+
+        # Resolve configuration if not given explicitly
+        if lookup_url is None:
+            lookup_url = Config.lookup_url
+        if auth_url is None:
+            auth_url = Config.auth_url
+        if verify_ssl is None:
+            verify_ssl = Config.verify_ssl
+        if disable_authentication is None:
+            disable_authentication = Config.disable_authentication
+
+        if disable_authentication is True:
+            return UnauthenticatedLookupClient(lookup_url=lookup_url, verify_ssl=verify_ssl)
+        else:
+            return ConfigurationBasedAuthenticatedLookupClient(lookup_url=lookup_url,
+                                                               auth_url=auth_url,
+                                                               username=username,
+                                                               password=password,
+                                                               verify_ssl=verify_ssl,
+                                                               cache_token=cache_token)
+
+    def __init__(self, *args, **kwargs):
+        # __init__ won’t actually be called for the subclasses (they have their own __init__)
+        pass
 
 
 class LookupClient(CredentialsBasedLookupClient):
