@@ -38,6 +38,7 @@ DSERVER_TOKEN_GENERATOR_URL_KEY = "DSERVER_TOKEN_GENERATOR_URL"
 DSERVER_USERNAME_KEY = "DSERVER_USERNAME"
 DSERVER_PASSWORD_KEY = "DSERVER_PASSWORD"
 DSERVER_VERIFY_SSL_KEY = "DSERVER_VERIFY_SSL"
+DSERVER_DISABLE_AUTHENTICATION_KEY = "DSERVER_DISABLE_AUTHENTICATION"
 
 AFFIRMATIVE_EXPRESSIONS = ['true', '1', 'y', 'yes', 'on']
 NEGATIVE_EXPRESSIONS = ['false', '0', 'n', 'no', 'off']
@@ -144,6 +145,20 @@ class DtoolLookupAPIConfig():
     @verify_ssl.setter
     def verify_ssl(self, value):
         dtoolcore.utils.write_config_value_to_file(DSERVER_VERIFY_SSL_KEY,
+                                                   AFFIRMATIVE_EXPRESSIONS[0] if value else NEGATIVE_EXPRESSIONS[0])
+
+    @property
+    def disable_authentication(self):
+        disable_authentication = dtoolcore.utils.get_config_value(DSERVER_DISABLE_AUTHENTICATION_KEY)
+        if isinstance(disable_authentication, str) and disable_authentication.lower() in NEGATIVE_EXPRESSIONS:
+            disable_authentication = False
+        elif not isinstance(disable_authentication, bool):
+            disable_authentication = True
+        return disable_authentication
+
+    @disable_authentication.setter
+    def disable_authentication(self, value):
+        dtoolcore.utils.write_config_value_to_file(DSERVER_DISABLE_AUTHENTICATION_KEY,
                                                    AFFIRMATIVE_EXPRESSIONS[0] if value else NEGATIVE_EXPRESSIONS[0])
 
 

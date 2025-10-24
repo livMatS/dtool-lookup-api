@@ -26,7 +26,7 @@
 
 import inspect
 
-from .core.LookupClient import ConfigurationBasedLookupClient
+from .core.LookupClient import ConfigurationBasedAuthenticatedLookupClient
 
 
 class _WrapClient:
@@ -36,12 +36,12 @@ class _WrapClient:
         self.__doc__ = self._func.__doc__
 
     async def __call__(self, *args, **kwargs):
-        async with ConfigurationBasedLookupClient() as lookup_client:
+        async with ConfigurationBasedAuthenticatedLookupClient() as lookup_client:
             return await self._func(lookup_client, *args, **kwargs)
 
 
 # Import all methods from ConfigurationBasedLookupClient into the global namespace
-for name, func in inspect.getmembers(ConfigurationBasedLookupClient, predicate=inspect.isfunction):
+for name, func in inspect.getmembers(ConfigurationBasedAuthenticatedLookupClient, predicate=inspect.isfunction):
     # Import everything that does not start with an underscore
     if not name.startswith('_'):
         globals()[name] = _WrapClient(name, func)
