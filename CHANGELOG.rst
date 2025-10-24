@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+0.10.3 (24Oct25)
+----------------
+
+- allows disabling authetication against server by setting ``DSERVER_DISABLE_AUTHENTICATION`` true
+
 0.10.2 (5Feb25)
 ---------------
 
