@@ -149,12 +149,17 @@ class DtoolLookupAPIConfig():
 
     @property
     def disable_authentication(self):
-        return dtoolcore.utils.get_config_value_from_file(
-            DSERVER_DISABLE_AUTHENTICATION_KEY, default=False)
+        disable_authentication = dtoolcore.utils.get_config_value(DSERVER_DISABLE_AUTHENTICATION_KEY)
+        if isinstance(disable_authentication, str) and disable_authentication.lower() in NEGATIVE_EXPRESSIONS:
+            disable_authentication = False
+        elif not isinstance(disable_authentication, bool):
+            disable_authentication = True
+        return disable_authentication
 
-    @token.setter
-    def disable_authentication(self, disable_authentication):
-        dtoolcore.utils.write_config_value_to_file(DSERVER_DISABLE_AUTHENTICATION_KEY, disable_authentication)
+    @disable_authentication.setter
+    def disable_authentication(self, value):
+        dtoolcore.utils.write_config_value_to_file(DSERVER_DISABLE_AUTHENTICATION_KEY,
+                                                   AFFIRMATIVE_EXPRESSIONS[0] if value else NEGATIVE_EXPRESSIONS[0])
 
 
 Config = DtoolLookupAPIConfig()
