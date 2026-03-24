@@ -11,6 +11,7 @@ authors = [
     {name = "Johannes L. Hörmann", email = "johannes.laurin@gmail.com"},
 ]
 dynamic = ["version"]
+requires-python = ">=3.8"
 dependencies = [
         "asgiref",
         "aiohttp",
